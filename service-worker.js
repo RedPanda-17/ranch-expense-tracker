@@ -1,25 +1,41 @@
-# Ranch Expense Tracker v1.1.0 — Accountant Edition
+const CACHE_NAME = "ranch-expense-tracker-v1.1.0-github-verified";
+const APP_SHELL = [
+  "./",
+  "./index.html",
+  "./manifest.webmanifest",
+  "./icons/icon-180.png",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
+];
 
-A local-first expense, mileage, receipt, reimbursement-report, and backup tool.
+self.addEventListener("install", event => {
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
+  self.skipWaiting();
+});
 
-## GitHub Pages deployment
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+    ))
+  );
+  self.clients.claim();
+});
 
-This package is prepared for:
+self.addEventListener("fetch", event => {
+  if (event.request.method !== "GET") return;
 
-`https://redpanda-17.github.io/personal-expense-tracker/`
+  if (event.request.mode === "navigate") {
+    event.respondWith(fetch(event.request).catch(() => caches.match("./index.html")));
+    return;
+  }
 
-The deployment `index.html` is self-contained: its CSS and JavaScript are bundled inside the file. This prevents missing or mismatched `app.js` and `styles.css` files from stopping the site from loading.
-
-Upload all files at the repository root and publish from `main` / `/(root)`. The first line of `index.html` must be `<!DOCTYPE html>`.
-
-## Local data
-
-Expenses, reports, settings, and receipts remain in browser storage for the exact website address. Create a backup before changing hosting providers or clearing browser data.
-
-## Copyright
-
-Copyright © 2026 Saul Garcia. All Rights Reserved. No open-source license is granted. See `COPYRIGHT.md`.
-
-## Release scope
-
-See `CHANGELOG.md` for Version 1.1.0 changes.
+  event.respondWith(
+    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
+      if (!response || response.status !== 200 || response.type === "opaque") return response;
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+      return response;
+    }))
+  );
+});
