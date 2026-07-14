@@ -893,7 +893,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 
-/* Ranch Expense Tracker v1.1.0 — Accountant Edition */
+/* Ranch Expense Tracker v1.2.0 — Feedback Edition */
 .dashboard-primary-action {
   width: 100%;
   margin-top: 16px;
@@ -1026,6 +1026,58 @@ input:focus, select:focus, textarea:focus {
 .site-footer-note {
   margin-top: 4px;
   font-size: 0.76rem;
+}
+
+
+/* Version 1.2.0 — Feedback Edition */
+.feedback-card {
+  text-align: center;
+}
+
+.feedback-inner {
+  width: min(100%, 680px);
+  margin: 0 auto;
+}
+
+.feedback-copy {
+  max-width: 560px;
+  margin: 0 auto 18px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.feedback-field {
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.feedback-actions {
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.feedback-actions button {
+  flex: 0 1 180px;
+}
+
+.feedback-privacy {
+  max-width: 560px;
+  margin: 16px auto 0;
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .feedback-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .feedback-actions button {
+    width: 100%;
+  }
 }
 
   </style>
@@ -1476,11 +1528,33 @@ input:focus, select:focus, textarea:focus {
         </div>
       </details>
 
+
+      <div class="card feedback-card" id="feedbackCard" style="margin-top:18px;">
+        <div class="feedback-inner">
+          <h2>Feedback</h2>
+          <p class="feedback-copy">
+            Share what worked, what was confusing, or what you would change.
+          </p>
+          <div class="field feedback-field">
+            <label for="feedbackEmail">Feedback recipient email</label>
+            <input id="feedbackEmail" type="email" placeholder="Email address that receives feedback" />
+          </div>
+          <div class="button-row feedback-actions">
+            <button class="secondary" onclick="saveSettings()">Save Email</button>
+            <button class="primary" onclick="sendFeedbackEmail()">Send Feedback</button>
+            <button class="secondary" onclick="reportProblemEmail()">Report a Problem</button>
+          </div>
+          <p class="feedback-privacy">
+            Expense details, reports, receipts, and backups are not attached automatically.
+          </p>
+        </div>
+      </div>
+
       <div class="card" style="margin-top:18px;">
         <h2>About</h2>
         <div class="status-grid">
-          <div class="status-card"><div class="label">Version</div><strong>1.1.0</strong></div>
-          <div class="status-card"><div class="label">Release</div><strong>Accountant Edition</strong></div>
+          <div class="status-card"><div class="label">Version</div><strong>1.2.0</strong></div>
+          <div class="status-card"><div class="label">Release</div><strong>Feedback Edition</strong></div>
           <div class="status-card"><div class="label">Storage</div><strong>Local to Device</strong></div>
         </div>
         <div class="notice" style="margin-top:16px;margin-bottom:0;">
@@ -1488,7 +1562,7 @@ input:focus, select:focus, textarea:focus {
         </div>
       </div>
     </section>
-  <div class="app-footer">Ranch Expense Tracker · Version 1.1.0 · Accountant Edition</div>
+  <div class="app-footer">Ranch Expense Tracker · Version 1.2.0 · Feedback Edition</div>
   </main>
 
   
@@ -1517,6 +1591,8 @@ input:focus, select:focus, textarea:focus {
 
   <script>
 
+    const APP_VERSION = "1.2.0";
+    const RELEASE_NAME = "Feedback Edition";
     const EXPENSE_KEY = "workExpenseTool.expenses.v1";
     const REPORT_KEY = "workExpenseTool.reports.v1";
     const SETTINGS_KEY = "workExpenseTool.settings.v1";
@@ -1552,6 +1628,7 @@ input:focus, select:focus, textarea:focus {
         mileageRate: Number(value.mileageRate ?? 0.40),
         reimbursementEmail: value.reimbursementEmail || "",
         backupEmail: value.backupEmail || "",
+        feedbackEmail: value.feedbackEmail || "",
         backupReminderDays: Number(value.backupReminderDays || 7),
         lastBackupAt: value.lastBackupAt || null,
         backupDismissedAt: value.backupDismissedAt || null,
@@ -3865,11 +3942,61 @@ input:focus, select:focus, textarea:focus {
       showView("current");
     }
 
+
+    function openFeedbackEmail(type) {
+      const recipient = String(settings.feedbackEmail || "").trim();
+      if (!recipient) {
+        alert("Add and save a feedback email address first.");
+        document.getElementById("feedbackEmail")?.focus();
+        return;
+      }
+
+      const isProblem = type === "problem";
+      const subject = isProblem
+        ? `Ranch Expense Tracker problem — Version ${APP_VERSION}`
+        : `Ranch Expense Tracker feedback — Version ${APP_VERSION}`;
+
+      const body = isProblem
+        ? [
+            "What were you trying to do?",
+            "",
+            "What happened?",
+            "",
+            "What did you expect to happen?",
+            "",
+            "Can you repeat the problem? If yes, list the steps:",
+            "",
+            `App version: ${APP_VERSION} — ${RELEASE_NAME}`,
+            `Date and time: ${new Date().toLocaleString()}`,
+            `Browser/device: ${navigator.userAgent}`
+          ].join("\n")
+        : [
+            "What worked well?",
+            "",
+            "What was confusing or difficult?",
+            "",
+            "What would you change?",
+            "",
+            `App version: ${APP_VERSION} — ${RELEASE_NAME}`
+          ].join("\n");
+
+      location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    function sendFeedbackEmail() {
+      openFeedbackEmail("feedback");
+    }
+
+    function reportProblemEmail() {
+      openFeedbackEmail("problem");
+    }
+
     function saveSettings() {
       settings.employeeName = document.getElementById("employeeName").value.trim();
       settings.mileageRate = Number(document.getElementById("mileageRate").value || 0.40);
       settings.reimbursementEmail = document.getElementById("reimbursementEmail")?.value.trim() || "";
       settings.backupEmail = document.getElementById("backupEmail")?.value.trim() || "";
+      settings.feedbackEmail = document.getElementById("feedbackEmail")?.value.trim() || "";
       settings.backupReminderDays = Number(document.getElementById("backupReminderDays")?.value || 7);
       settings = normalizeSettings(settings);
       saveAll();
@@ -3896,11 +4023,13 @@ input:focus, select:focus, textarea:focus {
       const mileage = document.getElementById("mileageRate");
       const email = document.getElementById("reimbursementEmail");
       const backupEmail = document.getElementById("backupEmail");
+      const feedbackEmail = document.getElementById("feedbackEmail");
       const reminder = document.getElementById("backupReminderDays");
       if (employee) employee.value = settings.employeeName || "";
       if (mileage) mileage.value = settings.mileageRate ?? 0.40;
       if (email) email.value = settings.reimbursementEmail || "";
       if (backupEmail) backupEmail.value = settings.backupEmail || "";
+      if (feedbackEmail) feedbackEmail.value = settings.feedbackEmail || "";
       if (reminder) reminder.value = String(settings.backupReminderDays || 7);
 
       const status = document.getElementById("backupStatus");
