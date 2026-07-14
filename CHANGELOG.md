@@ -1,28 +1,27 @@
 # Changelog
 
-## 1.1.0 — Accountant Edition
+## 1.2.0 — Feedback Edition
 
-### Report workflow
-- Simplified completed-report actions to **Share PDF**, **Export CSV**, and **Reopen Report**.
-- Removed duplicate PDF/email actions and the separate email-composer panel.
+### New
+- A clean, centered Feedback section in Settings.
+- A saved feedback-recipient email address.
+- Send Feedback with a short, prefilled questionnaire.
+- Report a Problem with basic troubleshooting prompts and app/device information.
 
-### Backups
-- Added **Share Backup** using the native share sheet when supported.
-- Added a saved backup email address used in the share message and desktop fallback instructions.
-- Kept **Save Backup to Files**, **Import Backup**, and full-history CSV export.
+### Removed from the earlier draft
+- Tester labels.
+- Online update checking.
+- Update-status panels.
+- Extra testing metadata and bottom-page clutter.
 
-### Accountant PDF
-- Added an answer-first cover page with employee, department, period, purpose, totals, report checks, category totals, and approval lines.
-- Added a compact expense summary table with protected column lengths to prevent text overflow.
-- Added full expense-detail pages so shortened table text is not lost.
-- Matched receipt pages to the same expense numbers used in the summary.
-- Preserved embedded original receipt files.
+### Privacy
+- Expenses, reports, receipts, and backups are never attached automatically.
+- Expense and receipt data remains stored locally in the browser.
 
-### Interface
-- Reduced the dashboard to four actionable metrics and one prominent **Add Expense** action.
-- Separated required expense information from optional notes.
-- Reorganized Settings into **Profile**, **Data & Backups**, **Saved Defaults**, and **About**.
-
-### Compatibility
-- Preserved the existing local-storage keys and IndexedDB receipt database name.
-- Preserved expense categories, validation, mileage, receipt viewing, report tracking, CSV exports, backup restore, and local-only storage.
+### Preserved
+- Accountant Edition reports and PDFs.
+- Mileage calculations.
+- Receipt storage and viewing.
+- Backup, restore, CSV export, and Share Backup.
+- Existing local-storage and receipt-database identifiers.
+- Copyright © 2026 Saul Garcia. All Rights Reserved.
