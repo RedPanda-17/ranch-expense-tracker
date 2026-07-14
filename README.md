@@ -1,24 +1,44 @@
-# Ranch Expense Tracker v1.1.0 — Accountant Edition
+# Ranch Expense Tracker
 
-A local-first expense, mileage, receipt, reimbursement-report, and backup tool.
+Ranch Expense Tracker is a simple, mobile-friendly tool for recording business expenses, tracking mileage, storing receipt images, and preparing reimbursement reports.
 
-## Deployment
+## Features
 
-Upload the contents of this ZIP to the same Netlify site. The app preserves the existing local-storage keys and IndexedDB receipt database name, so data in the same browser/site origin should remain available.
+* Record business expenses by category
+* Track reimbursable mileage
+* Attach and view receipt images
+* Build expense reports from selected entries
+* Generate accountant-friendly PDF reports
+* Export report data as CSV
+* Share or save complete backups
+* Import a backup onto another device
+* Send feedback or report a problem from within the app
 
-Create or share a complete backup before deployment as a normal precaution.
+## Privacy
 
-## Browser preview
+Expense information, reports, and receipt images are stored locally in the user’s browser. Ranch Expense Tracker does not automatically upload expense data to GitHub or another online service.
 
-`index.html` can be opened for a visual desktop preview. Native sharing, service-worker updates, Add to Home Screen, and installed iPhone behavior require an HTTPS deployment.
+Users should create regular backups, especially before changing devices, clearing browser data, or reinstalling the app.
 
-## Release scope
+## Using the App
 
-See `CHANGELOG.md` for the complete Version 1.1.0 change list.
+1. Add an expense or mileage entry.
+2. Attach a receipt when required.
+3. Review saved expenses in History.
+4. Select the expenses to include in a report.
+5. Generate and share the PDF or export the CSV.
+6. Create a backup regularly and store it somewhere secure.
 
+## Installation
 
-## Version 1.2.0 — Feedback Edition
+Ranch Expense Tracker can be opened in a supported web browser. On compatible mobile devices, it may also be added to the Home Screen for easier access.
 
-This release adds only a clean feedback workflow. It does not include tester labels, online update checking, cloud storage, or synchronization.
+## Current Version
 
-For the safest GitHub Pages update, upload the new `index.html` by itself first.
+**Version 1.2.0 — Feedback Edition**
+
+## Ownership
+
+Copyright © 2026 Saul Garcia. All Rights Reserved.
+
+This software and its source code may not be copied, modified, distributed, republished, or used without the express written permission of the copyright holder.
