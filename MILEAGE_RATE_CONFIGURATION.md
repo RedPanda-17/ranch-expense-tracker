@@ -1,6 +1,6 @@
 # Mileage Rate Configuration
 
-The user cannot edit the mileage rate. Version 1.3.0 is currently set to **$0.40 per mile**.
+The user cannot edit the mileage rate. Version 1.3.1 is currently set to **$0.40 per mile**.
 
 After Accounting confirms a different rate:
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.1 - Release Candidate Fixes - 2026-07-28
+
+### Fixed
+- HTML elements marked as hidden now stay hidden across the setup banner, mileage form, backup reminder, and transfer dialog fields
+- Downloading or successfully sharing a backup now immediately clears the backup reminder and records the backup date
+- Mileage routes in generated PDFs now use plain text instead of displaying an unsupported question-mark character
+
 ## 1.3.0 - Personal Expense Release - 2026-07-28
 
 ### Added

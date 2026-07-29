@@ -1,5 +1,8 @@
 # Version History
 
+## 1.3.1 - Release Candidate Fixes
+Corrected hidden UI elements, backup-reminder completion behavior, and mileage route text in generated PDFs.
+
 ## 1.3.0 - Personal Expense Release
 Current handoff release. Local-first personal tracking, polished interface, fixed mileage rate, direct PDF/CSV downloads and sharing, simplified reimbursement status, profile-preserving history clearing, and updated handoff documentation.
 

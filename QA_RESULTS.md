@@ -1,4 +1,4 @@
-# QA Results - Version 1.3.0
+# QA Results - Version 1.3.1
 
 Automated browser smoke testing was completed against the release source on July 28, 2026.
 
@@ -26,3 +26,11 @@ Automated browser smoke testing was completed against the release source on July
 - Accounting confirms the current company mileage rate.
 - IT tests the approved hosted address on company-supported desktop and mobile browsers.
 - IT confirms security, retention, support ownership, and backup expectations.
+
+
+## Version 1.3.1 regression checks
+
+- Setup banner hides after the employee profile is saved.
+- Merchant and amount fields hide when Mileage is selected.
+- Backup reminder hides immediately after Download Backup and `lastBackupAt` is saved.
+- Mileage route text in the generated PDF no longer contains a replacement question mark.

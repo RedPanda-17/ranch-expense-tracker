@@ -1,6 +1,6 @@
-# Version 1.3.0 - Personal Expense Release
+# Version 1.3.1 - Personal Expense Release
 
-Version 1.3 refocuses Ranch Expense Tracker as a personal, local-first business expense tool that makes PDF and CSV files easy to download or share.
+Version 1.3.1 refocuses Ranch Expense Tracker as a personal, local-first business expense tool that makes PDF and CSV files easy to download or share.
 
 ## Highlights
 
@@ -19,3 +19,10 @@ Version 1.3 refocuses Ranch Expense Tracker as a personal, local-first business 
 ## Current configuration
 
 Mileage reimbursement is configured at **$0.40 per mile pending Accounting confirmation**. Confirm this value before broad regular use.
+
+
+## Version 1.3.1 corrections
+
+- Corrected hidden setup, mileage, and backup-reminder elements.
+- A completed backup now clears the reminder and updates the displayed last-backup date.
+- Corrected mileage route text in generated PDFs.
