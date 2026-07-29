@@ -49,3 +49,8 @@ When releasing changed source files, update the service-worker cache name so exi
 ## PDF and CSV
 
 PDFs include a report cover, compact expense list, detailed expense records, receipt pages, and embedded original receipt attachments when supported. CSV exports use one expense per row and include report metadata, mileage fields, receipt status, notes, and category-specific fields.
+
+
+## Report email workflow
+
+The Email PDF and Email CSV actions create and download the report locally, then open a `mailto:` message addressed to the saved Default report recipient. Browsers do not permit the application to attach the generated local file automatically to a `mailto:` draft. Native Share actions remain available for supported mobile devices and may pass the file directly to the selected app.

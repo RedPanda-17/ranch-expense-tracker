@@ -276,10 +276,22 @@
               <strong id="currentReportTotal">$0.00</strong>
             </div>
             <div class="stacked-actions">
-              <button id="downloadDraftPdfButton" class="primary" type="button" onclick="downloadCurrentReportPdf()">Download PDF</button>
-              <button class="secondary" type="button" onclick="downloadCurrentReportCsv()">Download CSV</button>
-              <button class="secondary" type="button" onclick="shareCurrentReportPdf()">Share PDF</button>
-              <button class="secondary" type="button" onclick="shareCurrentReportCsv()">Share CSV</button>
+              <div class="export-action-group">
+                <div class="export-action-label">PDF report</div>
+                <div class="export-action-buttons">
+                  <button id="downloadDraftPdfButton" class="primary" type="button" onclick="downloadCurrentReportPdf()">Download</button>
+                  <button class="secondary" type="button" onclick="emailCurrentReportPdf()">Email</button>
+                  <button class="secondary" type="button" onclick="shareCurrentReportPdf()">Share</button>
+                </div>
+              </div>
+              <div class="export-action-group">
+                <div class="export-action-label">CSV data</div>
+                <div class="export-action-buttons">
+                  <button class="secondary" type="button" onclick="downloadCurrentReportCsv()">Download</button>
+                  <button class="secondary" type="button" onclick="emailCurrentReportCsv()">Email</button>
+                  <button class="secondary" type="button" onclick="shareCurrentReportCsv()">Share</button>
+                </div>
+              </div>
               <button id="finalizeReportButton" class="success-button" type="button" onclick="finalizeCurrentReport()">Finalize Report</button>
             </div>
             <p class="sidebar-note">Finalizing saves a copy under Past Reports and sets the personal reimbursement status to Submitted.</p>
@@ -326,7 +338,7 @@
         <div>
           <div class="eyebrow">Completed reports</div>
           <h2>Past Reports</h2>
-          <p>Download, share, or personally track whether a report is Submitted, Approved, or Reimbursed.</p>
+          <p>Download, email, share, or personally track whether a report is Submitted, Approved, or Reimbursed.</p>
         </div>
       </div>
       <div id="pastReportsList" class="report-card-list"></div>
@@ -356,7 +368,8 @@
             </div>
             <div class="field full">
               <label for="reimbursementEmail">Default report recipient</label>
-              <input id="reimbursementEmail" type="email" placeholder="Optional accounting or manager email">
+              <input id="reimbursementEmail" type="email" placeholder="Accounting or manager email">
+              <div class="field-help">Used by Email PDF and Email CSV to pre-address the message. The downloaded file must still be attached from the device.</div>
             </div>
           </div>
           <div class="fixed-rate-card">
@@ -478,7 +491,7 @@
             <div class="eyebrow">About</div>
             <h2>Ranch Expense Tracker</h2>
           </div>
-          <span class="version-chip">Version 1.3.1</span>
+          <span class="version-chip">Version 1.3.2</span>
         </div>
         <div class="about-grid">
           <div><span>Release</span><strong>Personal Expense Release</strong></div>
@@ -489,7 +502,7 @@
           <summary>What changed in Version 1.3</summary>
           <ul>
             <li>Cleaner mobile-first interface and report workflow.</li>
-            <li>Direct PDF and CSV downloads plus optional device sharing.</li>
+            <li>PDF and CSV downloads, pre-addressed email preparation, and optional device sharing.</li>
             <li>Past Reports simplified to personal reimbursement status only.</li>
             <li>Clear History preserves the user's name and profile settings.</li>
             <li>Mileage rate is fixed in the app instead of editable.</li>
@@ -536,8 +549,27 @@
     </div>
   </div>
 
+  <div id="reportTransferDialog" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeReportTransferDialog()"></div>
+    <div class="modal-dialog small-dialog" role="dialog" aria-modal="true" aria-labelledby="reportTransferTitle">
+      <div class="modal-header">
+        <div><div class="eyebrow">Report ready</div><h2 id="reportTransferTitle">Attach your downloaded report</h2></div>
+        <button class="icon-button" type="button" onclick="closeReportTransferDialog()" aria-label="Close">×</button>
+      </div>
+      <p>The <strong id="reportTransferFormat"></strong> file was downloaded. Open the prepared email, then attach this file from your Downloads folder.</p>
+      <div class="file-box"><span>File to attach</span><strong id="reportTransferFilename"></strong></div>
+      <div class="file-box"><span>Email recipient</span><strong id="reportTransferRecipient"></strong></div>
+      <div class="button-row">
+        <button class="primary" type="button" onclick="openPreparedReportEmail()">Open Email</button>
+        <button class="secondary" type="button" onclick="downloadPreparedReportAgain()">Download Again</button>
+        <button class="secondary" type="button" onclick="copyReportEmail()">Copy Email</button>
+      </div>
+      <p class="muted small-copy">For phones and tablets, Share PDF or Share CSV may attach the file more directly. Browsers cannot automatically attach a downloaded file to a pre-addressed email.</p>
+    </div>
+  </div>
+
   <footer class="site-footer">
-    <div>Ranch Expense Tracker · Version 1.3.1 · Personal Expense Release</div>
+    <div>Ranch Expense Tracker · Version 1.3.2 · Personal Expense Release</div>
     <div>Prepared for Pizza Ranch internal use and IT evaluation.</div>
   </footer>
 

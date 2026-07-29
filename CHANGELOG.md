@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.3.2 - Final Trial Export Update - 2026-07-28
+
+### Added
+- Email PDF and Email CSV actions for Current Report and Past Reports
+- Pre-addressed email subject and body using the saved Default report recipient
+- Clear attachment instructions and a report-transfer dialog after the file downloads
+- Copy-recipient and download-again actions for prepared report emails
+
+### Changed
+- Current Report export actions are grouped by PDF and CSV for clearer desktop and mobile use
+- Default report recipient now explains exactly how it is used
+- Mobile users can continue using native Share actions for more direct file attachment
+
+# Changelog
+
 ## 1.3.1 - Release Candidate Fixes - 2026-07-28
 
 ### Fixed

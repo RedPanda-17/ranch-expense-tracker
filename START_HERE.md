@@ -1,6 +1,6 @@
-# Ranch Expense Tracker v1.3.1 - Start Here
+# Ranch Expense Tracker v1.3.2 - Start Here
 
-This folder contains the Version 1.3.1 Personal Expense Release prepared for internal Pizza Ranch use and IT evaluation.
+This folder contains the Version 1.3.2 Personal Expense Release prepared for internal Pizza Ranch use and IT evaluation.
 
 ## Before regular use
 
@@ -17,7 +17,7 @@ Confirm the company mileage reimbursement rate with Accounting. This release is 
 
 - `index.html`, `app.css`, `app.js` - application source
 - `manifest.webmanifest`, `service-worker.js`, `app-icon.svg` - installable web-app support
-- `Ranch_Expense_Tracker_v1_3_1_Standalone.html` - single-file review copy
+- `Ranch_Expense_Tracker_v1_3_2_Standalone.html` - single-file review copy
 - `USER_GUIDE.md` - employee instructions
 - `TECHNICAL_HANDOFF.md` - IT architecture and deployment notes
 - `RELEASE_NOTES.md` and `CHANGELOG.md` - Version 1.3 changes

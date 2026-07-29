@@ -17,6 +17,8 @@
 - [ ] Readiness checks identify missing report and expense information.
 - [ ] PDF downloads successfully and receipts are readable.
 - [ ] CSV downloads successfully and opens with one expense per row.
+- [ ] Email PDF and Email CSV use the saved Default report recipient and open a pre-addressed message.
+- [ ] Email actions download the correct file and clearly identify which file to attach.
 - [ ] Share PDF and Share CSV work on supported mobile devices.
 - [ ] Download fallback appears where native sharing is unavailable.
 - [ ] Finalized reports appear in Past Reports.
