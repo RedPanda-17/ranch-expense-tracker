@@ -1,27 +1,27 @@
 # Changelog
 
-## 1.2.0 — Feedback Edition
+## 1.3.0 - Personal Expense Release - 2026-07-28
 
-### New
-- A clean, centered Feedback section in Settings.
-- A saved feedback-recipient email address.
-- Send Feedback with a short, prefilled questionnaire.
-- Report a Problem with basic troubleshooting prompts and app/device information.
+### Added
+- Separate Download PDF, Download CSV, Share PDF, and Share CSV actions
+- Compact report cover with quick expense list
+- Original receipt attachments inside generated PDFs when supported
+- Personal reimbursement status controls on finalized reports
+- Profile-preserving Clear Expense History workflow
+- Fixed-rate mileage display and calculation
+- Installable web-app manifest and offline cache support
+- Single-file standalone review copy
 
-### Removed from the earlier draft
-- Tester labels.
-- Online update checking.
-- Update-status panels.
-- Extra testing metadata and bottom-page clutter.
+### Changed
+- Redesigned navigation, dashboard, forms, report builder, history, Past Reports, and Settings
+- Reduced PDF page count for smaller reports
+- Expanded CSV columns for future accounting use
+- Simplified Past Reports and removed unrelated tracking fields
+- Improved mobile layouts, warnings, and first-use guidance
 
-### Privacy
-- Expenses, reports, receipts, and backups are never attached automatically.
-- Expense and receipt data remains stored locally in the browser.
-
-### Preserved
-- Accountant Edition reports and PDFs.
-- Mileage calculations.
-- Receipt storage and viewing.
-- Backup, restore, CSV export, and Share Backup.
-- Existing local-storage and receipt-database identifiers.
-- Copyright © 2026 Saul Garcia. All Rights Reserved.
+### Fixed
+- Legitimate short merchant names such as Casey's no longer trigger vague-purpose warnings
+- Singular report wording such as `1 expense` and `1 receipt`
+- Backup download and transfer guidance
+- Receipt preview and download handling
+- Data clearing no longer removes the user's saved name or profile

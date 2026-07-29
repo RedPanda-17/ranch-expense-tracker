@@ -1,0 +1,3 @@
+Ranch Expense Tracker v1.3 is provided for Pizza Ranch internal business use and IT evaluation.
+
+Before organization-wide deployment, Pizza Ranch leadership and IT should confirm ownership, support responsibility, security requirements, records retention, approved hosting, and the current mileage reimbursement rate.
