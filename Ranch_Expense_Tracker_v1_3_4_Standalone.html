@@ -1,3 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7a171b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ranch Expenses">
+  <title>Ranch Expense Tracker</title>
+  <style>
+:root {
+  --bg: #f5efe4;
+  --panel: #fffdf8;
+  --panel-alt: #f9f3e9;
+  --text: #2a231e;
+  --muted: #766a60;
+  --border: #dfd1bd;
+  --brand: #a71f25;
+  --brand-dark: #721419;
+  --brand-soft: #fae8e7;
+  --amber: #d39a30;
+  --amber-soft: #fff4dc;
+  --olive: #557044;
+  --olive-soft: #eaf2e4;
+  --danger: #a6191f;
+  --danger-soft: #fff0ef;
+  --warning: #8b5a0a;
+  --warning-soft: #fff8e7;
+  --shadow: 0 14px 34px rgba(74, 50, 30, 0.10);
+  --shadow-soft: 0 8px 22px rgba(74, 50, 30, 0.07);
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(211, 154, 48, 0.16), transparent 34rem),
+    linear-gradient(180deg, #fbf7ef 0%, var(--bg) 100%);
+  color: var(--text);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+button, input, select, textarea { font: inherit; }
+button { border: 0; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 3px solid rgba(167, 31, 37, 0.22);
+  outline-offset: 2px;
+}
+button:disabled { opacity: .45; cursor: not-allowed; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { margin-bottom: 6px; font-size: clamp(1.65rem, 4vw, 2.45rem); line-height: 1.05; }
+h2 { margin-bottom: 8px; font-size: clamp(1.3rem, 2.3vw, 1.75rem); }
+h3 { margin-bottom: 10px; }
+p { line-height: 1.55; }
+small { line-height: 1.35; }
+
+.site-header {
+  color: white;
+  background:
+    linear-gradient(135deg, rgba(23, 20, 17, .95), rgba(76, 30, 25, .96)),
+    linear-gradient(135deg, var(--brand-dark), var(--brand));
+  border-bottom: 4px solid var(--amber);
+  padding: calc(22px + env(safe-area-inset-top)) 20px 24px;
+}
+.header-wrap, .nav-wrap, .app-shell { width: min(1180px, calc(100% - 28px)); margin: 0 auto; }
+.header-wrap { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.brand-lockup { display: flex; align-items: center; gap: 16px; }
+.brand-lockup p { margin-bottom: 0; color: rgba(255,255,255,.78); }
+.brand-mark {
+  display: grid; place-items: center; flex: 0 0 auto; width: 54px; height: 54px;
+  border-radius: 16px; background: var(--brand); border: 2px solid rgba(255,255,255,.18);
+  box-shadow: inset 0 0 0 5px rgba(211,154,48,.18); font-size: 1.6rem; font-weight: 900;
+}
+.eyebrow { color: var(--brand); font-size: .76rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.site-header .eyebrow { color: #f2c46a; }
+.header-badge { padding: 9px 13px; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; background: rgba(255,255,255,.08); white-space: nowrap; font-size: .82rem; font-weight: 800; }
+
+.app-nav { position: sticky; top: 0; z-index: 40; background: rgba(255,253,248,.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); box-shadow: 0 3px 16px rgba(67,43,25,.06); }
+.nav-wrap { display: flex; gap: 5px; overflow-x: auto; padding: 9px 0; scrollbar-width: none; }
+.nav-wrap::-webkit-scrollbar { display: none; }
+.nav-btn { padding: 10px 13px; border-radius: 11px; background: transparent; color: var(--muted); font-weight: 800; white-space: nowrap; cursor: pointer; }
+.nav-btn:hover { background: var(--panel-alt); color: var(--text); }
+.nav-btn.active { background: var(--brand-soft); color: var(--brand-dark); box-shadow: inset 0 0 0 1px rgba(167,31,37,.08); }
+
+.app-shell { padding: 26px 0 72px; }
+.view { display: none; }
+.view.active { display: block; animation: viewIn .18s ease-out; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+.card, .hero-panel, .setup-banner {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-soft);
+}
+.card { padding: 22px; }
+.hero-panel { display: flex; justify-content: space-between; gap: 24px; align-items: center; padding: 28px; margin-bottom: 18px; background: linear-gradient(135deg, rgba(255,253,248,.96), rgba(255,244,220,.88)); position: relative; overflow: hidden; }
+.hero-panel::after { content: ""; position: absolute; width: 210px; height: 210px; border-radius: 50%; border: 28px solid rgba(167,31,37,.06); right: -70px; bottom: -120px; pointer-events: none; }
+.hero-panel p { margin-bottom: 0; color: var(--muted); max-width: 720px; }
+.hero-action { min-width: 180px; position: relative; z-index: 1; }
+.setup-banner, .backup-reminder { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin-bottom: 18px; padding: 21px; }
+.setup-banner { border-left: 5px solid var(--amber); background: var(--amber-soft); }
+.setup-banner p, .backup-reminder p { margin-bottom: 0; }
+.backup-reminder { border-left: 5px solid var(--olive); background: var(--olive-soft); }
+
+.metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+.metric-card { padding: 19px; border: 1px solid var(--border); border-radius: 16px; background: rgba(255,253,248,.9); box-shadow: var(--shadow-soft); overflow: hidden; position: relative; }
+.metric-card::after { content: ""; position: absolute; right: -24px; bottom: -38px; width: 86px; height: 86px; border: 12px solid rgba(211,154,48,.10); border-radius: 50%; }
+.metric-label { color: var(--muted); font-size: .76rem; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+.metric-value { margin-top: 6px; font-size: 1.8rem; font-weight: 900; }
+.metric-note { margin-top: 3px; color: var(--muted); font-size: .83rem; }
+.two-column { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(290px, .65fr); gap: 18px; align-items: start; }
+.section-heading, .page-heading, .readiness-header { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
+.page-heading { margin-bottom: 18px; }
+.page-heading p { color: var(--muted); margin-bottom: 0; max-width: 760px; }
+.section-heading h2, .readiness-header h2 { margin-bottom: 0; }
+.text-button { background: transparent; color: var(--brand); padding: 5px; font-weight: 850; cursor: pointer; }
+.summary-list { margin-top: 16px; display: grid; gap: 8px; }
+.summary-row { display: flex; justify-content: space-between; gap: 14px; padding: 11px 12px; border-radius: 12px; background: var(--panel-alt); }
+.empty-state { padding: 32px 14px; text-align: center; color: var(--muted); border: 1px dashed var(--border); border-radius: 14px; }
+.step-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 14px; }
+.step-list li { display: flex; gap: 12px; align-items: flex-start; }
+.step-list li > span { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 10px; color: white; background: var(--brand); font-weight: 900; flex: 0 0 auto; }
+.step-list strong, .step-list small { display: block; }
+.step-list small { margin-top: 3px; color: var(--muted); }
+
+.primary, .secondary, .danger, .success-button, .text-button, .icon-button { cursor: pointer; transition: transform .12s ease, background .12s ease, box-shadow .12s ease; }
+.primary, .secondary, .danger, .success-button { min-height: 42px; padding: 10px 15px; border-radius: 11px; font-weight: 850; }
+.primary { color: white; background: var(--brand); box-shadow: 0 8px 18px rgba(167,31,37,.18); }
+.primary:hover { background: var(--brand-dark); transform: translateY(-1px); }
+.secondary { color: #463b33; background: #eee5d9; }
+.secondary:hover { background: #e5d8c8; }
+.danger { color: var(--danger); background: var(--danger-soft); border: 1px solid rgba(166,25,31,.15); }
+.danger:hover { background: #ffe2df; }
+.success-button { color: white; background: var(--olive); box-shadow: 0 8px 18px rgba(85,112,68,.18); }
+.success-button:hover { background: #405a33; }
+.large-button { min-height: 48px; padding-inline: 24px; }
+.small-button { min-height: 35px; padding: 7px 10px; font-size: .83rem; }
+.button-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+.compact-row { margin-top: 0; }
+.stacked-actions { display: grid; gap: 9px; margin-top: 16px; }
+.stacked-actions button { width: 100%; }
+.export-action-group { display: grid; gap: 7px; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-alt); }
+.export-action-label { color: var(--muted); font-size: .72rem; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
+.export-action-buttons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+.export-action-buttons button { min-width: 0; padding-inline: 8px; }
+
+.form-card { max-width: 920px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field.full { grid-column: 1 / -1; }
+label { font-size: .9rem; font-weight: 850; }
+.required::after { content: " *"; color: var(--brand); }
+input, select, textarea { width: 100%; border: 1px solid #cdbda8; border-radius: 11px; background: white; color: var(--text); padding: 11px 12px; }
+input:hover, select:hover, textarea:hover { border-color: #b6a28a; }
+textarea { min-height: 92px; resize: vertical; }
+.money-input { display: flex; align-items: center; border: 1px solid #cdbda8; border-radius: 11px; background: white; overflow: hidden; }
+.money-input:focus-within { outline: 3px solid rgba(167,31,37,.14); border-color: var(--brand); }
+.money-input span { padding-left: 12px; color: var(--muted); font-weight: 800; }
+.money-input input { border: 0; outline: none !important; }
+.field-help { color: var(--muted); font-size: .78rem; }
+.form-section-heading { display: flex; gap: 11px; align-items: center; padding-bottom: 13px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+.form-section-heading:not(:first-of-type) { margin-top: 28px; }
+.form-section-heading strong, .form-section-heading small { display: block; }
+.form-section-heading small { color: var(--muted); margin-top: 3px; }
+.section-number { display: grid; place-items: center; width: 31px; height: 31px; border-radius: 10px; color: white; background: var(--brand); font-weight: 900; }
+.dynamic-fields { margin-top: 22px; }
+.dynamic-card { padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel-alt); }
+.dynamic-card h3 { margin-bottom: 14px; }
+.form-footer { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border); }
+.file-status { color: var(--olive); font-size: .84rem; font-weight: 800; min-height: 18px; }
+.error-panel, .warning-panel { padding: 13px 14px; border-radius: 12px; margin-bottom: 18px; line-height: 1.45; }
+.error-panel { color: var(--danger); background: var(--danger-soft); border: 1px solid #eab5b1; }
+.warning-panel { color: var(--warning); background: var(--warning-soft); border: 1px solid #ecd59f; }
+
+.report-layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 18px; align-items: start; }
+.report-main { display: grid; gap: 18px; }
+.sticky-card { position: sticky; top: 78px; }
+.saved-message { color: var(--olive); font-size: .82rem; font-weight: 800; }
+.status-badge { display: inline-flex; align-items: center; min-height: 29px; padding: 6px 10px; border-radius: 999px; font-size: .78rem; font-weight: 900; white-space: nowrap; }
+.status-badge.neutral { color: var(--muted); background: #eee7df; }
+.status-badge.ready { color: #315329; background: var(--olive-soft); }
+.status-badge.warning { color: var(--warning); background: var(--warning-soft); }
+.status-badge.blocked { color: var(--danger); background: var(--danger-soft); }
+.readiness-summary { color: var(--muted); margin-top: 12px; font-size: .9rem; }
+.issue-list { display: grid; gap: 8px; margin-top: 14px; }
+.issue-item { padding: 10px 11px; border-radius: 11px; border-left: 4px solid var(--amber); background: var(--warning-soft); }
+.issue-item.blocking { border-left-color: var(--danger); background: var(--danger-soft); }
+.issue-item strong { display: block; font-size: .86rem; }
+.issue-item span { display: block; margin-top: 2px; color: #5d5148; font-size: .8rem; line-height: 1.35; }
+.issue-item button { margin-top: 7px; padding: 5px 8px; border-radius: 8px; background: white; color: var(--brand); font-size: .76rem; font-weight: 850; cursor: pointer; }
+.report-total-box { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px; padding: 14px; border-radius: 13px; background: var(--amber-soft); border: 1px solid #ebd09c; }
+.report-total-box strong { font-size: 1.4rem; }
+.sidebar-note { margin: 12px 0 0; color: var(--muted); font-size: .76rem; line-height: 1.4; }
+.selection-summary { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 11px 12px; margin: 14px 0; border-radius: 12px; background: var(--panel-alt); font-size: .86rem; }
+.expense-list { display: grid; gap: 11px; }
+.expense-item { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 13px; align-items: start; padding: 15px; border: 1px solid var(--border); border-radius: 14px; background: white; }
+.expense-item.not-selected { opacity: .62; background: #fbf9f5; }
+.expense-check { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--brand); }
+.expense-topline { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; }
+.expense-title { font-weight: 900; }
+.expense-meta { margin-top: 5px; color: var(--muted); font-size: .82rem; }
+.expense-purpose { margin-top: 7px; line-height: 1.4; }
+.expense-details { margin-top: 7px; color: #5d5148; font-size: .8rem; line-height: 1.4; }
+.expense-actions { display: grid; gap: 7px; min-width: 108px; }
+.expense-actions button { min-height: 34px; padding: 6px 9px; font-size: .78rem; }
+.pill { display: inline-flex; padding: 4px 8px; border-radius: 999px; background: #eee7df; color: #5a4e44; font-size: .72rem; font-weight: 850; }
+.pill.ok { color: #315329; background: var(--olive-soft); }
+.pill.warn { color: var(--warning); background: var(--warning-soft); }
+.pill.bad { color: var(--danger); background: var(--danger-soft); }
+.amount { white-space: nowrap; font-weight: 900; }
+
+.filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.report-card-list { display: grid; gap: 15px; }
+.report-card { padding: 20px; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-soft); }
+.report-card-top { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
+.report-card h3 { margin-bottom: 4px; }
+.report-meta { display: flex; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: .82rem; }
+.report-card-total { font-size: 1.55rem; font-weight: 900; white-space: nowrap; }
+.report-purpose { margin: 14px 0 0; color: #564b42; }
+.report-controls { display: grid; grid-template-columns: minmax(180px, .7fr) minmax(0, 1.3fr); gap: 14px; align-items: end; margin-top: 16px; padding-top: 15px; border-top: 1px solid var(--border); }
+.report-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.report-actions button { min-height: 36px; padding: 7px 10px; font-size: .8rem; }
+
+.settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+.fixed-rate-card { display: flex; justify-content: space-between; gap: 14px; align-items: center; margin-top: 18px; padding: 14px; border-radius: 13px; background: var(--amber-soft); border: 1px solid #ecd29d; }
+.fixed-rate-card strong, .fixed-rate-card small { display: block; }
+.fixed-rate-card small { margin-top: 3px; color: var(--muted); }
+.fixed-rate-card span { color: var(--brand-dark); font-size: 1.1rem; font-weight: 900; white-space: nowrap; }
+.data-card, .settings-details, .danger-zone, .about-card { margin-top: 18px; }
+.backup-status { color: var(--muted); font-size: .82rem; }
+.data-action-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-top: 18px; }
+.privacy-note { margin-top: 18px; padding: 13px 14px; border-left: 4px solid var(--brand); background: var(--brand-soft); border-radius: 0 12px 12px 0; color: #5b4440; line-height: 1.45; }
+.settings-details { padding: 0; overflow: hidden; }
+.settings-details > summary { display: flex; justify-content: space-between; gap: 20px; padding: 20px 22px; cursor: pointer; list-style: none; }
+.settings-details > summary::-webkit-details-marker { display: none; }
+.settings-details > summary strong, .settings-details > summary small { display: block; }
+.settings-details > summary small { margin-top: 4px; color: var(--muted); }
+.summary-symbol { color: var(--brand); font-size: 1.35rem; font-weight: 900; }
+.settings-details[open] .summary-symbol { transform: rotate(45deg); }
+.details-body { padding: 20px 22px 22px; border-top: 1px solid var(--border); }
+.reference-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 15px; }
+.subsection { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+.saved-route-list { display: grid; gap: 8px; margin-top: 14px; }
+.saved-route { display: flex; justify-content: space-between; gap: 15px; align-items: center; padding: 10px 11px; border: 1px solid var(--border); border-radius: 11px; background: var(--panel-alt); }
+.saved-route small { display: block; margin-top: 2px; color: var(--muted); }
+.danger-zone { display: flex; justify-content: space-between; gap: 20px; align-items: center; border-color: #e8bbb7; background: #fff9f8; }
+.danger-zone p { margin-bottom: 0; color: #6f5a55; }
+.version-chip { display: inline-flex; padding: 7px 11px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-dark); font-weight: 900; }
+.about-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-top: 17px; }
+.about-grid div { padding: 13px; border-radius: 12px; background: var(--panel-alt); }
+.about-grid span, .about-grid strong { display: block; }
+.about-grid span { color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 850; }
+.about-grid strong { margin-top: 4px; }
+.changelog-details { margin-top: 16px; }
+.changelog-details summary { cursor: pointer; font-weight: 850; color: var(--brand); }
+.changelog-details li { margin-bottom: 6px; line-height: 1.4; }
+
+.toast { position: fixed; z-index: 100; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); max-width: min(520px, calc(100% - 30px)); padding: 11px 15px; border-radius: 12px; color: white; background: #2c2723; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.success { background: var(--olive); }
+.toast.error { background: var(--danger); }
+
+.modal { display: none; position: fixed; inset: 0; z-index: 90; padding: 18px; align-items: center; justify-content: center; }
+.modal.open { display: flex; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(25,20,16,.66); backdrop-filter: blur(3px); }
+.modal-dialog { position: relative; z-index: 1; width: min(920px, 100%); max-height: 92vh; overflow: auto; padding: 22px; border-radius: 18px; background: var(--panel); box-shadow: 0 26px 70px rgba(20,14,10,.35); }
+.small-dialog { width: min(620px, 100%); }
+.modal-header { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 16px; }
+.modal-header p { margin: 0; color: var(--muted); }
+.icon-button { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: #eee6dc; color: var(--text); font-size: 1.35rem; }
+.receipt-viewer-content { display: grid; place-items: center; min-height: 280px; max-height: 62vh; overflow: auto; border: 1px solid var(--border); border-radius: 14px; background: #eee8df; }
+.receipt-viewer-content img { max-width: 100%; height: auto; }
+.receipt-viewer-content iframe { width: 100%; height: 60vh; border: 0; background: white; }
+.file-box { display: grid; gap: 4px; padding: 12px; margin-top: 10px; border-radius: 11px; border: 1px solid var(--border); background: var(--panel-alt); }
+.file-box span { color: var(--muted); font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 850; }
+.muted { color: var(--muted); }
+.small-copy { font-size: .8rem; }
+
+.site-footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 20px max(20px, calc((100% - 1152px)/2)); color: #8a7b70; background: #261f1b; font-size: .77rem; }
+
+@media (max-width: 960px) {
+  .metric-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .two-column, .report-layout { grid-template-columns: 1fr; }
+  .sticky-card { position: static; }
+  .settings-grid { grid-template-columns: 1fr; }
+  .data-action-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 720px) {
+  .header-wrap { align-items: flex-start; }
+  .header-badge { display: none; }
+  .brand-mark { width: 46px; height: 46px; border-radius: 14px; }
+  .app-shell { width: min(100% - 20px, 1180px); padding-top: 17px; }
+  .hero-panel, .setup-banner, .backup-reminder, .danger-zone { align-items: stretch; flex-direction: column; }
+  .hero-action { width: 100%; }
+  .metric-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .metric-card { padding: 15px; }
+  .metric-value { font-size: 1.45rem; }
+  .card { padding: 17px; }
+  .page-heading { flex-direction: column; }
+  .form-grid, .filter-grid, .reference-grid, .about-grid { grid-template-columns: 1fr; }
+  .field.full { grid-column: auto; }
+  .expense-item { grid-template-columns: auto minmax(0,1fr); }
+  .expense-actions { grid-column: 2; display: flex; flex-wrap: wrap; min-width: 0; }
+  .report-card-top, .report-controls { display: block; }
+  .report-card-total { margin-top: 8px; }
+  .report-actions { justify-content: flex-start; margin-top: 12px; }
+  .fixed-rate-card { align-items: flex-start; flex-direction: column; }
+  .data-action-grid { grid-template-columns: 1fr; }
+  .site-footer { display: grid; text-align: center; }
+}
+@media (max-width: 430px) {
+  .metric-grid { grid-template-columns: 1fr; }
+  .brand-lockup { align-items: flex-start; gap: 11px; }
+  .brand-lockup p { font-size: .84rem; }
+  .section-heading, .readiness-header { flex-direction: column; }
+  .expense-item { padding: 12px; }
+  .expense-actions { grid-column: 1 / -1; }
+}
+@media print {
+  .site-header, .app-nav, .site-footer, .toast { display: none !important; }
+  body { background: white; }
+  .app-shell { width: 100%; padding: 0; }
+  .card { box-shadow: none; }
+}
+
+@media (max-width: 380px) {
+  .export-action-buttons { grid-template-columns: 1fr; }
+}
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-wrap">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">R</div>
+        <div>
+          <div class="eyebrow">Personal business expense tracking</div>
+          <h1>Ranch Expense Tracker</h1>
+          <p>Record expenses, protect receipts, and send clean PDF or CSV reports.</p>
+        </div>
+      </div>
+      <div class="header-badge">Local to this device</div>
+    </div>
+  </header>
+
+  <nav class="app-nav" aria-label="Main navigation">
+    <div class="nav-wrap">
+      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="add">Add Expense</button>
+      <button class="nav-btn" data-view="current">Current Report</button>
+      <button class="nav-btn" data-view="history">All Expenses</button>
+      <button class="nav-btn" data-view="past">Past Reports</button>
+      <button class="nav-btn" data-view="settings">Settings</button>
+    </div>
+  </nav>
+
+  <main class="app-shell">
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <section id="dashboard" class="view active">
+      <div id="setupBanner" class="setup-banner" hidden>
+        <div>
+          <div class="eyebrow">One-time setup</div>
+          <h2>Add your name before creating a report</h2>
+          <p>Your profile stays saved when expense history is cleared.</p>
+        </div>
+        <button class="primary" type="button" onclick="showView('settings', { focus: 'employeeName' })">Open Settings</button>
+      </div>
+
+      <div id="backupReminder" class="card backup-reminder" hidden>
+        <div>
+          <div class="eyebrow">Protect your records</div>
+          <h2>It is time to create a backup</h2>
+          <p id="backupReminderText" class="muted"></p>
+        </div>
+        <div class="button-row compact-row">
+          <button class="primary" type="button" onclick="shareBackup()">Share Backup</button>
+          <button class="secondary" type="button" onclick="dismissBackupReminder()">Remind Me Later</button>
+        </div>
+      </div>
+
+      <div class="hero-panel">
+        <div>
+          <div class="eyebrow">Current report</div>
+          <h2 id="dashboardGreeting">Ready when you are</h2>
+          <p id="dashboardReportDescription">Add expenses as they happen, then create a report when you are ready to send it.</p>
+        </div>
+        <button class="primary hero-action" type="button" onclick="showView('add')">+ Add Expense</button>
+      </div>
+
+      <div class="metric-grid">
+        <article class="metric-card">
+          <div class="metric-label">Selected report total</div>
+          <div id="dashTotal" class="metric-value">$0.00</div>
+          <div id="dashSelectedCount" class="metric-note">0 expenses selected</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">Mileage</div>
+          <div id="dashMileage" class="metric-value">$0.00</div>
+          <div id="dashMileageMiles" class="metric-note">0 miles</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">Needs attention</div>
+          <div id="dashAttention" class="metric-value">0</div>
+          <div class="metric-note">Missing details or receipts</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">Awaiting reimbursement</div>
+          <div id="dashOutstanding" class="metric-value">$0.00</div>
+          <div class="metric-note">Submitted or approved reports</div>
+        </article>
+      </div>
+
+      <div class="two-column">
+        <section class="card">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">Breakdown</div>
+              <h2>Current report summary</h2>
+            </div>
+            <button class="text-button" type="button" onclick="showView('current')">Review report →</button>
+          </div>
+          <div id="dashboardSummary" class="summary-list"></div>
+        </section>
+
+        <aside class="card guide-card">
+          <div class="eyebrow">Simple workflow</div>
+          <h2>Track now. Send later.</h2>
+          <ol class="step-list">
+            <li><span>1</span><div><strong>Save each expense</strong><small>Add the receipt and business reason.</small></div></li>
+            <li><span>2</span><div><strong>Review your report</strong><small>Fix anything marked as needing attention.</small></div></li>
+            <li><span>3</span><div><strong>Download or share</strong><small>Send a PDF or CSV using the method that works for you.</small></div></li>
+          </ol>
+        </aside>
+      </div>
+    </section>
+
+    <section id="add" class="view">
+      <div class="page-heading">
+        <div>
+          <div class="eyebrow">Expense entry</div>
+          <h2 id="formTitle">Add Expense</h2>
+          <p>Only the business purpose is checked for clarity. Legitimate merchant names such as Casey's are accepted.</p>
+        </div>
+        <button class="secondary" type="button" onclick="resetExpenseForm()">Start Over</button>
+      </div>
+
+      <form id="expenseForm" class="card form-card" novalidate>
+        <input type="hidden" id="expenseId">
+        <div id="formError" class="error-panel" hidden></div>
+        <div id="formWarning" class="warning-panel" hidden></div>
+
+        <div class="form-section-heading">
+          <span class="section-number">1</span>
+          <div><strong>Basic information</strong><small>Tell us what was purchased and why.</small></div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label class="required" for="date">Expense date</label>
+            <input id="date" type="date" required>
+          </div>
+          <div class="field">
+            <label class="required" for="category">Category</label>
+            <select id="category" required>
+              <option value="">Select a category</option>
+              <option>Auto (Fuel, Rental, Parking, Tolls)</option>
+              <option>Auto (Oil Changes, Tires, Car Wash)</option>
+              <option>Education (Books, Conferences)</option>
+              <option>Meals & Snacks</option>
+              <option>Meetings (PR Employees)</option>
+              <option>Supplies</option>
+              <option>Travel (Hotel, Airfare)</option>
+              <option>Mileage</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div id="merchantField" class="field">
+            <label class="required" for="merchant">Merchant or provider</label>
+            <input id="merchant" type="text" list="savedOrganizationsList" placeholder="Example: Casey's">
+            <small class="field-help">Business names may be short. The business purpose is reviewed separately.</small>
+          </div>
+          <div id="amountField" class="field">
+            <label class="required" for="amount">Amount</label>
+            <div class="money-input"><span>$</span><input id="amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+          </div>
+          <div class="field full">
+            <label class="required" for="purpose">Business purpose</label>
+            <textarea id="purpose" placeholder="Example: Lunch while traveling to the Marion store visit"></textarea>
+            <small class="field-help">Describe the project, store, meeting, travel reason, or other business need.</small>
+          </div>
+        </div>
+
+        <div id="dynamicFields" class="dynamic-fields"></div>
+
+        <div class="form-section-heading">
+          <span class="section-number">2</span>
+          <div><strong>Receipt and notes</strong><small>Mileage does not require a receipt.</small></div>
+        </div>
+        <div class="form-grid">
+          <div id="receiptField" class="field full">
+            <label class="required" for="receipt">Receipt</label>
+            <input id="receipt" type="file" accept="image/*,.pdf,application/pdf">
+            <div id="existingReceipt" class="file-status"></div>
+            <small class="field-help">Images and PDFs stay on this device until you export or back them up.</small>
+          </div>
+          <div class="field full">
+            <label for="notes">Optional notes</label>
+            <textarea id="notes" placeholder="Anything else you may need to remember later"></textarea>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button class="primary large-button" type="submit">Save Expense</button>
+          <button class="secondary" type="button" onclick="resetExpenseForm()">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="current" class="view">
+      <div class="page-heading">
+        <div>
+          <div class="eyebrow">Report builder</div>
+          <h2>Current Report</h2>
+          <p>Select expenses, complete the report details, then download or finalize it.</p>
+        </div>
+        <button class="primary" type="button" onclick="showView('add')">+ Add Expense</button>
+      </div>
+
+      <div class="report-layout">
+        <div class="report-main">
+          <section class="card">
+            <div class="section-heading">
+              <div>
+                <div class="eyebrow">Report details</div>
+                <h2>Name this report</h2>
+              </div>
+              <span id="reportDraftSaved" class="saved-message"></span>
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label class="required" for="reportTitle">Report name</label>
+                <input id="reportTitle" type="text" placeholder="Example: July store visits">
+              </div>
+              <div class="field">
+                <label for="reportDepartment">Department</label>
+                <input id="reportDepartment" type="text" placeholder="Department">
+              </div>
+              <div class="field">
+                <label class="required" for="reportPeriodStart">Period start</label>
+                <input id="reportPeriodStart" type="date">
+              </div>
+              <div class="field">
+                <label class="required" for="reportPeriodEnd">Period end</label>
+                <input id="reportPeriodEnd" type="date">
+              </div>
+              <div class="field full">
+                <label class="required" for="reportPurpose">Overall business purpose</label>
+                <textarea id="reportPurpose" placeholder="Example: Store visits and project work for the Beyond Oil test"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="card report-expenses-card">
+            <div class="section-heading">
+              <div>
+                <div class="eyebrow">Included expenses</div>
+                <h2>Choose what belongs in this report</h2>
+              </div>
+              <div class="button-row compact-row">
+                <button class="secondary small-button" type="button" onclick="selectAllAvailableExpenses()">Select All</button>
+                <button class="secondary small-button" type="button" onclick="clearExpenseSelection()">Clear</button>
+              </div>
+            </div>
+            <div id="selectionSummary" class="selection-summary"></div>
+            <div id="currentExpenseList" class="expense-list"></div>
+          </section>
+        </div>
+
+        <aside class="report-sidebar">
+          <section class="card sticky-card">
+            <div class="readiness-header">
+              <div>
+                <div class="eyebrow">Report check</div>
+                <h2>Ready to send?</h2>
+              </div>
+              <span id="readinessBadge" class="status-badge neutral">Not ready</span>
+            </div>
+            <div id="readinessSummary" class="readiness-summary"></div>
+            <div id="readinessIssues" class="issue-list"></div>
+            <div class="report-total-box">
+              <span>Selected total</span>
+              <strong id="currentReportTotal">$0.00</strong>
+            </div>
+            <div class="stacked-actions">
+              <div class="export-action-group">
+                <div class="export-action-label">PDF report</div>
+                <div class="export-action-buttons">
+                  <button id="downloadDraftPdfButton" class="primary" type="button" onclick="downloadCurrentReportPdf()">Download</button>
+                  <button class="secondary" type="button" onclick="emailCurrentReportPdf()">Email</button>
+                  <button class="secondary" type="button" onclick="shareCurrentReportPdf()">Share</button>
+                </div>
+              </div>
+              <div class="export-action-group">
+                <div class="export-action-label">CSV data</div>
+                <div class="export-action-buttons">
+                  <button class="secondary" type="button" onclick="downloadCurrentReportCsv()">Download</button>
+                  <button class="secondary" type="button" onclick="emailCurrentReportCsv()">Email</button>
+                  <button class="secondary" type="button" onclick="shareCurrentReportCsv()">Share</button>
+                </div>
+              </div>
+              <button id="finalizeReportButton" class="success-button" type="button" onclick="finalizeCurrentReport()">Finalize Report</button>
+            </div>
+            <p class="sidebar-note">Finalizing saves a copy under Past Reports and sets the personal reimbursement status to Submitted.</p>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <section id="history" class="view">
+      <div class="page-heading">
+        <div>
+          <div class="eyebrow">Personal history</div>
+          <h2>All Expenses</h2>
+          <p>Review draft and previously reported expenses stored on this device.</p>
+        </div>
+        <button class="primary" type="button" onclick="showView('add')">+ Add Expense</button>
+      </div>
+
+      <section class="card">
+        <div class="filter-grid">
+          <div class="field">
+            <label for="historySearch">Search</label>
+            <input id="historySearch" type="search" placeholder="Merchant, purpose, location...">
+          </div>
+          <div class="field">
+            <label for="historyCategory">Category</label>
+            <select id="historyCategory"><option value="">All categories</option></select>
+          </div>
+          <div class="field">
+            <label for="historyState">Report state</label>
+            <select id="historyState">
+              <option value="">All expenses</option>
+              <option value="draft">Not reported</option>
+              <option value="reported">In a past report</option>
+            </select>
+          </div>
+        </div>
+        <div id="historyList" class="expense-list"></div>
+      </section>
+    </section>
+
+    <section id="past" class="view">
+      <div class="page-heading">
+        <div>
+          <div class="eyebrow">Completed reports</div>
+          <h2>Past Reports</h2>
+          <p>Download, email, share, or personally track whether a report is Submitted, Approved, or Reimbursed.</p>
+        </div>
+      </div>
+      <div id="pastReportsList" class="report-card-list"></div>
+    </section>
+
+    <section id="settings" class="view">
+      <div class="page-heading">
+        <div>
+          <div class="eyebrow">Your preferences</div>
+          <h2>Settings</h2>
+          <p>Your name and profile settings remain saved when expense history is cleared.</p>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <section class="card">
+          <div class="eyebrow">Profile</div>
+          <h2>Your information</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label class="required" for="employeeName">Your name</label>
+              <input id="employeeName" type="text" placeholder="Your name">
+            </div>
+            <div class="field">
+              <label for="defaultDepartment">Department</label>
+              <input id="defaultDepartment" type="text" placeholder="Department">
+            </div>
+            <div class="field full">
+              <label for="reimbursementEmail">Default report recipient</label>
+              <input id="reimbursementEmail" type="email" placeholder="Accounting or manager email">
+              <div class="field-help">Used by Email PDF and Email CSV to pre-address the message. The downloaded file must still be attached from the device.</div>
+            </div>
+          </div>
+          <div class="fixed-rate-card">
+            <div>
+              <strong>Company mileage rate</strong>
+              <small>This rate is fixed in this release and cannot be changed in Settings.</small>
+            </div>
+            <span id="fixedMileageRateDisplay">$0.40 / mile</span>
+          </div>
+          <div class="button-row">
+            <button class="primary" type="button" onclick="saveSettings()">Save Profile</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="eyebrow">Export defaults</div>
+          <h2>Sending and feedback</h2>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="backupEmail">Backup email</label>
+              <input id="backupEmail" type="email" placeholder="Where you normally send backups">
+            </div>
+            <div class="field full">
+              <label for="feedbackEmail">Feedback recipient</label>
+              <input id="feedbackEmail" type="email" placeholder="Optional support or project contact">
+            </div>
+            <div class="field">
+              <label for="backupReminderDays">Backup reminder</label>
+              <select id="backupReminderDays">
+                <option value="3">Every 3 days</option>
+                <option value="7">Every 7 days</option>
+                <option value="14">Every 14 days</option>
+                <option value="30">Every 30 days</option>
+              </select>
+            </div>
+          </div>
+          <div class="button-row">
+            <button class="primary" type="button" onclick="saveSettings()">Save Preferences</button>
+            <button class="secondary" type="button" onclick="sendFeedbackEmail()">Send Feedback</button>
+            <button class="secondary" type="button" onclick="reportProblemEmail()">Report a Problem</button>
+          </div>
+        </section>
+      </div>
+
+      <section class="card data-card">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Data and backups</div>
+            <h2>Protect or move your records</h2>
+          </div>
+          <div id="backupStatus" class="backup-status"></div>
+        </div>
+        <input id="backupImportInput" type="file" accept=".json,application/json" hidden>
+        <div class="data-action-grid">
+          <button class="primary" type="button" onclick="shareBackup()">Share Backup</button>
+          <button class="secondary" type="button" onclick="exportBackup()">Download Backup</button>
+          <button class="secondary" type="button" onclick="document.getElementById('backupImportInput').click()">Import Backup</button>
+          <button class="secondary" type="button" onclick="exportAllExpensesCSV()">Download Full History CSV</button>
+        </div>
+        <div class="privacy-note">
+          <strong>Local storage reminder:</strong> clearing browser data, deleting the browser profile, or losing the device can remove expenses and receipts. Create backups regularly.
+        </div>
+      </section>
+
+      <details class="card settings-details">
+        <summary>
+          <span><strong>Saved defaults</strong><small>People, organizations, locations, vehicles, and common mileage routes</small></span>
+          <span class="summary-symbol">+</span>
+        </summary>
+        <div class="details-body">
+          <div class="reference-grid">
+            <div class="field">
+              <label for="savedPeopleText">People</label>
+              <textarea id="savedPeopleText" placeholder="One name per line"></textarea>
+            </div>
+            <div class="field">
+              <label for="savedOrganizationsText">Organizations and merchants</label>
+              <textarea id="savedOrganizationsText" placeholder="One organization per line"></textarea>
+            </div>
+            <div class="field">
+              <label for="savedLocationsText">Locations</label>
+              <textarea id="savedLocationsText" placeholder="One location per line"></textarea>
+            </div>
+            <div class="field">
+              <label for="savedVehiclesText">Vehicles</label>
+              <textarea id="savedVehiclesText" placeholder="One vehicle per line"></textarea>
+            </div>
+          </div>
+          <div class="button-row">
+            <button class="primary" type="button" onclick="saveReferenceLists()">Save Defaults</button>
+          </div>
+
+          <div class="subsection">
+            <h3>Saved mileage routes</h3>
+            <div class="form-grid">
+              <div class="field"><label for="routeStart">Starting location</label><input id="routeStart" type="text" list="savedLocationsList"></div>
+              <div class="field"><label for="routeDestination">Destination</label><input id="routeDestination" type="text" list="savedLocationsList"></div>
+              <div class="field"><label for="routeMiles">Total miles</label><input id="routeMiles" type="number" min="0" step="0.1"></div>
+              <div class="field"><label for="routeTripType">Trip type</label><select id="routeTripType"><option>Round trip</option><option>One way</option></select></div>
+            </div>
+            <div class="button-row"><button class="primary" type="button" onclick="addSavedRoute()">Add Route</button></div>
+            <div id="savedRoutesList" class="saved-route-list"></div>
+          </div>
+        </div>
+      </details>
+
+      <section class="card danger-zone">
+        <div>
+          <div class="eyebrow">Clear history</div>
+          <h2>Remove expense records from this device</h2>
+          <p>This removes expenses, reports, drafts, and receipts. Your name, department, emails, backup preferences, and saved defaults remain.</p>
+        </div>
+        <button class="danger" type="button" onclick="clearExpenseHistory()">Clear Expense History</button>
+      </section>
+
+      <section class="card about-card">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">About</div>
+            <h2>Ranch Expense Tracker</h2>
+          </div>
+          <span class="version-chip">Version 1.3.4</span>
+        </div>
+        <div class="about-grid">
+          <div><span>Release</span><strong>Personal Expense Release</strong></div>
+          <div><span>Storage</span><strong>Local to device</strong></div>
+          <div><span>Mileage rate</span><strong id="aboutMileageRate">$0.40 per mile</strong></div>
+        </div>
+        <details class="changelog-details">
+          <summary>What changed in Version 1.3</summary>
+          <ul>
+            <li>Cleaner mobile-first interface and report workflow.</li>
+            <li>PDF and CSV downloads, pre-addressed email preparation, and optional device sharing.</li>
+            <li>Past Reports simplified to personal reimbursement status only.</li>
+            <li>Clear History preserves the user's name and profile settings.</li>
+            <li>Mileage rate is fixed in the app instead of editable.</li>
+            <li>Merchant names are no longer evaluated as vague business purposes.</li>
+            <li>Improved install support and icons across Windows, Android, iPhone, iPad, Chromebook, and Mac.</li>
+          </ul>
+        </details>
+      </section>
+    </section>
+
+    <datalist id="savedPeopleList"></datalist>
+    <datalist id="savedOrganizationsList"></datalist>
+    <datalist id="savedLocationsList"></datalist>
+    <datalist id="savedVehiclesList"></datalist>
+  </main>
+
+  <div id="receiptViewer" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeReceiptViewer()"></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="receiptViewerTitle">
+      <div class="modal-header">
+        <div><div class="eyebrow">Local receipt</div><h2 id="receiptViewerTitle">Receipt</h2><p id="receiptViewerMeta"></p></div>
+        <button class="icon-button" type="button" onclick="closeReceiptViewer()" aria-label="Close">×</button>
+      </div>
+      <div id="receiptViewerContent" class="receipt-viewer-content"></div>
+      <div class="button-row"><button class="primary" type="button" onclick="downloadViewedReceipt()">Download Receipt</button><button class="secondary" type="button" onclick="closeReceiptViewer()">Close</button></div>
+    </div>
+  </div>
+
+  <div id="backupTransferDialog" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeBackupTransferDialog()"></div>
+    <div class="modal-dialog small-dialog" role="dialog" aria-modal="true" aria-labelledby="backupTransferTitle">
+      <div class="modal-header">
+        <div><div class="eyebrow">Backup ready</div><h2 id="backupTransferTitle">Move this backup</h2></div>
+        <button class="icon-button" type="button" onclick="closeBackupTransferDialog()" aria-label="Close">×</button>
+      </div>
+      <p id="backupTransferMessage">Your backup was downloaded. Attach it to an email or save it somewhere secure.</p>
+      <div class="file-box"><span>File</span><strong id="backupTransferFilename"></strong></div>
+      <div id="backupTransferRecipientRow" class="file-box"><span>Suggested recipient</span><strong id="backupTransferRecipient"></strong></div>
+      <div class="button-row">
+        <button class="primary" type="button" onclick="openBackupEmail()">Open Email</button>
+        <button class="secondary" type="button" onclick="downloadPreparedBackupAgain()">Download Again</button>
+        <button class="secondary" type="button" onclick="copyBackupEmail()">Copy Email</button>
+      </div>
+      <p class="muted small-copy">Browsers cannot automatically attach a local file to an email. Attach the downloaded JSON file after the email opens.</p>
+    </div>
+  </div>
+
+  <div id="reportTransferDialog" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeReportTransferDialog()"></div>
+    <div class="modal-dialog small-dialog" role="dialog" aria-modal="true" aria-labelledby="reportTransferTitle">
+      <div class="modal-header">
+        <div><div class="eyebrow">Report ready</div><h2 id="reportTransferTitle">Attach your downloaded report</h2></div>
+        <button class="icon-button" type="button" onclick="closeReportTransferDialog()" aria-label="Close">×</button>
+      </div>
+      <p>The <strong id="reportTransferFormat"></strong> file was downloaded. Open the prepared email, then attach this file from your Downloads folder.</p>
+      <div class="file-box"><span>File to attach</span><strong id="reportTransferFilename"></strong></div>
+      <div class="file-box"><span>Email recipient</span><strong id="reportTransferRecipient"></strong></div>
+      <div class="button-row">
+        <button class="primary" type="button" onclick="openPreparedReportEmail()">Open Email</button>
+        <button class="secondary" type="button" onclick="downloadPreparedReportAgain()">Download Again</button>
+        <button class="secondary" type="button" onclick="copyReportEmail()">Copy Email</button>
+      </div>
+      <p class="muted small-copy">For phones and tablets, Share PDF or Share CSV may attach the file more directly. Browsers cannot automatically attach a downloaded file to a pre-addressed email.</p>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div>Ranch Expense Tracker · Version 1.3.4 · Personal Expense Release</div>
+    <div>Copyright © 2026 Saul Garcia. All Rights Reserved.</div>
+    <div>Licensed for Pizza Ranch internal business use and IT evaluation.</div>
+  </footer>
+
+  <script>
 "use strict";
 
 const APP_VERSION = "1.3.4";
@@ -2028,3 +2929,7 @@ async function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+  </script>
+</body>
+</html>

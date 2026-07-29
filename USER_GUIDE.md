@@ -1,5 +1,11 @@
 # Employee User Guide
 
+## Install the app
+
+Use the hosted HTTPS link provided by Accounting or IT. Follow `Ranch_Expense_Tracker_Web_App_Installation_Guide.pdf` for Windows, Chromebook, Android, iPhone, iPad, or Mac instructions.
+
+Install before entering real expenses whenever possible. Do not use private browsing. Installation does not create an account or sync data to another device.
+
 ## First-time setup
 
 Open **Settings**, enter your name, department, and Default report recipient, and save your profile. The Default report recipient is used by **Email PDF** and **Email CSV** to pre-address the message. Your profile remains saved when you use **Clear Expense History**.
@@ -38,6 +44,12 @@ A finalized report starts at **Submitted**. The personal status can be changed t
 
 Use **Settings > Data & Backups** regularly. A JSON backup includes expenses, reports, settings, drafts, and original receipt files. A successful download or share clears the backup reminder and records the backup date.
 
+Create a backup before uninstalling the app, clearing browser data, switching browsers or profiles, changing devices, or moving to a new hosted link.
+
 ## Clear Expense History
 
 This removes expenses, reports, drafts, and receipts. It preserves the user's name, department, email defaults, saved references, and saved mileage routes.
+
+## Local-data reminder
+
+The installed web app still stores records locally. It is not a cloud account. Use one primary device and browser during the trial, and keep current backups.

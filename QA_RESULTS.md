@@ -1,37 +1,43 @@
-# QA Results - Version 1.3.3
+# QA Results - Version 1.3.4
 
-Version 1.3.3 received targeted code-level regression testing on July 29, 2026. This patch corrects Current Report text-entry behavior and restores the copyright/internal-use notice while retaining the tested v1.3.2 export workflow.
+Version 1.3.4 received static code, package, manifest, icon, and document validation on July 29, 2026. Actual installation behavior remains a required real-device test because the final experience is controlled by the employee's browser, operating system, and company device policies.
 
-## Passed in the Version 1.3.3 regression
+## Passed in the Version 1.3.4 regression
 
 - JavaScript source passes a syntax check.
-- Current Report autosave preserves spaces in report name, department, and overall purpose.
-- A report title entered as `July First Half Report` remains exactly `July First Half Report` instead of becoming `JulyFirstHalfReport`.
-- Required-field validation still trims surrounding whitespace when deciding whether a field is empty.
-- Expense-entry, dynamic category, search, Settings, saved-reference, and route text fields have no space-blocking keyboard handler or input sanitizer.
-- Hosted and standalone files contain the same v1.3.3 input fix.
-- The visible footer contains the Saul Garcia copyright notice and Pizza Ranch internal-use license.
-- The service-worker cache name changed to v1.3.3 so published browsers request the corrected files.
-- The sample backup identifies Version 1.3.3.
-- JavaScript source contains no global key handler that prevents the spacebar in text fields.
+- Hosted and standalone files identify Version 1.3.4.
+- Hosted HTML includes both `mobile-web-app-capable` and `apple-mobile-web-app-capable` metadata.
+- Hosted HTML includes a dedicated 180x180 Apple touch icon.
+- Manifest JSON parses successfully and includes app ID, start URL, scope, standalone display, language, theme/background colors, and PNG/SVG icons.
+- PNG icons exist at the declared 180x180, 192x192, and 512x512 dimensions.
+- Service worker uses a Version 1.3.4 cache name and pre-caches all required application and icon files.
+- Version metadata and sample backup identify Version 1.3.4.
+- Installation guide includes Windows Edge, desktop Chrome, Chromebook, Android, iPhone, iPad, Mac Safari, and iOS/iPadOS Chrome instructions.
+- Installation guide DOCX and PDF render cleanly across four pages with no clipped text or layout overlap.
+- Current Report spacing fix and prior PDF/CSV, backup, receipt, validation, and local-storage code paths remain unchanged from Version 1.3.3.
 
-## Previously tested workflows retained from v1.3.1-v1.3.2
+## Previously passed and unchanged
 
-- Casey's merchant entry is accepted when the business purpose is specific.
-- Fixed mileage calculations use $0.40 per mile pending Accounting confirmation.
-- PDF and CSV Download, Email, and Share actions are present for current and past reports.
-- The saved Default report recipient powers the Email PDF and Email CSV preparation workflow.
-- A completed backup records `lastBackupAt` and hides the backup reminder.
-- Clear Expense History preserves the employee profile.
-- Past Report status options are Submitted, Approved, and Reimbursed.
+- Casey's meal entry validation
+- Fixed mileage calculations at the configured $0.40 rate
+- Receipt upload and IndexedDB storage
+- PDF and CSV generation
+- Submitted, Approved, and Reimbursed report statuses
+- Profile-preserving Clear Expense History
+- Backup creation, reminder clearing, and restore logic
+- Desktop and mobile responsive layout smoke testing
 
 ## Required before employee onboarding
 
 - Accounting confirms the current company mileage rate.
-- Saul stress-tests the published GitHub Pages build in the company-supported desktop browser.
-- Test receipt upload, PDF/CSV download, native sharing, prepared email, backup, and restore on the actual employee devices selected for the trial.
-- Accounting reviews and approves a real sample PDF and CSV.
+- Publish the complete Version 1.3.4 folder to GitHub Pages.
+- Test installation from the published address on the company-supported Windows browser.
+- Test iPhone Safari and, when applicable, Android Chrome installation.
+- Confirm the installed app reopens, retains a test expense and receipt, and reports Version 1.3.4.
+- Test backup download/restore and PDF/CSV download/share on each device category used by the first employee group.
+- Confirm Outlook or the device email/share application behaves acceptably.
+- Accounting reviews and approves the sample PDF and CSV.
 
 ## Required before organization-wide release
 
-- IT confirms the approved hosting address, security expectations, retention requirements, support ownership, and backup expectations.
+- IT confirms approved hosting, security expectations, retention requirements, support ownership, browser/device policy, and the long-term cloud or multi-account plan.
