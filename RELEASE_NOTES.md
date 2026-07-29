@@ -1,27 +1,19 @@
-# Version 1.3.2 - Personal Expense Release
+# Ranch Expense Tracker v1.3.3 — Final Pre-Trial Release
 
-Version 1.3.2 is the final pre-trial update prepared for controlled employee testing.
+## Release purpose
 
-## Highlights
+This build is prepared for Saul's stress testing and a controlled employee trial coordinated with Pizza Ranch Accounting. It remains a local-first personal business expense tracker.
 
-- Redesigned and polished desktop and mobile interface
-- PDF and CSV actions for Download, Email, and Share
-- Email actions use the saved Default report recipient to pre-address the message
-- Email subject and body include the employee, report period, report total, and filename
-- Native Share remains available for phones and tablets that can pass the file directly to Outlook, Mail, Teams, or another app
-- More compact, professional PDF report with original receipt files
-- Standardized accounting-friendly CSV format
-- Past Reports simplified to reimbursement status: Submitted, Approved, or Reimbursed
-- Clear Expense History preserves the user's profile and saved defaults
-- Mileage rate fixed at the release level rather than adjustable by employees
-- Merchant validation separated from business-purpose validation, resolving the Casey's warning issue
-- Backup download immediately clears the backup reminder and records the backup date
-- Prior Version 1.x browser data keys retained for compatibility
+## Changes in v1.3.3
 
-## Email limitation
+- Fixed Current Report text fields removing spaces while typing.
+- Verified normal spaces remain available in report names, departments, purposes, merchants, locations, attendees, notes, settings, and reference-data fields.
+- Restored the visible copyright and internal-use license notice.
+- Retained the PDF/CSV Download, Email, and Share workflows introduced in v1.3.2.
+- Retained the backup-reminder, field-visibility, Casey's validation, and PDF route fixes from v1.3.1.
 
-A browser can pre-address an email or pass a file to the device share menu, but it cannot reliably do both at once. Email PDF and Email CSV therefore download the file and open a pre-addressed message with attachment instructions. Share PDF and Share CSV are usually the smoother option on mobile devices.
+## Release gates
 
-## Current configuration
-
-Mileage reimbursement is configured at **$0.40 per mile pending Accounting confirmation**. Confirm this value before onboarding employees who will submit mileage.
+- Confirm the official fixed mileage reimbursement rate with Accounting.
+- Test the published GitHub Pages address in the browsers and mobile devices employees will use.
+- Have Accounting approve a real sample PDF and CSV before expanding the trial.

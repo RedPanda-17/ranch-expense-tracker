@@ -1,6 +1,13 @@
 # Changelog
 
-## 1.3.2 - Final Trial Export Update - 2026-07-28
+## v1.3.3 — Final Pre-Trial Release
+
+- Fixed autosave trimming spaces from Current Report text fields.
+- Added raw-value handling during report entry while preserving trimmed validation/export behavior.
+- Restored copyright and Pizza Ranch internal-use notice.
+- Added regression coverage for spaces in application text fields.
+
+## 1.3.3 - Final Trial Export Update - 2026-07-28
 
 ### Added
 - Email PDF and Email CSV actions for Current Report and Past Reports

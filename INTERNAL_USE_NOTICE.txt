@@ -1,3 +1,5 @@
-Ranch Expense Tracker v1.3 is provided for Pizza Ranch internal business use and IT evaluation.
+Copyright © 2026 Saul Garcia. All Rights Reserved.
 
-Before organization-wide deployment, Pizza Ranch leadership and IT should confirm ownership, support responsibility, security requirements, records retention, approved hosting, and the current mileage reimbursement rate.
+Ranch Expense Tracker v1.3.3 is licensed for Pizza Ranch internal business use and IT evaluation.
+
+This release is intended for controlled employee testing while Pizza Ranch Accounting and IT evaluate future use, integration, support, security, and ownership decisions. Confirm the official mileage reimbursement rate before onboarding employees who submit mileage.

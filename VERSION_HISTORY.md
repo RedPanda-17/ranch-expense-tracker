@@ -1,6 +1,10 @@
 # Version History
 
-## 1.3.2 - Final Trial Export Update
+## 1.3.3 — Final Pre-Trial Release
+
+Corrected text-entry autosave so spaces remain intact throughout Current Report fields, restored the copyright notice, and completed pre-trial regression testing.
+
+## 1.3.3 - Final Trial Export Update
 Added working Email PDF and Email CSV actions that use the Default report recipient, prefill report details, and guide the user to attach the downloaded file. Retained native Share actions for mobile use.
 
 ## 1.3.1 - Release Candidate Fixes

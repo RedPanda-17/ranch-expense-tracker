@@ -37,3 +37,11 @@
 - [ ] Current Android Chrome, when applicable
 - [ ] Installed Home Screen experience
 - [ ] Offline reopening after first hosted load
+
+## Text-entry regression
+
+- [ ] Report name accepts spaces between words without removing them.
+- [ ] Report department accepts spaces.
+- [ ] Overall report purpose accepts spaces and punctuation.
+- [ ] Merchant, business purpose, notes, dynamic detail fields, Settings, and saved reference lists accept spaces.
+- [ ] Autosave does not move the cursor or rewrite the active field while typing.
