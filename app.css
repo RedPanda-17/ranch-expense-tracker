@@ -134,8 +134,8 @@ small { line-height: 1.35; }
 .stacked-actions button { width: 100%; }
 .export-action-group { display: grid; gap: 7px; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-alt); }
 .export-action-label { color: var(--muted); font-size: .72rem; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
-.export-action-buttons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
-.export-action-buttons button { min-width: 0; padding-inline: 8px; }
+.export-action-buttons { display: grid; grid-template-columns: minmax(92px, 1.18fr) repeat(2, minmax(0, 1fr)); gap: 7px; }
+.export-action-buttons button { min-width: 0; padding-inline: 6px; font-size: .8rem; white-space: nowrap; }
 
 .form-card { max-width: 920px; }
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
@@ -384,7 +384,7 @@ textarea { min-height: 92px; resize: vertical; }
   .card { box-shadow: none; }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 340px) {
   .export-action-buttons { grid-template-columns: 1fr; }
 }
 

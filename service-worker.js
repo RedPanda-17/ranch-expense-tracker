@@ -1,4 +1,4 @@
-const CACHE_NAME = "ranch-expense-tracker-v1.4.0";
+const CACHE_NAME = "ranch-expense-tracker-v1.4.0-ui-1";
 const ASSETS = ["./", "./index.html", "./app.css", "./app.js", "./manifest.webmanifest", "./app-icon.svg", "./app-icon-180.png", "./app-icon-192.png", "./app-icon-512.png", "./version.json"];
 
 self.addEventListener("install", event => {
