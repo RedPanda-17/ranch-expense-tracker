@@ -8,10 +8,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ranch Expenses">
-  <title>Ranch Expense Tracker</title>
+  <title>Ranch Expense Tracker - Version 1.4.0</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" sizes="180x180" href="app-icon-180.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="app-icon-192.png">
+  <link rel="icon" href="app-icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="app-icon-180.png">
   <link rel="stylesheet" href="app.css">
 </head>
 <body>
@@ -22,10 +22,10 @@
         <div>
           <div class="eyebrow">Personal business expense tracking</div>
           <h1>Ranch Expense Tracker</h1>
-          <p>Record expenses, protect receipts, and send clean PDF or CSV reports.</p>
+          <p>Record business expenses and mileage, organize reports, and export clear PDF and CSV files.</p>
         </div>
       </div>
-      <div class="header-badge">Local to this device</div>
+      <div class="header-badge">Version 1.4.0</div>
     </div>
   </header>
 
@@ -93,7 +93,7 @@
         <article class="metric-card">
           <div class="metric-label">Awaiting reimbursement</div>
           <div id="dashOutstanding" class="metric-value">$0.00</div>
-          <div class="metric-note">Submitted or approved reports</div>
+          <div class="metric-note">Submitted reports not yet marked reimbursed</div>
         </article>
       </div>
 
@@ -113,7 +113,7 @@
           <div class="eyebrow">Simple workflow</div>
           <h2>Track now. Send later.</h2>
           <ol class="step-list">
-            <li><span>1</span><div><strong>Save each expense</strong><small>Add the receipt and business reason.</small></div></li>
+            <li><span>1</span><div><strong>Save each expense</strong><small>Add the receipt and basic details.</small></div></li>
             <li><span>2</span><div><strong>Review your report</strong><small>Fix anything marked as needing attention.</small></div></li>
             <li><span>3</span><div><strong>Download or share</strong><small>Send a PDF or CSV using the method that works for you.</small></div></li>
           </ol>
@@ -122,82 +122,99 @@
     </section>
 
     <section id="add" class="view">
-      <div class="page-heading">
+      <div class="page-heading quick-page-heading">
         <div>
-          <div class="eyebrow">Expense entry</div>
+          <div class="eyebrow">Quick expense entry</div>
           <h2 id="formTitle">Add Expense</h2>
-          <p>Only the business purpose is checked for clarity. Legitimate merchant names such as Casey's are accepted.</p>
+          <p>Capture the basics first. Any relevant follow-up fields appear automatically after you choose a subcategory.</p>
         </div>
         <button class="secondary" type="button" onclick="resetExpenseForm()">Start Over</button>
       </div>
 
-      <form id="expenseForm" class="card form-card" novalidate>
+      <form id="expenseForm" class="card form-card quick-expense-card" novalidate>
         <input type="hidden" id="expenseId">
         <div id="formError" class="error-panel" hidden></div>
         <div id="formWarning" class="warning-panel" hidden></div>
 
-        <div class="form-section-heading">
-          <span class="section-number">1</span>
-          <div><strong>Basic information</strong><small>Tell us what was purchased and why.</small></div>
+        <div id="receiptField" class="quick-receipt-card">
+          <div>
+            <strong id="documentTitle">Add receipt</strong>
+            <small id="documentHelp">Take a photo or choose an image/PDF. You can also attach it later before finalizing the report.</small>
+          </div>
+          <label id="documentPickerLabel" class="receipt-picker" for="receipt">Choose receipt</label>
+          <input id="receipt" class="visually-hidden-file" type="file" accept="image/*,.pdf,application/pdf">
+          <div id="existingReceipt" class="file-status"></div>
         </div>
 
-        <div class="form-grid">
-          <div class="field">
-            <label class="required" for="date">Expense date</label>
-            <input id="date" type="date" required>
+        <div class="form-grid quick-entry-grid">
+          <div id="amountField" class="field">
+            <label class="required" for="amount">Amount</label>
+            <div class="money-input"><span>$</span><input id="amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+          </div>
+          <div id="merchantField" class="field">
+            <label class="required" for="merchant">Merchant</label>
+            <div class="saved-picker" data-saved-picker data-kind="organizations" data-input-id="merchant">
+              <div class="saved-picker-control">
+                <input id="merchant" type="text" placeholder="Select or add a merchant" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="merchantSavedMenu">
+                <button class="saved-picker-toggle" type="button" aria-label="Show saved merchants">⌄</button>
+              </div>
+              <div id="merchantSavedMenu" class="saved-picker-menu" hidden></div>
+            </div>
+          </div>
+          <div id="descriptionField" class="field full">
+            <label id="descriptionLabel" for="purpose">Description <span class="optional-label">Optional</span></label>
+            <textarea id="purpose" placeholder="Add a description when it will help explain the expense"></textarea>
+            <small id="descriptionHelp" class="field-help">Required for Education, Supplies, Other, and any subcategory beginning with Other.</small>
           </div>
           <div class="field">
             <label class="required" for="category">Category</label>
             <select id="category" required>
               <option value="">Select a category</option>
-              <option>Auto (Fuel, Rental, Parking, Tolls)</option>
-              <option>Auto (Oil Changes, Tires, Car Wash)</option>
-              <option>Education (Books, Conferences)</option>
-              <option>Meals & Snacks</option>
+              <option>Auto</option>
+              <option>Education</option>
+              <option>Meals &amp; Snacks</option>
               <option>Meetings (PR Employees)</option>
               <option>Supplies</option>
-              <option>Travel (Hotel, Airfare)</option>
+              <option>Travel</option>
               <option>Mileage</option>
               <option>Other</option>
             </select>
           </div>
-          <div id="merchantField" class="field">
-            <label class="required" for="merchant">Merchant or provider</label>
-            <input id="merchant" type="text" list="savedOrganizationsList" placeholder="Example: Casey's">
-            <small class="field-help">Business names may be short. The business purpose is reviewed separately.</small>
+          <div id="subcategoryField" class="field">
+            <label for="subcategory">Subcategory <span class="optional-label">Optional</span></label>
+            <select id="subcategory" disabled><option value="">Choose a category first</option></select>
           </div>
-          <div id="amountField" class="field">
-            <label class="required" for="amount">Amount</label>
-            <div class="money-input"><span>$</span><input id="amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+          <div class="field">
+            <label for="expenseTag">Project or trip tag <span class="optional-label">Optional</span></label>
+            <div class="saved-picker" data-saved-picker data-kind="tags" data-input-id="expenseTag">
+              <div class="saved-picker-control">
+                <input id="expenseTag" type="text" placeholder="Select or add a project or trip tag" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="expenseTagSavedMenu">
+                <button class="saved-picker-toggle" type="button" aria-label="Show saved tags">⌄</button>
+              </div>
+              <div id="expenseTagSavedMenu" class="saved-picker-menu" hidden></div>
+            </div>
+            <small class="field-help">Use a tag when it will help group or find related expenses later.</small>
           </div>
-          <div class="field full">
-            <label class="required" for="purpose">Business purpose</label>
-            <textarea id="purpose" placeholder="Example: Lunch while traveling to the Marion store visit"></textarea>
-            <small class="field-help">Describe the project, store, meeting, travel reason, or other business need.</small>
+          <div class="field date-field-compact">
+            <label class="required" for="date">Expense date</label>
+            <input id="date" type="date" required>
           </div>
         </div>
 
         <div id="dynamicFields" class="dynamic-fields"></div>
 
-        <div class="form-section-heading">
-          <span class="section-number">2</span>
-          <div><strong>Receipt and notes</strong><small>Mileage does not require a receipt.</small></div>
-        </div>
-        <div class="form-grid">
-          <div id="receiptField" class="field full">
-            <label class="required" for="receipt">Receipt</label>
-            <input id="receipt" type="file" accept="image/*,.pdf,application/pdf">
-            <div id="existingReceipt" class="file-status"></div>
-            <small class="field-help">Images and PDFs stay on this device until you export or back them up.</small>
+        <details class="optional-expense-details general-notes-details">
+          <summary>Add a note <span>Optional</span></summary>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="notes">Notes</label>
+              <textarea id="notes" placeholder="Anything else you may need to remember later"></textarea>
+            </div>
           </div>
-          <div class="field full">
-            <label for="notes">Optional notes</label>
-            <textarea id="notes" placeholder="Anything else you may need to remember later"></textarea>
-          </div>
-        </div>
+        </details>
 
-        <div class="form-footer">
-          <button class="primary large-button" type="submit">Save Expense</button>
+        <div class="form-footer quick-form-footer">
+          <button id="saveExpenseButton" class="primary large-button" type="submit">Create expense</button>
           <button class="secondary" type="button" onclick="resetExpenseForm()">Cancel</button>
         </div>
       </form>
@@ -224,9 +241,34 @@
               <span id="reportDraftSaved" class="saved-message"></span>
             </div>
             <div class="form-grid">
-              <div class="field">
+              <div class="field full report-name-field">
                 <label class="required" for="reportTitle">Report name</label>
-                <input id="reportTitle" type="text" placeholder="Example: July store visits">
+                <div class="report-name-control">
+                  <input id="reportTitle" type="text" placeholder="Enter a report name">
+                  <button class="secondary" type="button" onclick="togglePayPeriodPanel()">Choose Pay Period</button>
+                </div>
+                <small class="field-help">Choose a pay period to fill the name and dates, or enter your own report name.</small>
+                <div id="payPeriodPanel" class="pay-period-panel" hidden>
+                  <div class="pay-period-quick-grid">
+                    <button id="currentPayPeriodButton" class="pay-period-choice" type="button" onclick="applyQuickPayPeriod('current')"></button>
+                    <button id="previousPayPeriodButton" class="pay-period-choice" type="button" onclick="applyQuickPayPeriod('previous')"></button>
+                  </div>
+                  <div class="pay-period-custom-grid">
+                    <div class="field">
+                      <label for="payPeriodMonth">Choose another month</label>
+                      <input id="payPeriodMonth" type="month">
+                    </div>
+                    <div class="field">
+                      <label for="payPeriodHalf">Pay period</label>
+                      <select id="payPeriodHalf">
+                        <option value="first">1st–15th</option>
+                        <option value="second">16th–end of month</option>
+                      </select>
+                    </div>
+                    <button class="primary pay-period-apply" type="button" onclick="applyCustomPayPeriod()">Use This Period</button>
+                  </div>
+                  <p class="muted small-copy">This fills the suggested report name, start date, and end date. You can still override the report name afterward.</p>
+                </div>
               </div>
               <div class="field">
                 <label for="reportDepartment">Department</label>
@@ -241,8 +283,9 @@
                 <input id="reportPeriodEnd" type="date">
               </div>
               <div class="field full">
-                <label class="required" for="reportPurpose">Overall business purpose</label>
-                <textarea id="reportPurpose" placeholder="Example: Store visits and project work for the Beyond Oil test"></textarea>
+                <label for="reportPurpose">Report note <span class="muted">(optional)</span></label>
+                <textarea id="reportPurpose" placeholder="Add a note about the report, trip, or project if helpful"></textarea>
+                <p class="muted small-copy">Use this only when one note helps explain the report as a whole. Expense descriptions are required for Education, Supplies, Other, and broad Other subcategories.</p>
               </div>
             </div>
           </section>
@@ -254,9 +297,15 @@
                 <h2>Choose what belongs in this report</h2>
               </div>
               <div class="button-row compact-row">
+                <button class="secondary small-button" type="button" onclick="selectFilteredExpenses()">Select Filtered</button>
                 <button class="secondary small-button" type="button" onclick="selectAllAvailableExpenses()">Select All</button>
                 <button class="secondary small-button" type="button" onclick="clearExpenseSelection()">Clear</button>
               </div>
+            </div>
+            <div class="report-filter-grid">
+              <div class="field"><label for="reportExpenseSearch">Search expenses</label><input id="reportExpenseSearch" type="search" placeholder="Merchant, description, location, or tag"></div>
+              <div class="field"><label for="reportTagFilter">Project or trip tag</label><select id="reportTagFilter"><option value="">All tags</option></select></div>
+              <div class="field"><label for="reportCategoryFilter">Category</label><select id="reportCategoryFilter"><option value="">All categories</option></select></div>
             </div>
             <div id="selectionSummary" class="selection-summary"></div>
             <div id="currentExpenseList" class="expense-list"></div>
@@ -317,11 +366,15 @@
         <div class="filter-grid">
           <div class="field">
             <label for="historySearch">Search</label>
-            <input id="historySearch" type="search" placeholder="Merchant, purpose, location...">
+            <input id="historySearch" type="search" placeholder="Merchant, description, location, or tag...">
           </div>
           <div class="field">
             <label for="historyCategory">Category</label>
             <select id="historyCategory"><option value="">All categories</option></select>
+          </div>
+          <div class="field">
+            <label for="historyTag">Project or trip tag</label>
+            <select id="historyTag"><option value="">All tags</option></select>
           </div>
           <div class="field">
             <label for="historyState">Report state</label>
@@ -341,7 +394,7 @@
         <div>
           <div class="eyebrow">Completed reports</div>
           <h2>Past Reports</h2>
-          <p>Download, email, share, or personally track whether a report is Submitted, Approved, or Reimbursed.</p>
+          <p>Download, email, share, or personally track whether a report is Submitted or Reimbursed. Reopen a report when corrections are needed.</p>
         </div>
       </div>
       <div id="pastReportsList" class="report-card-list"></div>
@@ -439,7 +492,7 @@
 
       <details class="card settings-details">
         <summary>
-          <span><strong>Saved defaults</strong><small>People, organizations, locations, vehicles, and common mileage routes</small></span>
+          <span><strong>Saved defaults</strong><small>Manage the choices shown in searchable dropdowns throughout Add Expense</small></span>
           <span class="summary-symbol">+</span>
         </summary>
         <div class="details-body">
@@ -468,8 +521,8 @@
           <div class="subsection">
             <h3>Saved mileage routes</h3>
             <div class="form-grid">
-              <div class="field"><label for="routeStart">Starting location</label><input id="routeStart" type="text" list="savedLocationsList"></div>
-              <div class="field"><label for="routeDestination">Destination</label><input id="routeDestination" type="text" list="savedLocationsList"></div>
+              <div class="field"><label for="routeStart">Starting location</label><div class="saved-picker" data-saved-picker data-kind="locations" data-input-id="routeStart"><div class="saved-picker-control"><input id="routeStart" type="text" placeholder="Select or add a location" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="routeStartSavedMenu"><button class="saved-picker-toggle" type="button" aria-label="Show saved locations">⌄</button></div><div id="routeStartSavedMenu" class="saved-picker-menu" hidden></div></div></div>
+              <div class="field"><label for="routeDestination">Destination</label><div class="saved-picker" data-saved-picker data-kind="locations" data-input-id="routeDestination"><div class="saved-picker-control"><input id="routeDestination" type="text" placeholder="Select or add a location" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="routeDestinationSavedMenu"><button class="saved-picker-toggle" type="button" aria-label="Show saved locations">⌄</button></div><div id="routeDestinationSavedMenu" class="saved-picker-menu" hidden></div></div></div>
               <div class="field"><label for="routeMiles">Total miles</label><input id="routeMiles" type="number" min="0" step="0.1"></div>
               <div class="field"><label for="routeTripType">Trip type</label><select id="routeTripType"><option>Round trip</option><option>One way</option></select></div>
             </div>
@@ -494,32 +547,30 @@
             <div class="eyebrow">About</div>
             <h2>Ranch Expense Tracker</h2>
           </div>
-          <span class="version-chip">Version 1.3.4</span>
+          <span class="version-chip">Version 1.4.0</span>
         </div>
         <div class="about-grid">
-          <div><span>Release</span><strong>Personal Expense Release</strong></div>
+          <div><span>Release</span><strong>Employee Workflow Release</strong></div>
           <div><span>Storage</span><strong>Local to device</strong></div>
           <div><span>Mileage rate</span><strong id="aboutMileageRate">$0.40 per mile</strong></div>
         </div>
         <details class="changelog-details">
-          <summary>What changed in Version 1.3</summary>
+          <summary>What is included in Version 1.4.0</summary>
           <ul>
-            <li>Cleaner mobile-first interface and report workflow.</li>
-            <li>PDF and CSV downloads, pre-addressed email preparation, and optional device sharing.</li>
-            <li>Past Reports simplified to personal reimbursement status only.</li>
-            <li>Clear History preserves the user's name and profile settings.</li>
-            <li>Mileage rate is fixed in the app instead of editable.</li>
-            <li>Merchant names are no longer evaluated as vague business purposes.</li>
-            <li>Improved install support and icons across Windows, Android, iPhone, iPad, Chromebook, and Mac.</li>
+            <li>A faster receipt-first Add Expense layout with the original broad categories.</li>
+            <li>Subcategory-specific fields appear only when they apply.</li>
+            <li>Description is required for Education, Supplies, Other, and any broad Other subcategory.</li>
+            <li>Mileage uses route documentation instead of a purchase receipt.</li>
+            <li>Optional project or trip tags support searching, filtering, and report selection.</li>
+            <li>Saved people, organizations, locations, vehicles, and tags use searchable dropdowns with an Add New option.</li>
+            <li>Choose Pay Period fills the 1st-15th or 16th-end-of-month dates and suggests a report name that can be overridden.</li>
+            <li>Current Report uses an optional Report Note instead of a required overall business purpose.</li>
+            <li>Past Reports use Submitted and Reimbursed statuses and can be reopened for corrections.</li>
+            <li>PDF, CSV, backup, restore, and local receipt storage remain available.</li>
           </ul>
         </details>
       </section>
     </section>
-
-    <datalist id="savedPeopleList"></datalist>
-    <datalist id="savedOrganizationsList"></datalist>
-    <datalist id="savedLocationsList"></datalist>
-    <datalist id="savedVehiclesList"></datalist>
   </main>
 
   <div id="receiptViewer" class="modal" aria-hidden="true">
@@ -573,7 +624,7 @@
   </div>
 
   <footer class="site-footer">
-    <div>Ranch Expense Tracker · Version 1.3.4 · Personal Expense Release</div>
+    <div>Ranch Expense Tracker · Version 1.4.0 · Employee Workflow Release</div>
     <div>Copyright © 2026 Saul Garcia. All Rights Reserved.</div>
     <div>Licensed for Pizza Ranch internal business use and IT evaluation.</div>
   </footer>

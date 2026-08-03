@@ -1,7 +1,7 @@
 {
-  "version": "1.3.4",
-  "release": "Personal Expense Release",
-  "released": "2026-07-29",
+  "version": "1.4.0",
+  "release": "Employee Workflow Release",
+  "released": "2026-08-03",
   "fixedMileageRate": 0.4,
-  "update": "Cross-Device Trial Readiness"
+  "update": "Simplified expense entry, pay-period reports, tags, route documentation, and safer report history"
 }

@@ -1,44 +1,56 @@
 # Ranch Expense Tracker
 
-Ranch Expense Tracker is a simple, mobile-friendly tool for recording business expenses, tracking mileage, storing receipt images, and preparing reimbursement reports.
+**Current release:** Version 1.4.0 - Employee Workflow Release  
+**Live testing site:** https://redpanda-17.github.io/ranch-expense-tracker/
 
-## Features
+Ranch Expense Tracker is a local-first web application for personally recording business expenses and mileage, attaching supporting documents, organizing reports, and exporting PDF and CSV files.
 
-* Record business expenses by category
-* Track reimbursable mileage
-* Attach and view receipt images
-* Build expense reports from selected entries
-* Generate accountant-friendly PDF reports
-* Export report data as CSV
-* Share or save complete backups
-* Import a backup onto another device
-* Send feedback or report a problem from within the app
+## Start here
 
-## Privacy
+- Employees: read `USER_GUIDE.md` and the installation guide.
+- Accounting: review `sample/Expense-Report-Sample.pdf`, `sample/Expense-Report-Sample.csv`, and `RELEASE_NOTES.md`.
+- IT: begin with `TECHNICAL_HANDOFF.md`, `UPGRADE_NOTES.md`, and the hosted source files.
 
-Expense information, reports, and receipt images are stored locally in the user’s browser. Ranch Expense Tracker does not automatically upload expense data to GitHub or another online service.
+## Current application files
 
-Users should create regular backups, especially before changing devices, clearing browser data, or reinstalling the app.
+The GitHub Pages release uses:
 
-## Using the App
+- `index.html`
+- `app.css`
+- `app.js`
+- `manifest.webmanifest`
+- `service-worker.js`
+- `version.json`
+- `app-icon-*` files
 
-1. Add an expense or mileage entry.
-2. Attach a receipt when required.
-3. Review saved expenses in History.
-4. Select the expenses to include in a report.
-5. Generate and share the PDF or export the CSV.
-6. Create a backup regularly and store it somewhere secure.
+`Ranch_Expense_Tracker_v1_4_0_Standalone.html` is a single-file review copy. The hosted source files should be used for GitHub Pages.
 
-## Installation
+## Important storage model
 
-Ranch Expense Tracker can be opened in a supported web browser. On compatible mobile devices, it may also be added to the Home Screen for easier access.
+Expense records, reports, settings, and report drafts are stored in browser `localStorage`. Receipts and route images are stored in browser IndexedDB. No expense data is uploaded to GitHub by the application.
 
-## Current Version
+Data is tied to the website address, device, browser, and browser profile. Employees should use the same browser and regularly download backups.
 
-**Version 1.2.0 — Feedback Edition**
+## Version 1.4.0 highlights
 
-## Ownership
+- Simplified Add Expense workflow
+- Original broad categories with optional subcategories
+- Conditional fields based on the selected subcategory
+- Description required for Education, Supplies, Other, and broad Other subcategories
+- Optional project or trip tags
+- Searchable saved-default dropdowns with Add New
+- Mileage route documentation instead of a purchase receipt
+- Pay-period report-name helper for the 1st-15th and 16th-end of month
+- Optional Report Note
+- Past Reports statuses limited to Submitted and Reimbursed
+- Reopen Report instead of deleting finalized reports
 
-Copyright © 2026 Saul Garcia. All Rights Reserved.
+## Known limitations
 
-This software and its source code may not be copied, modified, distributed, republished, or used without the express written permission of the copyright holder.
+- The current site is publicly reachable.
+- The application has no user authentication or centralized database.
+- Data is not synchronized between devices or browsers.
+- The fixed mileage rate remains $0.40 per mile until Accounting confirms another rate.
+- Native sharing and email behavior varies by browser and device.
+
+Copyright © 2026 Saul Garcia. All Rights Reserved. Licensed for Pizza Ranch internal business use and IT evaluation.

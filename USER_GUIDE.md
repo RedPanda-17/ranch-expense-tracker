@@ -1,55 +1,50 @@
-# Employee User Guide
+# Employee User Guide - Version 1.4.0
 
-## Install the app
+## 1. Complete Settings
 
-Use the hosted HTTPS link provided by Accounting or IT. Follow `Ranch_Expense_Tracker_Web_App_Installation_Guide.pdf` for Windows, Chromebook, Android, iPhone, iPad, or Mac instructions.
+Enter your name, department, and the email address that should receive reports. These profile settings remain when expense history is cleared.
 
-Install before entering real expenses whenever possible. Do not use private browsing. Installation does not create an account or sync data to another device.
+## 2. Add an expense
 
-## First-time setup
+Attach a receipt when available, then enter the amount, merchant, category, date, and any requested category details.
 
-Open **Settings**, enter your name, department, and Default report recipient, and save your profile. The Default report recipient is used by **Email PDF** and **Email CSV** to pre-address the message. Your profile remains saved when you use **Clear Expense History**.
+Description is required for:
 
-## Add an expense
+- Education
+- Supplies
+- Other
+- Any subcategory beginning with Other
 
-1. Choose **Add Expense**.
-2. Enter the date, category, merchant or provider, amount, and business purpose.
-3. Complete the category-specific details.
-4. Attach the original receipt when required.
-5. Choose **Save Expense**.
+It is optional for the remaining categories.
 
-A merchant name such as `Casey's` is accepted. The business-purpose field should explain the business reason, such as `Lunch while traveling to the Marion store visit`.
+## 3. Mileage
 
-## Record mileage
+Mileage does not use a purchase receipt. Enter the start, destination, miles, and trip type. Upload a route screenshot under Route Documentation when available. Accounting may verify the shortest reasonable route.
 
-Choose **Mileage**, enter the route and total reimbursable miles, and select one way or round trip. The application calculates reimbursement using the company rate fixed in the current release.
+## 4. Tags and saved defaults
 
-## Create and send a report
+Project or trip tags are optional. Use them to group expenses for a trip, training, project, or store visit. Saved merchants, locations, vehicles, people, and tags can be selected or added directly from expense entry.
 
-1. Open **Current Report**.
-2. Select the expenses to include.
-3. Enter the report name, date range, and overall business purpose.
-4. Correct anything listed under **Ready to send?**
-5. Choose the action that fits your device:
-   - **Download** saves the PDF or CSV for manual use.
-   - **Email** downloads the file, then prepares an email to the saved Default report recipient. Attach the named file from Downloads before sending.
-   - **Share** opens the device share menu when supported and is usually the easiest way to attach a file on a phone or tablet.
-6. Choose **Finalize Report** to save it under Past Reports.
+## 5. Build the current report
 
-## Past Reports
+Use Choose Pay Period to select:
 
-A finalized report starts at **Submitted**. The personal status can be changed to Submitted, Approved, or Reimbursed. PDF and CSV files can be downloaded, emailed, or shared again while the local report remains on the device.
+- 1st-15th
+- 16th-end of month
 
-## Backups
+The app fills the report dates and suggests a name. You can type a different report name. Select expenses individually, Select All, or filter and Select Filtered.
 
-Use **Settings > Data & Backups** regularly. A JSON backup includes expenses, reports, settings, drafts, and original receipt files. A successful download or share clears the backup reminder and records the backup date.
+## 6. Export
 
-Create a backup before uninstalling the app, clearing browser data, switching browsers or profiles, changing devices, or moving to a new hosted link.
+- Download PDF for a readable report with supporting documents.
+- Download CSV for spreadsheet or accounting use.
+- Share uses the device share menu when supported.
+- Email downloads the file and prepares a pre-addressed email. Attach the file from Downloads.
 
-## Clear Expense History
+## 7. Past Reports
 
-This removes expenses, reports, drafts, and receipts. It preserves the user's name, department, email defaults, saved references, and saved mileage routes.
+Finalized reports are marked Submitted. Change the status to Reimbursed after payment if you want to track it. Reopen Report returns the report and its expenses to Current Report for corrections.
 
-## Local-data reminder
+## 8. Backups
 
-The installed web app still stores records locally. It is not a cloud account. Use one primary device and browser during the trial, and keep current backups.
+Download backups regularly. A backup contains expenses, reports, settings, drafts, and supporting documents. Store it securely.

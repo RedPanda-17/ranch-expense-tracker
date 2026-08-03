@@ -1,20 +1,21 @@
 # Mileage Rate Configuration
 
-The user cannot edit the mileage rate. Version 1.3.4 is currently set to **$0.40 per mile**.
+The mileage rate is currently fixed at:
 
-After Accounting confirms a different rate:
+`$0.40 per mile`
 
-1. Open `app.js`.
-2. Change the value near the top:
+The value is defined near the top of `app.js`:
 
 ```javascript
 const FIXED_MILEAGE_RATE = 0.40;
 ```
 
-3. Change `fixedMileageRate` in `version.json` to the same value.
-4. Increase the application version and release date.
-5. Change the cache name in `service-worker.js` so installed copies receive the update.
-6. Update the standalone HTML's embedded `APP_VERSION` and mileage value.
-7. Run the QA checklist, including mileage calculation, PDF/CSV export, and installed-app update testing.
+Employees cannot change the rate in Settings.
 
-A rate change should be released as a new version so reports retain a clear record of which application release produced them.
+Before employee mileage use, Accounting should confirm the approved rate. After changing it:
+
+1. Update `FIXED_MILEAGE_RATE` in `app.js` and the standalone HTML.
+2. Update `version.json` and this document.
+3. Change the service-worker cache name.
+4. Test mileage calculations, PDF, CSV, and backups.
+5. Release a new version number.

@@ -1,43 +1,29 @@
-# QA Results - Version 1.3.4
+# QA Results - Version 1.4.0
 
-Version 1.3.4 received static code, package, manifest, icon, and document validation on July 29, 2026. Actual installation behavior remains a required real-device test because the final experience is controlled by the employee's browser, operating system, and company device policies.
+**Build date:** August 3, 2026
 
-## Passed in the Version 1.3.4 regression
+## Automated and structural checks passed
 
-- JavaScript source passes a syntax check.
-- Hosted and standalone files identify Version 1.3.4.
-- Hosted HTML includes both `mobile-web-app-capable` and `apple-mobile-web-app-capable` metadata.
-- Hosted HTML includes a dedicated 180x180 Apple touch icon.
-- Manifest JSON parses successfully and includes app ID, start URL, scope, standalone display, language, theme/background colors, and PNG/SVG icons.
-- PNG icons exist at the declared 180x180, 192x192, and 512x512 dimensions.
-- Service worker uses a Version 1.3.4 cache name and pre-caches all required application and icon files.
-- Version metadata and sample backup identify Version 1.3.4.
-- Installation guide includes Windows Edge, desktop Chrome, Chromebook, Android, iPhone, iPad, Mac Safari, and iOS/iPadOS Chrome instructions.
-- Installation guide DOCX and PDF render cleanly across four pages with no clipped text or layout overlap.
-- Current Report spacing fix and prior PDF/CSV, backup, receipt, validation, and local-storage code paths remain unchanged from Version 1.3.3.
-
-## Previously passed and unchanged
-
-- Casey's meal entry validation
-- Fixed mileage calculations at the configured $0.40 rate
-- Receipt upload and IndexedDB storage
+- JavaScript syntax check
+- Manifest and version JSON parsing
+- Hosted and standalone version labels
+- Production local-storage and IndexedDB names
+- Education description requirement
+- Auto expense without Description
+- Other category without Subcategory
+- Mileage calculation at $0.40 per mile
+- Pay-period date calculation and manual report-name override
 - PDF and CSV generation
-- Submitted, Approved, and Reimbursed report statuses
-- Profile-preserving Clear Expense History
-- Backup creation, reminder clearing, and restore logic
-- Desktop and mobile responsive layout smoke testing
+- Submitted/Reimbursed status list
+- No Past Reports Delete action
+- Legacy Version 1.3.4 sample-data compatibility
+- Mobile viewport with no page-level horizontal overflow
+- ZIP integrity and SHA-256 manifest
 
-## Required before employee onboarding
+## Sample report verification
 
-- Accounting confirms the current company mileage rate.
-- Publish the complete Version 1.3.4 folder to GitHub Pages.
-- Test installation from the published address on the company-supported Windows browser.
-- Test iPhone Safari and, when applicable, Android Chrome installation.
-- Confirm the installed app reopens, retains a test expense and receipt, and reports Version 1.3.4.
-- Test backup download/restore and PDF/CSV download/share on each device category used by the first employee group.
-- Confirm Outlook or the device email/share application behaves acceptably.
-- Accounting reviews and approves the sample PDF and CSV.
+The generated sample PDF rendered successfully as five pages. The cover, expense details, and three sample supporting-document pages were visually reviewed without clipping, overlap, or broken glyphs.
 
-## Required before organization-wide release
+## Environment limitation
 
-- IT confirms approved hosting, security expectations, retention requirements, support ownership, browser/device policy, and the long-term cloud or multi-account plan.
+The automated browser environment blocks normal URL navigation and IndexedDB access. UI logic was executed in an isolated browser document with in-memory localStorage and simulated sample receipt records. Real GitHub Pages deployment, IndexedDB persistence, installed-app updates, Outlook behavior, and device-native sharing still require manual testing on company-supported devices.

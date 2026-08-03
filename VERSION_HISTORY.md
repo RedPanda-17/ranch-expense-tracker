@@ -1,27 +1,14 @@
 # Version History
 
-## 1.3.4 - Cross-Device Trial Readiness
-Added standards-based mobile metadata, PNG install icons, stronger manifest configuration, refreshed offline caching, and a complete device installation guide for the controlled employee trial.
+| Version | Status | Purpose |
+|---|---|---|
+| 1.4.0 | Current official release | Simplified employee workflow and report organization |
+| Lab 0.1-0.6 | Experimental history | Iterative testing of simplified expense entry and report changes |
+| 1.3.4 | Previous official release | Cross-device trial readiness |
+| 1.3.3 | Archived | Text-entry and copyright fixes |
+| 1.3.2 | Archived | Email export workflow |
+| 1.3.1 | Archived | Backup reminder and display fixes |
+| 1.3.0 | Archived | Personal Expense Release |
+| 1.2.x and earlier | Historical | Prototype and original local-first development |
 
-## 1.3.3 - Final Pre-Trial Release
-Corrected text-entry autosave so spaces remain intact throughout Current Report fields and restored the copyright notice.
-
-## 1.3.2 - Final Trial Export Update
-Added Email PDF and Email CSV actions that use the Default report recipient, prefill report details, and guide the user to attach the downloaded file. Retained native Share actions for mobile use.
-
-## 1.3.1 - Release Candidate Fixes
-Corrected hidden UI elements, backup-reminder completion behavior, and mileage route text in generated PDFs.
-
-## 1.3.0 - Personal Expense Release
-Introduced local-first personal tracking, a polished interface, fixed mileage rate, direct PDF/CSV exports, reimbursement status, profile-preserving history clearing, and updated handoff documentation.
-
-## 1.2.1 - Backup Transfer Fix
-Focused on making complete JSON backups easier to download, email, and restore on another device.
-
-## 1.2.0 - Feedback Edition
-Added feedback and problem-reporting support and expanded the report/review workflow.
-
-## 1.1.0 - Accountant Edition
-Expanded accounting-oriented PDF, CSV, receipt, report, and backup capabilities.
-
-Previous releases should remain available through source-control history or archived packages. A distributed source change should receive a new version number.
+Version 1.4.0 retains the production browser-storage keys used by Version 1.x so existing data can continue at the same website address.

@@ -1,22 +1,37 @@
-# Ranch Expense Tracker v1.3.4 - Cross-Device Trial Readiness
+# Release Notes - Version 1.4.0
 
-## Release purpose
+**Release date:** August 3, 2026  
+**Release name:** Employee Workflow Release
 
-This build prepares the local-first application for cross-device stress testing and a controlled employee trial coordinated with Pizza Ranch Accounting.
+## Expense entry
 
-## Changes in v1.3.4
+- Returned the Add Expense screen to a simpler receipt-first layout.
+- Restored the original broad categories: Auto, Education, Meals & Snacks, Meetings (PR Employees), Supplies, Travel, Mileage, and Other.
+- Added subcategories and conditional follow-up fields.
+- Removed the subcategory field from Other.
+- Made Description optional for most categories.
+- Made Description required for Education, Supplies, Other, and any subcategory beginning with Other.
+- Added optional project or trip tags.
+- Added searchable saved-default dropdowns with Add New.
 
-- Added the standard `mobile-web-app-capable` metadata while retaining Apple's mobile web-app metadata.
-- Added dedicated 180x180, 192x192, and 512x512 PNG application icons for Apple, Android, Chrome, and Edge installation paths.
-- Strengthened the web app manifest with an app ID, scope, relative start URL, language, categories, and PNG icon definitions.
-- Updated the service-worker cache to include the new icons and force installed copies to retrieve the new release.
-- Added an employee-ready web-app installation guide covering Windows Edge, desktop Chrome, Chromebook, Android Chrome, iPhone Safari, iPad Safari, Mac Safari, and the iOS/iPadOS Chrome alternative.
-- Added installation troubleshooting and local-data warnings, including the separate storage behavior of Safari web apps on Mac.
-- Retained the Current Report spacing fix, copyright notice, PDF/CSV email workflow, backup reminder fix, Casey's validation fix, and prior report improvements.
+## Mileage
 
-## Release gates
+- Replaced the receipt label with Route Documentation.
+- Added start, destination, miles, and one-way/round-trip fields.
+- Route screenshots are recommended but do not block entry.
+- Accounting may verify the shortest reasonable route.
 
-- Confirm the official fixed mileage reimbursement rate with Accounting.
-- Publish and test the GitHub Pages address on the actual devices employees will use.
-- Confirm installation, reopening, receipt storage, backup, PDF, CSV, and sharing on each supported device category.
-- Have Accounting approve a real sample PDF and CSV before expanding beyond the first test group.
+## Reports
+
+- Added Choose Pay Period for the 1st-15th and 16th-end of month.
+- Pay-period selection fills dates and suggests a report name.
+- Employees can override the suggested name.
+- Replaced required Overall Business Purpose with optional Report Note.
+- Added tag/category/search filtering and Select Filtered.
+- Past Reports use Submitted and Reimbursed only.
+- Removed Delete Report and added Reopen Report safeguards.
+
+## Compatibility
+
+- Production local-storage and IndexedDB names remain unchanged from Version 1.x.
+- Existing Version 1.x browser data should remain available when the GitHub Pages address remains unchanged.
