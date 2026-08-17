@@ -1,7 +1,6 @@
 {
-  "version": "1.4.0",
-  "release": "Employee Workflow Release",
-  "released": "2026-08-03",
-  "fixedMileageRate": 0.4,
-  "update": "Simplified expense entry, pay-period reports, tags, route documentation, and safer report history"
+  "app": "Ranch Expense Tracker",
+  "version": "1.4.5",
+  "release": "Automatic Update & Cache Reliability Update",
+  "released": "2026-08-17"
 }
