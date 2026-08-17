@@ -1,11 +1,11 @@
-/* Ranch Expense Tracker v1.4.5
+/* Ranch Expense Tracker v1.4.6
    Automatic Update & Cache Reliability Update
 
    App records are NOT stored here. Expenses/settings use localStorage and
    receipt files use IndexedDB. This worker manages only offline application
    files.
 */
-const APP_VERSION = "1.4.5";
+const APP_VERSION = "1.4.6";
 const CACHE_PREFIX = "ranch-expense-tracker-shell-";
 const CACHE_NAME = `${CACHE_PREFIX}${APP_VERSION}`;
 const OFFLINE_APP = "./index.html";
