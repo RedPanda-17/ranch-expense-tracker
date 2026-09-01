@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ranch Expenses">
-  <title>Ranch Expense Tracker - Version 1.4.6</title>
+  <title>Ranch Expense Tracker - Version 1.5.0</title>
   <style>
 :root {
   --bg: #f5efe4;
@@ -585,7 +585,7 @@ textarea { min-height: 92px; resize: vertical; }
           <p>Record business expenses and mileage, organize reports, and download clear PDF and CSV files.</p>
         </div>
       </div>
-      <div class="header-badge">Version 1.4.6</div>
+      <div class="header-badge">Version 1.5.0</div>
     </div>
   </header>
 
@@ -1097,16 +1097,26 @@ textarea { min-height: 92px; resize: vertical; }
             <div class="eyebrow">About</div>
             <h2>Ranch Expense Tracker</h2>
           </div>
-          <span class="version-chip">Version 1.4.6</span>
+          <span class="version-chip">Version 1.5.0</span>
         </div>
         <div class="about-grid">
-          <div><span>Release</span><strong>iPhone PDF Download Update</strong></div>
+          <div><span>Release</span><strong>PDF Accounting Review Update</strong></div>
           <div><span>Storage</span><strong>Local to device</strong></div>
           <div><span>Mileage rate</span><strong id="aboutMileageRate">$0.40 per mile</strong></div>
         </div>
         <details class="changelog-details">
-          <summary>What is included in Version 1.4.6</summary>
+          <summary>What is included in Version 1.5.0</summary>
           <ul>
+            <li>PDF Expense Summary is grouped by category and amount.</li>
+            <li>Expense details include a blank Accounting Code field, receipt thumbnail, and full-size supporting-document appendix.</li>
+            <li>PDF-only accounting review checks can flag possible receipt-total mismatches and tips over 20%.</li>
+            <li>Receipt OCR can flag possible alcohol, tobacco/nicotine, gift card/prepaid, lottery, and cash-equivalent items for manual review.</li>
+            <li>PDF-only checks also flag possible duplicate expenses, missing supporting documents, and dates outside the report period.</li>
+            <li>Receipt dates are compared with entered expense dates and flagged when they appear different.</li>
+            <li>Receipt totals are reconciled against subtotal, tax, tip, and common fee lines before an amount-mismatch warning is issued.</li>
+            <li>Faded receipts can recover a plausible tip amount from receipt layout when OCR misses the TIP label.</li>
+            <li>Receipt-reading warnings are advisory only; Accounting verifies the attached receipt.</li>
+            <li>Backup restore keeps the safer record-first recovery behavior from the 1.4.7 candidate.</li>
             <li>Fixed iPhone/iPad PDF downloads so Download PDF targets a single .pdf file rather than opening a PDF/share flow that can include both a webpage link and the document.</li>
             <li>Apple mobile devices now receive generated PDFs through a generic binary-download MIME type while preserving the normal .pdf filename.</li>
             <li>PDF downloads use same-window download handling instead of creating a second link/tab fallback.</li>
@@ -1167,7 +1177,7 @@ textarea { min-height: 92px; resize: vertical; }
 
 
   <footer class="site-footer">
-    <div>Ranch Expense Tracker · Version 1.4.6 · iPhone PDF Download Update</div>
+    <div>Ranch Expense Tracker · Version 1.5.0 · PDF Accounting Review Update</div>
     <div>Copyright © 2026 Saul Garcia. All Rights Reserved.</div>
     <div>Licensed for Pizza Ranch internal business use and IT evaluation.</div>
   </footer>
@@ -1175,8 +1185,8 @@ textarea { min-height: 92px; resize: vertical; }
   <script>
 "use strict";
 
-const APP_VERSION = "1.4.6";
-const RELEASE_NAME = "iPhone PDF Download Update";
+const APP_VERSION = "1.5.0";
+const RELEASE_NAME = "PDF Accounting Review Update";
 // Accounting can update this single value in a future release after confirming the company rate.
 const FIXED_MILEAGE_RATE = 0.40;
 
@@ -1194,7 +1204,7 @@ const RECEIPT_PDF_TARGET_BYTES = 120 * 1024;
 const RECEIPT_PDF_MIN_DIMENSION = 960;
 const RECEIPT_PDF_MIN_JPEG_QUALITY = 0.48;
 
-// Keep the production storage keys so Version 1.4.6 opens data created by Version 1.x releases.
+// Keep the production storage keys so Version 1.5.0 opens data created by Version 1.x releases.
 const EXPENSE_KEY = "workExpenseTool.expenses.v1";
 const REPORT_KEY = "workExpenseTool.reports.v1";
 const SETTINGS_KEY = "workExpenseTool.settings.v1";
@@ -2993,21 +3003,63 @@ async function importBackupFile(event) {
   if (!file) return;
   try {
     const data = JSON.parse(await file.text());
-    if (!Array.isArray(data.expenses) || !Array.isArray(data.reports) || !Array.isArray(data.receipts)) throw new Error("This is not a valid Ranch Expense Tracker backup.");
-    if (!confirm(`Restore ${data.expenses.length} expenses, ${data.reports.length} reports, and ${data.receipts.length} receipts? Current expense history on this device will be replaced.`)) return;
-    await clearReceiptStore();
-    for (const receipt of data.receipts) {
-      const buffer = base64ToArrayBuffer(receipt.data || "");
-      await putReceipt({ id: receipt.id, name: receipt.name, type: receipt.type, bytes: buffer, blob: new Blob([buffer], { type: receipt.type || "application/octet-stream" }), savedAt: new Date().toISOString() });
+    if (!Array.isArray(data.expenses) || !Array.isArray(data.reports) || !Array.isArray(data.receipts)) {
+      throw new Error("This is not a valid Ranch Expense Tracker backup.");
     }
+
+    // Validate and decode the receipt payloads before replacing any current records.
+    const stagedReceipts = [];
+    for (const receipt of data.receipts) {
+      if (!receipt || !receipt.id) throw new Error("A receipt record in this backup is invalid.");
+      const buffer = base64ToArrayBuffer(receipt.data || "");
+      const type = receipt.type || "application/octet-stream";
+      stagedReceipts.push({
+        id: receipt.id,
+        name: receipt.name || "receipt",
+        type,
+        blob: new Blob([buffer], { type }),
+        savedAt: new Date().toISOString()
+      });
+    }
+
+    if (!confirm(`Restore ${data.expenses.length} expenses, ${data.reports.length} reports, and ${data.receipts.length} receipts? Current expense history on this device will be replaced.`)) return;
+
+    // Restore the core accounting records first. Receipt storage should never
+    // prevent otherwise-valid expenses and reports from being recovered.
     expenses = data.expenses;
     reports = data.reports;
     settings = normalizeSettings(data.settings || {});
     reportDraft = normalizeReportDraft(data.reportDraft || {});
     saveAll();
+
+    let restoredReceipts = 0;
+    let failedReceipts = 0;
+    try {
+      await clearReceiptStore();
+      for (const receipt of stagedReceipts) {
+        try {
+          // Store one binary representation instead of duplicating both Blob
+          // and ArrayBuffer data in IndexedDB during a restore.
+          await putReceipt(receipt);
+          restoredReceipts += 1;
+        } catch (receiptError) {
+          failedReceipts += 1;
+          console.warn(`Receipt ${receipt.id} could not be restored.`, receiptError);
+        }
+      }
+    } catch (receiptStoreError) {
+      failedReceipts = stagedReceipts.length;
+      console.warn("Receipt storage could not be reset during backup restore.", receiptStoreError);
+    }
+
     renderAll();
-    showToast("Backup restored.", "success");
     showView("dashboard");
+
+    if (failedReceipts) {
+      showToast(`Backup restored ${data.expenses.length} expenses and ${data.reports.length} reports. ${restoredReceipts} of ${data.receipts.length} receipts were restored; ${failedReceipts} receipt${failedReceipts === 1 ? "" : "s"} could not be restored on this device.`, "neutral");
+    } else {
+      showToast(`Backup restored: ${data.expenses.length} expenses, ${data.reports.length} reports, and ${restoredReceipts} receipts.`, "success");
+    }
   } catch (error) {
     console.error(error);
     showToast(error.message || "The backup could not be restored.", "error");
@@ -3472,187 +3524,813 @@ async function receiptImageToJpeg(blob) {
   };
 }
 
+
+function categorySummaryRows(items) {
+  const preferredOrder = ["Auto", "Education", "Meals & Snacks", "Meetings", "Supplies", "Travel", "Mileage", "Other"];
+  const totals = new Map();
+  items.forEach(expense => {
+    const category = String(expense.category || "Other").trim() || "Other";
+    totals.set(category, (totals.get(category) || 0) + Number(expense.amount || 0));
+  });
+  return [...totals.entries()]
+    .map(([category, amount]) => ({ category, amount }))
+    .sort((a, b) => {
+      const ai = preferredOrder.indexOf(a.category);
+      const bi = preferredOrder.indexOf(b.category);
+      if (ai >= 0 || bi >= 0) return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+      return a.category.localeCompare(b.category);
+    });
+}
+
 function addCoverPage(pdf, details, items, status, submittedDate) {
   const total = items.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
   const mileageItems = items.filter(expense => expense.category === "Mileage");
   const mileageTotal = mileageItems.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
   const expenseTotal = total - mileageTotal;
   const receiptCount = items.filter(expense => expense.receiptId).length;
+  const categoryRows = categorySummaryRows(items);
   let commands = "";
   commands += pdfRectCommand(0, 720, 612, 72, .96);
   commands += pdfTextCommand("RANCH EXPENSE TRACKER", 42, 762, 10, true);
   commands += pdfTextCommand("EXPENSE REPORT", 42, 736, 22, true);
   commands += pdfTextCommand(truncatePdfText(details.title || "Expense Report", 76), 42, 705, 14, true);
   commands += pdfLineCommand(42, 691, 570, 691, 1.1);
-
   commands += pdfTextCommand("EMPLOYEE", 42, 667, 8, true);
   commands += pdfTextCommand(truncatePdfText(details.employeeName || settings.employeeName || "Not specified", 34), 42, 651, 10);
   commands += pdfTextCommand("DEPARTMENT", 222, 667, 8, true);
   commands += pdfTextCommand(truncatePdfText(details.department || "Not specified", 32), 222, 651, 10);
   commands += pdfTextCommand("STATUS", 430, 667, 8, true);
   commands += pdfTextCommand(status || "Draft", 430, 651, 10, true);
-
   commands += pdfTextCommand("REPORT PERIOD", 42, 620, 8, true);
   commands += pdfTextCommand(`${shortDate(details.periodStart) || "Not specified"} through ${shortDate(details.periodEnd) || "Not specified"}`, 42, 604, 10);
   commands += pdfTextCommand(submittedDate ? "FINALIZED" : "PREPARED", 430, 620, 8, true);
   commands += pdfTextCommand(new Date(submittedDate || Date.now()).toLocaleDateString("en-US"), 430, 604, 10);
-
   if (String(details.purpose || "").trim()) {
     commands += pdfTextCommand("REPORT NOTE", 42, 570, 8, true);
     let noteY = 553;
-    wrapPdfText(details.purpose, 92).slice(0, 5).forEach(line => { commands += pdfTextCommand(line, 42, noteY, 10); noteY -= 13; });
+    wrapPdfText(details.purpose, 92).slice(0, 4).forEach(line => {
+      commands += pdfTextCommand(line, 42, noteY, 9);
+      noteY -= 12;
+    });
   }
+  commands += pdfRectCommand(42, 414, 528, 96, .97);
+  commands += pdfTextCommand("REPORT TOTAL", 58, 482, 9, true);
+  commands += pdfTextCommand(money(total), 58, 450, 24, true);
+  commands += pdfTextCommand("PURCHASE EXPENSES", 300, 482, 8, true);
+  commands += pdfTextCommand(money(expenseTotal), 300, 463, 12, true);
+  commands += pdfTextCommand("MILEAGE", 430, 482, 8, true);
+  commands += pdfTextCommand(money(mileageTotal), 430, 463, 12, true);
+  commands += pdfTextCommand(`${items.length} expense${items.length === 1 ? "" : "s"}`, 300, 438, 9);
+  commands += pdfTextCommand(`${receiptCount} supporting document${receiptCount === 1 ? "" : "s"} attached`, 430, 438, 9);
 
-  commands += pdfRectCommand(42, 405, 528, 104, .97);
-  commands += pdfTextCommand("REPORT TOTAL", 58, 478, 9, true);
-  commands += pdfTextCommand(money(total), 58, 444, 25, true);
-  commands += pdfTextCommand("PURCHASE EXPENSES", 300, 478, 8, true);
-  commands += pdfTextCommand(money(expenseTotal), 300, 460, 12, true);
-  commands += pdfTextCommand("MILEAGE", 430, 478, 8, true);
-  commands += pdfTextCommand(money(mileageTotal), 430, 460, 12, true);
-  commands += pdfTextCommand(`${items.length} expense${items.length === 1 ? "" : "s"}`, 300, 432, 9);
-  commands += pdfTextCommand(`${receiptCount} supporting document${receiptCount === 1 ? "" : "s"} attached`, 430, 432, 9);
+  commands += pdfTextCommand("EXPENSE SUMMARY", 42, 382, 10, true);
+  commands += pdfTextCommand("Grouped totals by expense category.", 42, 366, 8);
+  const left = 42, amountX = 430, right = 570;
+  let y = 340;
+  const rowHeight = 24;
+  commands += pdfRectCommand(left, y - rowHeight, right - left, rowHeight, .95);
+  commands += pdfTextCommand("CATEGORY", left + 9, y - 16, 8, true);
+  commands += pdfTextCommand("AMOUNT", amountX + 9, y - 16, 8, true);
+  commands += pdfLineCommand(left, y, right, y, .7);
+  commands += pdfLineCommand(left, y - rowHeight, right, y - rowHeight, .5);
+  y -= rowHeight;
 
-  commands += pdfTextCommand("MILEAGE RATE", 42, 365, 8, true);
-  commands += pdfTextCommand(`${money(FIXED_MILEAGE_RATE)} per mile`, 42, 348, 10);
-  commands += pdfTextCommand("FILES INCLUDED", 222, 365, 8, true);
-  commands += pdfTextCommand("Expense details and optimized supporting documents", 222, 348, 10);
-
-  // Quick list keeps small reports compact while preserving a full detail section later.
-  commands += pdfTextCommand("QUICK EXPENSE LIST", 42, 310, 9, true);
-  commands += pdfTextCommand("DATE", 42, 290, 8, true);
-  commands += pdfTextCommand("MERCHANT / ROUTE", 104, 290, 8, true);
-  commands += pdfTextCommand("CATEGORY", 328, 290, 8, true);
-  commands += pdfTextCommand("AMOUNT", 518, 290, 8, true);
-  commands += pdfLineCommand(42, 280, 570, 280, .65);
-  let quickY = 262;
-  items.slice(0, 5).forEach(expense => {
-    commands += pdfTextCommand(shortDate(expense.date), 42, quickY, 8);
-    commands += pdfTextCommand(truncatePdfText(merchantText(expense) || "Not applicable", 38), 104, quickY, 8);
-    commands += pdfTextCommand(truncatePdfText(expense.category, 31), 328, quickY, 8);
-    commands += pdfTextCommand(money(expense.amount), 520, quickY, 8, true);
-    quickY -= 21;
-    commands += pdfLineCommand(42, quickY + 8, 570, quickY + 8, .2);
+  categoryRows.forEach(row => {
+    commands += pdfTextCommand(truncatePdfText(row.category, 55), left + 9, y - 16, 9);
+    commands += pdfTextCommand(money(row.amount), amountX + 9, y - 16, 9, true);
+    commands += pdfLineCommand(left, y - rowHeight, right, y - rowHeight, .25);
+    y -= rowHeight;
   });
-  if (items.length > 5) commands += pdfTextCommand(`Plus ${items.length - 5} more expense${items.length - 5 === 1 ? "" : "s"} on the summary pages.`, 42, quickY - 3, 8);
+  commands += pdfRectCommand(left, y - rowHeight, right - left, rowHeight, .965);
+  commands += pdfTextCommand("TOTAL REIMBURSEMENT", left + 9, y - 16, 9, true);
+  commands += pdfTextCommand(money(total), amountX + 9, y - 16, 9, true);
+  commands += pdfLineCommand(left, y - rowHeight, right, y - rowHeight, .7);
 
-  commands += pdfLineCommand(42, 92, 570, 92, .5);
-  commands += pdfTextCommand(`Created with Ranch Expense Tracker v${APP_VERSION} - data stored locally on the user's device.`, 42, 74, 8);
+  const bottom = y - rowHeight;
+  [left, amountX, right].forEach(x => {
+    commands += pdfLineCommand(x, 340, x, bottom, .4);
+  });
+
+  commands += pdfLineCommand(42, 58, 570, 58, .5);
+  commands += pdfTextCommand(`Created with Ranch Expense Tracker v${APP_VERSION} - data stored locally on the user's device.`, 42, 42, 8);
   pdf.addPage(commands);
 }
 
-function addExpenseSummaryPages(pdf, items) {
-  let index = 0;
-  while (index < items.length) {
-    let commands = pdfTextCommand("EXPENSE SUMMARY", 42, 758, 15, true);
-    let y = 730;
-    commands += pdfTextCommand("#", 42, y, 8, true);
-    commands += pdfTextCommand("DATE", 60, y, 8, true);
-    commands += pdfTextCommand("MERCHANT / ROUTE", 118, y, 8, true);
-    commands += pdfTextCommand("CATEGORY", 255, y, 8, true);
-    commands += pdfTextCommand("PURPOSE", 385, y, 8, true);
-    commands += pdfTextCommand("AMOUNT", 530, y, 8, true);
-    y -= 10;
-    commands += pdfLineCommand(42, y, 570, y, .8);
-    y -= 18;
-    while (index < items.length && y > 82) {
-      const expense = items[index];
-      const purposeLines = wrapPdfText(expense.purpose || "", 30).slice(0, 2);
-      const rowHeight = Math.max(24, purposeLines.length * 11 + 8);
-      if (y - rowHeight < 66) break;
-      commands += pdfTextCommand(String(index + 1), 42, y, 8);
-      commands += pdfTextCommand(shortDate(expense.date), 60, y, 8);
-      commands += pdfTextCommand(truncatePdfText(merchantText(expense) || "Not applicable", 26), 118, y, 8);
-      commands += pdfTextCommand(truncatePdfText(expense.category, 24), 255, y, 8);
-      purposeLines.forEach((line, lineIndex) => { commands += pdfTextCommand(line, 385, y - lineIndex * 10, 8); });
-      commands += pdfTextCommand(money(expense.amount), 528, y, 8, true);
-      y -= rowHeight;
-      commands += pdfLineCommand(42, y + 7, 570, y + 7, .25);
-      index++;
+async function getPdfSupportingDocument(pdf, expense, imageCache) {
+  if (!expense.receiptId) return null;
+  if (imageCache.has(expense.receiptId)) return imageCache.get(expense.receiptId);
+  let record = null;
+  try { record = await getReceipt(expense.receiptId); }
+  catch (error) { console.warn("Could not retrieve supporting document.", error); }
+  const blob = record?.blob || (record?.bytes ? new Blob([record.bytes], { type: record.type || "application/octet-stream" }) : null);
+  const filename = record?.name || expense.receiptName || "supporting-document";
+  const type = record?.type || blob?.type || expense.receiptType || "application/octet-stream";
+  const result = { record, blob, filename, type, isImage: false, imageRef: null, width: 0, height: 0 };
+  if (blob && String(type).toLowerCase().startsWith("image/")) {
+    try {
+      const image = await receiptImageToJpeg(blob);
+      result.isImage = true;
+      result.imageRef = pdf.addJpeg(image.bytes, image.width, image.height);
+      result.width = image.width;
+      result.height = image.height;
+    } catch (error) {
+      console.warn("Could not prepare supporting-document thumbnail.", error);
     }
-    pdf.addPage(commands);
+  }
+  imageCache.set(expense.receiptId, result);
+  return result;
+}
+
+
+const ACCOUNTING_REVIEW_TERM_GROUPS = [
+  {
+    label: "Possible alcohol item",
+    patterns: [
+      { rx: /\bBEER\b/i, strong: false },
+      { rx: /\bWINE\b/i, strong: false },
+      { rx: /\bLIQUOR\b/i, strong: false },
+      { rx: /\bVODKA\b/i, strong: true },
+      { rx: /\bWHISK(?:EY|Y)\b/i, strong: true },
+      { rx: /\bBOURBON\b/i, strong: true },
+      { rx: /\bTEQUILA\b/i, strong: true },
+      { rx: /\bRUM\b/i, strong: false },
+      { rx: /\bGIN\b/i, strong: false },
+      { rx: /\bIPA\b/i, strong: false },
+      { rx: /\bLAGER\b/i, strong: false },
+      { rx: /\bMARGARITA\b/i, strong: true },
+      { rx: /\bMARTINI\b/i, strong: true },
+      { rx: /\bMIMOSA\b/i, strong: true },
+      { rx: /\bBLOODY\s+MARY\b/i, strong: true },
+      { rx: /\bSANGRIA\b/i, strong: true },
+      { rx: /\bCAB(?:ERNET)?\b/i, strong: false },
+      { rx: /\bCHARD(?:ONNAY)?\b/i, strong: false },
+      { rx: /\bPINOT(?:\s+NOIR|\s+GRIGIO)?\b/i, strong: false },
+      { rx: /\bBUD\s*(?:LIGHT|LT)\b/i, strong: true },
+      { rx: /\bMICH(?:ELOB)?\s*(?:ULTRA)?\b/i, strong: true },
+      { rx: /\bCOORS\b/i, strong: true },
+      { rx: /\bMILLER\s*(?:LITE|LT)?\b/i, strong: true },
+      { rx: /\bBUSCH\b/i, strong: true },
+      { rx: /\bCORONA\b/i, strong: true },
+      { rx: /\bMODELO\b/i, strong: true },
+      { rx: /\bWHITE\s*CLAW\b|\bWHT\s*CLAW\b/i, strong: true },
+      { rx: /\bHIGH\s*NOON\b/i, strong: true },
+      { rx: /\bTWISTED\s*TEA\b/i, strong: true }
+    ]
+  },
+  {
+    label: "Possible tobacco or nicotine item",
+    patterns: [
+      { rx: /\bTOBACCO\b/i, strong: true },
+      { rx: /\bCIG(?:ARETTE|ARETTES|S)?\b/i, strong: true },
+      { rx: /\bCIGAR(?:S)?\b/i, strong: true },
+      { rx: /\bNICOTINE\b/i, strong: true },
+      { rx: /\bVAPE\b|\bVAPOR\b/i, strong: true },
+      { rx: /\bVUSE\b/i, strong: true },
+      { rx: /\bJUUL\b/i, strong: true },
+      { rx: /\bZYN\b/i, strong: true },
+      { rx: /\bCOPENHAGEN\b/i, strong: true },
+      { rx: /\bSKOAL\b/i, strong: true },
+      { rx: /\bMARLBORO\b/i, strong: true },
+      { rx: /\bCAMEL\b/i, strong: true },
+      { rx: /\bNEWPORT\b/i, strong: true }
+    ]
+  },
+  {
+    label: "Possible gift card or prepaid item",
+    patterns: [
+      { rx: /\bGIFT\s*CARD\b|\bGIFTCARD\b|\bGFT\s*CARD\b|\bGIFT\s*CRD\b/i, strong: true },
+      { rx: /\bGIFT\s*CERT(?:IFICATE)?\b/i, strong: true },
+      { rx: /\bPRE\s*PAID\s*CARD\b|\bPREPAID\s*CARD\b/i, strong: true },
+      { rx: /\bVISA\s*GC\b|\bVISA\s*GIFT\b/i, strong: true },
+      { rx: /\bMC\s*GC\b|\bMASTERCARD\s*GIFT\b/i, strong: true },
+      { rx: /\bAMAZON\s*GIFT\b/i, strong: true },
+      { rx: /\bAPPLE\s*GIFT\b/i, strong: true },
+      { rx: /\bGOOGLE\s*PLAY\b/i, strong: true },
+      { rx: /\bSTEAM\s*(?:CARD|GIFT)\b/i, strong: true },
+      { rx: /\bPLAYSTATION\s*(?:CARD|GIFT)?\b/i, strong: true },
+      { rx: /\bXBOX\s*(?:CARD|GIFT)?\b/i, strong: true }
+    ]
+  },
+  {
+    label: "Possible lottery or cash-equivalent item",
+    patterns: [
+      { rx: /\bLOTTERY\b|\bLOTTO\b/i, strong: true },
+      { rx: /\bSCRATCH\s*(?:OFF|TICKET)?\b/i, strong: true },
+      { rx: /\bMONEY\s*ORDER\b/i, strong: true },
+      { rx: /\bWESTERN\s*UNION\b/i, strong: true }
+    ]
+  }
+];
+
+function normalizeAccountingReviewText(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[^\x20-\x7E\n\r\t]/g, " ")
+    .replace(/\r/g, "")
+    .replace(/[ \t]+/g, " ")
+    .trim();
+}
+
+function accountingReviewLines(text) {
+  return normalizeAccountingReviewText(text)
+    .split("\n")
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function accountingMoneyValues(line) {
+  const values = [];
+  const normalized = String(line || "").replace(/,/g, "");
+  const rx = /(?:^|[^\d])\$?\s*(\d{1,5}\.\d{2})(?!\d)/g;
+  let match;
+  while ((match = rx.exec(normalized))) {
+    const value = Number(match[1]);
+    if (Number.isFinite(value)) values.push(value);
+  }
+  return values;
+}
+
+function accountingLastMoney(line) {
+  const values = accountingMoneyValues(line);
+  return values.length ? values[values.length - 1] : null;
+}
+
+function findAccountingLabeledAmount(lines, matcher, rejecter = null) {
+  const candidates = [];
+  lines.forEach((line, index) => {
+    if (!matcher.test(line) || (rejecter && rejecter.test(line))) return;
+    let value = accountingLastMoney(line);
+    if (value == null && index + 1 < lines.length) value = accountingLastMoney(lines[index + 1]);
+    if (value == null) return;
+    candidates.push({ value, index, line });
+  });
+  return candidates.length ? candidates[candidates.length - 1] : null;
+}
+
+function parseAccountingReceiptAmounts(text) {
+  const lines = accountingReviewLines(text);
+  const subtotal = findAccountingLabeledAmount(lines, /\bSUB\s*TOTAL\b/i);
+  const tax = findAccountingLabeledAmount(
+    lines,
+    /\b(?:SALES\s*)?TAX\b/i,
+    /\b(?:TAX\s*ID|TAXABLE|TAX\s*RATE)\b/i
+  );
+  let tip = findAccountingLabeledAmount(
+    lines,
+    // Common OCR variants for TIP include T1P, TLP, and occasionally TP.
+    /\b(?:TIP|T1P|TLP|TP|GRATUITY)\b/i,
+    /\b(?:SUGGESTED|GUIDE|18%|20%|22%|25%)\b/i
+  );
+  const fee = findAccountingLabeledAmount(
+    lines,
+    /\b(?:SERVICE\s*(?:FEE|CHARGE)|PROCESSING\s*FEE|DELIVERY\s*FEE)\b/i
+  );
+
+  const totalCandidates = [];
+  lines.forEach((line, index) => {
+    if (/\bSUB\s*TOTAL\b/i.test(line)) return;
+    if (/\b(?:TAX|TIP|T1P|TLP|TP|GRATUITY|CHANGE|SAVINGS|DISCOUNT|TENDERED)\b/i.test(line)) return;
+    if (!/\b(?:GRAND\s*TOTAL|TOTAL\s*DUE|AMOUNT\s*DUE|BALANCE\s*DUE|TOTAL)\b/i.test(line)) return;
+    let value = accountingLastMoney(line);
+    if (value == null && index + 1 < lines.length) value = accountingLastMoney(lines[index + 1]);
+    if (value == null) return;
+    let score = 1;
+    if (/\bGRAND\s*TOTAL\b/i.test(line)) score = 5;
+    else if (/\b(?:TOTAL\s*DUE|AMOUNT\s*DUE|BALANCE\s*DUE)\b/i.test(line)) score = 4;
+    else if (/^\s*TOTAL\b/i.test(line)) score = 3;
+    totalCandidates.push({ value, index, line, score });
+  });
+  totalCandidates.sort((a, b) => a.score - b.score || a.index - b.index);
+  const total = totalCandidates.length ? totalCandidates[totalCandidates.length - 1] : null;
+
+  // If OCR loses the TIP label but still reads the amount, recover a single
+  // plausible charge located between subtotal/tax and the final total.
+  // This uses receipt structure only; it never invents a tip from the
+  // employee-entered reimbursement amount.
+  if (!tip && subtotal && total && total.index > subtotal.index) {
+    const excludedIndexes = new Set(
+      [subtotal?.index, tax?.index, fee?.index, total?.index].filter(Number.isInteger)
+    );
+    const startIndex = Math.max(
+      subtotal.index,
+      Number.isInteger(tax?.index) ? tax.index : subtotal.index,
+      Number.isInteger(fee?.index) ? fee.index : subtotal.index
+    );
+    const between = [];
+    for (let index = startIndex + 1; index < total.index; index++) {
+      if (excludedIndexes.has(index)) continue;
+      const line = lines[index];
+      if (/\b(?:SUB\s*TOTAL|TAX|TOTAL|CHANGE|SAVINGS|DISCOUNT|TENDERED)\b/i.test(line)) continue;
+      const value = accountingLastMoney(line);
+      if (value == null || value <= 0) continue;
+      // Position-only recovery is deliberately conservative.
+      if (subtotal.value > 0 && value <= subtotal.value * .40 + .05) {
+        between.push({ value, index, line, inferred: true });
+      }
+    }
+    if (between.length === 1) tip = between[0];
+  }
+
+  return {
+    lines,
+    subtotal: subtotal?.value ?? null,
+    tax: tax?.value ?? null,
+    tip: tip?.value ?? null,
+    tipInferred: Boolean(tip?.inferred),
+    fee: fee?.value ?? null,
+    total: total?.value ?? null
+  };
+}
+function accountingRoundMoney(value) {
+  return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+}
+
+function resolveAccountingReceiptTotal(amounts, enteredAmount) {
+  const ocrTotal = Number.isFinite(amounts?.total) ? accountingRoundMoney(amounts.total) : null;
+  const subtotal = Number.isFinite(amounts?.subtotal) ? accountingRoundMoney(amounts.subtotal) : null;
+  const components = [amounts?.tax, amounts?.tip, amounts?.fee].filter(Number.isFinite).map(accountingRoundMoney);
+  const componentTotal = subtotal != null && components.length
+    ? accountingRoundMoney(subtotal + components.reduce((sum, value) => sum + value, 0))
+    : null;
+  const entered = Number.isFinite(Number(enteredAmount)) ? accountingRoundMoney(Number(enteredAmount)) : null;
+
+  if (ocrTotal != null && componentTotal != null) {
+    const arithmeticDifference = Math.abs(ocrTotal - componentTotal);
+    if (arithmeticDifference <= .05) {
+      return { value: ocrTotal, ocrTotal, componentTotal, manualReview: false, source: "ocr" };
+    }
+
+    const enteredToOcr = entered == null ? Infinity : Math.abs(entered - ocrTotal);
+    const enteredToComponents = entered == null ? Infinity : Math.abs(entered - componentTotal);
+
+    // When the expense amount agrees with the receipt arithmetic and the OCR
+    // TOTAL does not, treat the component arithmetic as the better reading.
+    if (enteredToComponents <= .05 && enteredToOcr > .05) {
+      return { value: componentTotal, ocrTotal, componentTotal, manualReview: false, source: "components" };
+    }
+
+    // If the entered reimbursement agrees with the printed OCR total, retain it.
+    if (enteredToOcr <= .05) {
+      return { value: ocrTotal, ocrTotal, componentTotal, manualReview: false, source: "ocr" };
+    }
+
+    // Conflicting receipt arithmetic should be reviewed manually rather than
+    // turned into a confident amount-mismatch warning.
+    return { value: null, ocrTotal, componentTotal, manualReview: true, source: "conflict" };
+  }
+
+  if (ocrTotal != null) return { value: ocrTotal, ocrTotal, componentTotal, manualReview: false, source: "ocr" };
+  if (componentTotal != null && entered != null && Math.abs(entered - componentTotal) <= .05) {
+    return { value: componentTotal, ocrTotal, componentTotal, manualReview: false, source: "components" };
+  }
+  return { value: null, ocrTotal, componentTotal, manualReview: false, source: "none" };
+}
+
+function normalizeAccountingReceiptDate(month, day, year) {
+  let m = Number(month);
+  let d = Number(day);
+  let y = Number(year);
+  if (![m, d, y].every(Number.isFinite)) return null;
+  if (y < 100) y += y >= 70 ? 1900 : 2000;
+  if (y < 2000 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+  const test = new Date(Date.UTC(y, m - 1, d));
+  if (test.getUTCFullYear() !== y || test.getUTCMonth() !== m - 1 || test.getUTCDate() !== d) return null;
+  return `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+
+function parseAccountingReceiptDate(text) {
+  const lines = accountingReviewLines(text);
+  const candidates = [];
+
+  lines.forEach((line, index) => {
+    const normalized = normalizeAccountingReviewText(line);
+    let match;
+    const mdy = /(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/g;
+    while ((match = mdy.exec(normalized))) {
+      const value = normalizeAccountingReceiptDate(match[1], match[2], match[3]);
+      if (!value) continue;
+      let score = index <= 10 ? 2 : 0;
+      if (/\b(?:DATE|PURCHASE\s*DATE|TRANSACTION\s*DATE)\b/i.test(normalized)) score += 8;
+      if (/\b(?:EXP|EXPIRES|EXPIRATION)\b/i.test(normalized)) score -= 8;
+      candidates.push({ value, line: normalized, index, score });
+    }
+
+    const ymd = /(20\d{2})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/g;
+    while ((match = ymd.exec(normalized))) {
+      const value = normalizeAccountingReceiptDate(match[2], match[3], match[1]);
+      if (!value) continue;
+      let score = index <= 10 ? 2 : 0;
+      if (/\b(?:DATE|PURCHASE\s*DATE|TRANSACTION\s*DATE)\b/i.test(normalized)) score += 8;
+      if (/\b(?:EXP|EXPIRES|EXPIRATION)\b/i.test(normalized)) score -= 8;
+      candidates.push({ value, line: normalized, index, score });
+    }
+  });
+
+  candidates.sort((a, b) => b.score - a.score || a.index - b.index);
+  return candidates.length && candidates[0].score >= 0 ? candidates[0] : null;
+}
+
+function accountingLineLooksLikeItem(line) {
+  return accountingMoneyValues(line).length > 0 || /\b\d+\s*(?:PK|PACK|CT|EA)\b/i.test(line);
+}
+
+function accountingLineLooksLikeMerchantHeader(line, index, expense) {
+  if (index > 5) return false;
+  const merchant = normalizeAccountingReviewText(merchantText(expense) || "").toUpperCase().replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  const candidate = normalizeAccountingReviewText(line).toUpperCase().replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  if (!merchant || !candidate) return false;
+  if (candidate.includes(merchant) || merchant.includes(candidate)) return true;
+  const merchantTokens = new Set(merchant.split(" ").filter(token => token.length > 2));
+  const candidateTokens = candidate.split(" ").filter(token => token.length > 2);
+  if (!merchantTokens.size || !candidateTokens.length) return false;
+  const overlap = candidateTokens.filter(token => merchantTokens.has(token)).length;
+  return overlap >= Math.min(2, merchantTokens.size) && overlap / Math.max(1, candidateTokens.length) >= .5;
+}
+
+function detectAccountingRestrictedItems(text, expense) {
+  const lines = accountingReviewLines(text);
+  const found = [];
+  const seen = new Set();
+
+  for (const group of ACCOUNTING_REVIEW_TERM_GROUPS) {
+    for (let index = 0; index < lines.length; index++) {
+      const line = lines[index];
+      if (accountingLineLooksLikeMerchantHeader(line, index, expense)) continue;
+      for (const pattern of group.patterns) {
+        pattern.rx.lastIndex = 0;
+        if (!pattern.rx.test(line)) continue;
+        if (!pattern.strong && !accountingLineLooksLikeItem(line) && index <= 5) continue;
+        const key = group.label;
+        if (!seen.has(key)) {
+          seen.add(key);
+          found.push({
+            type: "restricted",
+            title: group.label,
+            detail: `Matched receipt text: "${truncatePdfText(normalizeAccountingReviewText(line), 62)}"`
+          });
+        }
+        break;
+      }
+      if (seen.has(group.label)) break;
+    }
+  }
+  return found;
+}
+
+function accountingExpenseDuplicateKey(expense) {
+  const merchant = normalizeAccountingReviewText(merchantText(expense) || expense.category || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const date = String(expense.date || "");
+  const amount = Number(expense.amount || 0).toFixed(2);
+  return `${merchant}|${date}|${amount}`;
+}
+
+function createAccountingReviewContext(items, details) {
+  const duplicateCounts = new Map();
+  items.forEach(expense => {
+    const key = accountingExpenseDuplicateKey(expense);
+    duplicateCounts.set(key, (duplicateCounts.get(key) || 0) + 1);
+  });
+  return {
+    details,
+    duplicateCounts,
+    ocrLibraryPromise: null,
+    workerPromise: null,
+    worker: null
+  };
+}
+
+function loadAccountingOcrLibrary(context) {
+  if (window.Tesseract?.createWorker) return Promise.resolve(window.Tesseract);
+  if (context.ocrLibraryPromise) return context.ocrLibraryPromise;
+  context.ocrLibraryPromise = new Promise((resolve, reject) => {
+    const existing = document.querySelector('script[data-ranch-accounting-ocr="true"]');
+    if (existing) {
+      existing.addEventListener("load", () => window.Tesseract?.createWorker ? resolve(window.Tesseract) : reject(new Error("OCR library did not initialize.")), { once: true });
+      existing.addEventListener("error", () => reject(new Error("OCR library could not be loaded.")), { once: true });
+      return;
+    }
+    const script = document.createElement("script");
+    script.dataset.ranchAccountingOcr = "true";
+    script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    script.async = true;
+    script.onload = () => window.Tesseract?.createWorker ? resolve(window.Tesseract) : reject(new Error("OCR library did not initialize."));
+    script.onerror = () => reject(new Error("OCR library could not be loaded."));
+    document.head.appendChild(script);
+  });
+  return context.ocrLibraryPromise;
+}
+
+async function getAccountingOcrWorker(context) {
+  if (context.worker) return context.worker;
+  if (context.workerPromise) return context.workerPromise;
+  context.workerPromise = (async () => {
+    const TesseractLib = await loadAccountingOcrLibrary(context);
+    const worker = await TesseractLib.createWorker("eng");
+    context.worker = worker;
+    return worker;
+  })();
+  return context.workerPromise;
+}
+
+async function closeAccountingOcrWorker(context) {
+  try {
+    if (context.worker) await context.worker.terminate();
+  } catch (error) {
+    console.warn("Accounting OCR worker could not be terminated cleanly.", error);
+  } finally {
+    context.worker = null;
+    context.workerPromise = null;
   }
 }
 
-function addExpenseDetailPages(pdf, items) {
+function accountingDateOutsideReport(expense, details) {
+  if (!expense.date || !details?.periodStart || !details?.periodEnd) return false;
+  const date = new Date(`${expense.date}T12:00:00`);
+  const start = new Date(`${details.periodStart}T00:00:00`);
+  const end = new Date(`${details.periodEnd}T23:59:59`);
+  if ([date, start, end].some(value => Number.isNaN(value.getTime()))) return false;
+  return date < start || date > end;
+}
+
+async function analyzeExpenseForAccounting(expense, doc, context) {
+  const flags = [];
+
+  if (!expense.receiptId) {
+    flags.push({
+      type: "missing-document",
+      title: expense.category === "Mileage" ? "Route documentation is missing" : "Receipt is missing",
+      detail: "Supporting documentation was not attached to this expense."
+    });
+  }
+
+  if ((context.duplicateCounts.get(accountingExpenseDuplicateKey(expense)) || 0) > 1) {
+    flags.push({
+      type: "duplicate",
+      title: "Possible duplicate expense",
+      detail: "Another expense in this report has the same date, merchant, and amount."
+    });
+  }
+
+  if (accountingDateOutsideReport(expense, context.details)) {
+    flags.push({
+      type: "date",
+      title: "Expense date is outside the report period",
+      detail: `Expense date: ${shortDate(expense.date)}`
+    });
+  }
+
+  if (!expense.receiptId || expense.category === "Mileage") return flags;
+
+  if (!doc?.blob || !doc?.isImage) {
+    flags.push({
+      type: "ocr-unavailable",
+      title: "Automated receipt review unavailable",
+      detail: "This supporting document is not an image that the local receipt reader can analyze."
+    });
+    return flags;
+  }
+
+  try {
+    const worker = await getAccountingOcrWorker(context);
+    const imageUrl = URL.createObjectURL(doc.blob);
+    let result;
+    try {
+      result = await worker.recognize(imageUrl);
+    } finally {
+      URL.revokeObjectURL(imageUrl);
+    }
+    const text = normalizeAccountingReviewText(result?.data?.text || "");
+    const confidence = Number(result?.data?.confidence);
+
+    if (!text) {
+      flags.push({
+        type: "ocr-unavailable",
+        title: "Receipt text could not be read",
+        detail: "Accounting should review the attached receipt manually."
+      });
+      return flags;
+    }
+
+    if (Number.isFinite(confidence) && confidence < 42) {
+      flags.push({
+        type: "low-confidence",
+        title: "Receipt reading confidence is low",
+        detail: "Accounting should verify the automated review against the attached receipt."
+      });
+    }
+
+    const receiptDate = parseAccountingReceiptDate(text);
+    if (receiptDate?.value && expense.date && receiptDate.value !== expense.date) {
+      flags.push({
+        type: "receipt-date",
+        title: "Expense date may not match receipt date",
+        detail: `Entered date ${shortDate(expense.date)} | Receipt date ${shortDate(receiptDate.value)}`
+      });
+    }
+
+    const amounts = parseAccountingReceiptAmounts(text);
+    const entered = Number(expense.amount || 0);
+    const resolvedTotal = resolveAccountingReceiptTotal(amounts, entered);
+
+    if (resolvedTotal.manualReview) {
+      flags.push({
+        type: "total-review",
+        title: "Receipt total needs manual verification",
+        detail: `OCR total ${money(resolvedTotal.ocrTotal)} | Receipt components add to ${money(resolvedTotal.componentTotal)}`
+      });
+    } else if (Number.isFinite(resolvedTotal.value)) {
+      const difference = Math.abs(entered - resolvedTotal.value);
+      if (difference > .05) {
+        flags.push({
+          type: "amount",
+          title: "Reimbursement amount may not match receipt total",
+          detail: `Entered ${money(entered)} | Receipt total ${money(resolvedTotal.value)} | Difference ${money(difference)}`
+        });
+      }
+    }
+
+    if (Number.isFinite(amounts.tip) && Number.isFinite(amounts.subtotal) && amounts.subtotal > 0) {
+      const percentage = amounts.tip / amounts.subtotal * 100;
+      if (percentage > 20.05) {
+        flags.push({
+          type: "tip",
+          title: "Tip appears to exceed the 20% guideline",
+          detail: `${amounts.tipInferred ? "Possible tip" : "Detected tip"} ${money(amounts.tip)} on subtotal ${money(amounts.subtotal)} (${percentage.toFixed(1)}%)`
+        });
+      }
+    }
+
+    flags.push(...detectAccountingRestrictedItems(text, expense));
+  } catch (error) {
+    console.warn("Automated accounting review could not analyze a receipt.", error);
+    flags.push({
+      type: "ocr-unavailable",
+      title: "Automated receipt review unavailable",
+      detail: "The receipt reader could not complete this check. Accounting should review the attached receipt manually."
+    });
+  }
+
+  return flags;
+}
+
+async function analyzeReportForAccounting(pdf, items, details, imageCache) {
+  const context = createAccountingReviewContext(items, details);
+  const reviews = [];
+  try {
+    for (const expense of items) {
+      const doc = expense.receiptId ? await getPdfSupportingDocument(pdf, expense, imageCache) : null;
+      reviews.push(await analyzeExpenseForAccounting(expense, doc, context));
+    }
+  } finally {
+    await closeAccountingOcrWorker(context);
+  }
+  return reviews;
+}
+
+function accountingReviewPdfLines(flags) {
+  const lines = [];
+  (flags || []).forEach(flag => {
+    lines.push(...wrapPdfText(`REVIEW: ${flag.title}`, 58).slice(0, 2));
+    if (flag.detail) lines.push(...wrapPdfText(flag.detail, 58).slice(0, 2).map(line => `  ${line}`));
+  });
+  return lines;
+}
+
+async function addExpenseDetailPages(pdf, items, imageCache, accountingReviews = []) {
   let commands = "";
-  let y = 756;
-  const flush = () => { if (commands) pdf.addPage(commands); commands = ""; y = 756; };
-  items.forEach((expense, index) => {
-    const purposeLines = wrapPdfText(expense.purpose || "Not specified", 78);
-    const detailLines = wrapPdfText(detailText(expense) || "No additional category details.", 78);
-    const noteLines = expense.notes ? wrapPdfText(expense.notes, 78) : [];
-    const height = 92 + purposeLines.length * 12 + detailLines.length * 11 + noteLines.length * 11;
+  let y = 738;
+  let xobjects = {};
+  let imageCounter = 0;
+
+  const flush = () => {
+    if (commands) pdf.addPage(commands, xobjects);
+    commands = "";
+    xobjects = {};
+    imageCounter = 0;
+    y = 738;
+  };
+
+  for (let index = 0; index < items.length; index++) {
+    const expense = items[index];
+    const flags = accountingReviews[index] || [];
+    const purposeLines = wrapPdfText(expense.purpose || "Not specified", 58).slice(0, 4);
+    const detailLines = wrapPdfText(detailText(expense) || "No additional category details.", 58).slice(0, 4);
+    const noteLines = expense.notes ? wrapPdfText(expense.notes, 58).slice(0, 3) : [];
+    const reviewLines = accountingReviewPdfLines(flags).slice(0, 10);
+    const textHeight = 118
+      + purposeLines.length * 11
+      + detailLines.length * 10
+      + noteLines.length * 10
+      + (reviewLines.length ? 26 + reviewLines.length * 10 : 0);
+    const height = Math.max(166, Math.min(286, textHeight));
+
     if (!commands || y - height < 64) {
       if (commands) flush();
       commands += pdfTextCommand("EXPENSE DETAILS", 42, 768, 15, true);
-      y = 738;
+      commands += pdfTextCommand("Accounting review notes appear only when an expense may need attention.", 42, 752, 8);
+      y = 724;
     }
+
     commands += pdfRectCommand(42, y - height + 16, 528, height, .975);
     commands += pdfTextCommand(`EXPENSE ${index + 1}`, 56, y, 8, true);
-    commands += pdfTextCommand(truncatePdfText(merchantText(expense) || expense.category, 58), 56, y - 20, 13, true);
-    commands += pdfTextCommand(shortDate(expense.date), 430, y - 20, 9);
-    commands += pdfTextCommand(money(expense.amount), 510, y - 20, 11, true);
-    commands += pdfTextCommand(truncatePdfText(expense.category, 70), 56, y - 39, 9);
-    commands += pdfTextCommand(expense.receiptId ? `${expense.category === "Mileage" ? "Route document" : "Receipt"}: ${truncatePdfText(expense.receiptName || "Attached", 38)}` : expense.category === "Mileage" ? "Route document: Not attached" : "Receipt: Missing", 310, y - 39, 9);
-    let lineY = y - 62;
+    commands += pdfTextCommand(truncatePdfText(merchantText(expense) || expense.category, 48), 56, y - 20, 13, true);
+    commands += pdfTextCommand(shortDate(expense.date), 344, y - 20, 9);
+    commands += pdfTextCommand(money(expense.amount), 402, y - 20, 11, true);
+    commands += pdfTextCommand(truncatePdfText(expense.category, 42), 56, y - 39, 9);
+    commands += pdfTextCommand("ACCOUNTING CODE", 292, y - 39, 7.5, true);
+    commands += pdfLineCommand(374, y - 41, 448, y - 41, .6);
+    commands += pdfTextCommand(
+      expense.receiptId
+        ? `${expense.category === "Mileage" ? "Route document" : "Receipt"}: ${truncatePdfText(expense.receiptName || "Attached", 42)}`
+        : expense.category === "Mileage"
+          ? "Route document: Not attached"
+          : "Receipt: Missing",
+      56, y - 55, 7.5
+    );
+
+    let lineY = y - 76;
     commands += pdfTextCommand("DESCRIPTION", 56, lineY, 8, true); lineY -= 14;
-    purposeLines.forEach(line => { commands += pdfTextCommand(line, 56, lineY, 9); lineY -= 12; });
-    commands += pdfTextCommand("CATEGORY DETAILS", 56, lineY - 2, 8, true); lineY -= 16;
-    detailLines.forEach(line => { commands += pdfTextCommand(line, 56, lineY, 9); lineY -= 11; });
+    purposeLines.forEach(line => { commands += pdfTextCommand(line, 56, lineY, 8.5); lineY -= 11; });
+    commands += pdfTextCommand("CATEGORY DETAILS", 56, lineY - 2, 8, true); lineY -= 15;
+    detailLines.forEach(line => { commands += pdfTextCommand(line, 56, lineY, 8.5); lineY -= 10; });
+
     if (noteLines.length) {
-      commands += pdfTextCommand("NOTES", 56, lineY - 2, 8, true); lineY -= 16;
-      noteLines.forEach(line => { commands += pdfTextCommand(line, 56, lineY, 9); lineY -= 11; });
+      commands += pdfTextCommand("NOTES", 56, lineY - 2, 8, true); lineY -= 15;
+      noteLines.forEach(line => { commands += pdfTextCommand(line, 56, lineY, 8.5); lineY -= 10; });
     }
+
+    if (reviewLines.length) {
+      lineY -= 4;
+      commands += pdfLineCommand(56, lineY, 448, lineY, .45);
+      lineY -= 14;
+      commands += pdfTextCommand("ACCOUNTING REVIEW", 56, lineY, 8, true);
+      lineY -= 14;
+      reviewLines.forEach(line => {
+        commands += pdfTextCommand(truncatePdfText(line, 70), 56, lineY, 8);
+        lineY -= 10;
+      });
+    }
+
+    const thumbX = 466;
+    const thumbY = y - height + 30;
+    const thumbW = 88;
+    const thumbH = Math.min(122, height - 72);
+    commands += pdfRectCommand(thumbX, thumbY, thumbW, thumbH, .94);
+
+    const doc = await getPdfSupportingDocument(pdf, expense, imageCache);
+    if (doc?.isImage && doc.imageRef) {
+      const scale = Math.min((thumbW - 8) / doc.width, (thumbH - 8) / doc.height);
+      const drawWidth = doc.width * scale;
+      const drawHeight = doc.height * scale;
+      const drawX = thumbX + (thumbW - drawWidth) / 2;
+      const drawY = thumbY + (thumbH - drawHeight) / 2;
+      const imageName = `Im${++imageCounter}`;
+      xobjects[imageName] = doc.imageRef;
+      commands += `q ${drawWidth.toFixed(2)} 0 0 ${drawHeight.toFixed(2)} ${drawX.toFixed(2)} ${drawY.toFixed(2)} cm /${imageName} Do Q
+`;
+    } else if (expense.receiptId) {
+      commands += pdfTextCommand("DOCUMENT", thumbX + 15, thumbY + thumbH / 2 + 6, 8, true);
+      commands += pdfTextCommand("ATTACHED", thumbX + 18, thumbY + thumbH / 2 - 8, 8);
+    } else {
+      commands += pdfTextCommand("NO", thumbX + 36, thumbY + thumbH / 2 + 6, 8, true);
+      commands += pdfTextCommand("RECEIPT", thumbX + 24, thumbY + thumbH / 2 - 8, 8);
+    }
+
     y -= height + 14;
-  });
+  }
   flush();
 }
 
-async function addReceiptAppendix(pdf, items) {
+async function addReceiptAppendix(pdf, items, imageCache) {
   const receiptItems = items.filter(expense => expense.receiptId);
   if (!receiptItems.length) return;
   for (let index = 0; index < receiptItems.length; index++) {
     const expense = receiptItems[index];
-    let record = null;
-    try { record = await getReceipt(expense.receiptId); }
-    catch (error) { console.warn("Could not retrieve receipt.", error); }
-    let blob = record?.blob || (record?.bytes ? new Blob([record.bytes], { type: record.type || "application/octet-stream" }) : null);
-    const filename = record?.name || expense.receiptName || `receipt-${index + 1}`;
-    const type = record?.type || blob?.type || expense.receiptType || "application/octet-stream";
-    const isImage = Boolean(blob && String(type).toLowerCase().startsWith("image/"));
-
+    const doc = await getPdfSupportingDocument(pdf, expense, imageCache);
+    const blob = doc?.blob || null;
+    const filename = doc?.filename || expense.receiptName || `receipt-${index + 1}`;
+    const type = doc?.type || expense.receiptType || "application/octet-stream";
     const documentLabel = expense.category === "Mileage" ? "ROUTE DOCUMENT" : "RECEIPT";
     let commands = pdfTextCommand(`${documentLabel} ${index + 1}`, 42, 760, 9, true);
     commands += pdfTextCommand(truncatePdfText(merchantText(expense) || expense.category, 70), 42, 737, 16, true);
     commands += pdfTextCommand(`${shortDate(expense.date)}  |  ${truncatePdfText(expense.category, 50)}  |  ${money(expense.amount)}`, 42, 717, 9);
     let y = 697;
-    wrapPdfText(expense.purpose || "", 86).slice(0, 3).forEach(line => { commands += pdfTextCommand(line, 42, y, 9); y -= 12; });
+    wrapPdfText(expense.purpose || "", 86).slice(0, 3).forEach(line => {
+      commands += pdfTextCommand(line, 42, y, 9);
+      y -= 12;
+    });
 
-    if (isImage) {
-      try {
-        // Image receipts are rendered once as an optimized JPEG page. Version 1.4.0
-        // embedded the full original photo as a second copy, which made multi-photo
-        // reports unnecessarily large.
-        const image = await receiptImageToJpeg(blob);
-        const imageRef = pdf.addJpeg(image.bytes, image.width, image.height);
-        const maxWidth = 520;
-        const maxHeight = Math.max(120, y - 48);
-        const scale = Math.min(maxWidth / image.width, maxHeight / image.height);
-        const drawWidth = image.width * scale;
-        const drawHeight = image.height * scale;
-        const x = 46 + (520 - drawWidth) / 2;
-        const drawY = 42 + (maxHeight - drawHeight) / 2;
-        commands += `q ${drawWidth.toFixed(2)} 0 0 ${drawHeight.toFixed(2)} ${x.toFixed(2)} ${drawY.toFixed(2)} cm /Im1 Do Q\n`;
-        pdf.addPage(commands, { Im1: imageRef });
-      } catch (error) {
-        console.warn("Receipt image optimization failed during PDF export.", error);
-        if (blob) pdf.addAttachment(`${String(index + 1).padStart(2, "0")}-${filename}`, type, new Uint8Array(await blob.arrayBuffer()));
-        commands += pdfTextCommand(`The ${expense.category === "Mileage" ? "route image" : "receipt image"} could not be rendered. The original file is embedded as an attachment instead.`, 42, y - 20, 9);
-        pdf.addPage(commands);
-      }
+    if (doc?.isImage && doc.imageRef) {
+      const maxWidth = 520;
+      const maxHeight = Math.max(120, y - 48);
+      const scale = Math.min(maxWidth / doc.width, maxHeight / doc.height);
+      const drawWidth = doc.width * scale;
+      const drawHeight = doc.height * scale;
+      const x = 46 + (520 - drawWidth) / 2;
+      const drawY = 42 + (maxHeight - drawHeight) / 2;
+      commands += `q ${drawWidth.toFixed(2)} 0 0 ${drawHeight.toFixed(2)} ${x.toFixed(2)} ${drawY.toFixed(2)} cm /Im1 Do Q\n`;
+      pdf.addPage(commands, { Im1: doc.imageRef });
     } else {
-      // PDFs and other supporting documents are preserved as attachments.
       if (blob) pdf.addAttachment(`${String(index + 1).padStart(2, "0")}-${filename}`, type, new Uint8Array(await blob.arrayBuffer()));
       commands += pdfRectCommand(42, 270, 528, 220, .97);
       commands += pdfTextCommand(blob ? `ORIGINAL ${documentLabel} ATTACHED` : `${documentLabel} FILE NOT FOUND`, 72, 420, 14, true);
@@ -3665,10 +4343,11 @@ async function addReceiptAppendix(pdf, items) {
 
 async function buildReportPdfBlob(details, items, status = "Draft", submittedDate = null) {
   const pdf = new LocalPdfDocument();
+  const imageCache = new Map();
+  const accountingReviews = await analyzeReportForAccounting(pdf, items, details, imageCache);
   addCoverPage(pdf, details, items, status, submittedDate);
-  if (items.length > 5) addExpenseSummaryPages(pdf, items);
-  addExpenseDetailPages(pdf, items);
-  await addReceiptAppendix(pdf, items);
+  await addExpenseDetailPages(pdf, items, imageCache, accountingReviews);
+  await addReceiptAppendix(pdf, items, imageCache);
   return new Blob([pdf.build()], { type: "application/pdf" });
 }
 
