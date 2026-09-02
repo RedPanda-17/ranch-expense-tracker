@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Loading OCR v4 Parser Lab v4</title>
+<style>
+body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#2a231e;display:grid;min-height:100vh;place-items:center}.box{max-width:620px;margin:20px;padding:24px;background:#fffdf8;border:1px solid #dfd1bd;border-radius:16px}.bad{color:#a6191f;white-space:pre-wrap}
+</style>
+</head>
+<body><div class="box"><b>Loading OCR v4 Parser Lab v4…</b><p>This revision preserves the fast upload/crop path and restores the browser dependency PaddleOCR.js requires internally.</p><div id="error" class="bad"></div></div>
+<script>
+(async()=>{
+ try{
+   const res=await fetch('./ocr-v4-parser-v3.html?v=4',{cache:'no-store'});
+   if(!res.ok)throw new Error('Could not load parser source: HTTP '+res.status);
+   let html=await res.text();
+   const old='"onnxruntime-web":"https://esm.run/onnxruntime-web@1.22.0","clipper-lib"';
+   const replacement='"onnxruntime-web":"https://esm.run/onnxruntime-web@1.22.0","@techstark/opencv-js":"https://esm.run/@techstark/opencv-js@4.10.0-release.1","clipper-lib"';
+   if(!html.includes(old))throw new Error('Expected PaddleOCR import-map marker was not found in v3 source.');
+   html=html.replace(old,replacement)
+            .replaceAll('OCR v4 Parser Lab v3','OCR v4 Parser Lab v4')
+            .replaceAll('Receipt Parser Lab v3','Receipt Parser Lab v4');
+   document.open();
+   document.write(html);
+   document.close();
+ }catch(e){document.getElementById('error').textContent=e?.stack||String(e)}
+})();
+</script>
+</body>
+</html>
