@@ -10,37 +10,31 @@
 <script>
 (async()=>{
  try{
-   const res=await fetch('./ocr-v4-parser-v3.html?v=5',{cache:'no-store'});
+   const res=await fetch('./ocr-v4-parser-v3.html?v=5b',{cache:'no-store'});
    if(!res.ok)throw new Error('Could not load parser source: HTTP '+res.status);
    let html=await res.text();
 
-   // Restore PaddleOCR's internal OpenCV browser dependency.
    const mapOld='"onnxruntime-web":"https://esm.run/onnxruntime-web@1.22.0","clipper-lib"';
    const mapNew='"onnxruntime-web":"https://esm.run/onnxruntime-web@1.22.0","@techstark/opencv-js":"https://esm.run/@techstark/opencv-js@4.10.0-release.1","clipper-lib"';
    if(html.includes(mapOld))html=html.replace(mapOld,mapNew);
 
-   // Version labels.
    html=html.replaceAll('OCR v4 Parser Lab v3','OCR v4 Parser Lab v5')
             .replaceAll('Receipt Parser Lab v3','Receipt Parser Lab v5');
 
-   // Accept OCR lines where date and time are concatenated: 08/19/202611:25:12AM.
    const oldDate='function date(t){const m=String(t).match(/\\b(\\d{1,2})\\s*[\\/.-]\\s*(\\d{1,2})\\s*[\\/.-]\\s*(20\\d{2}|\\d{2})\\b/);if(!m)return"";let y=+m[3];if(y<100)y+=2000;return`${y}-${String(+m[1]).padStart(2,"0")}-${String(+m[2]).padStart(2,"0")}`}';
    const newDate='function date(t){const s=String(t||"");const m=s.match(/\\b(\\d{1,2})\\s*[\\/.-]\\s*(\\d{1,2})\\s*[\\/.-]\\s*(20\\d{2}|\\d{2})(?=$|[^0-9]|\\d{1,2}:\\d{2})/);if(!m)return"";const mo=+m[1],dy=+m[2];let y=+m[3];if(y<100)y+=2000;if(mo<1||mo>12||dy<1||dy>31)return"";return`${y}-${String(mo).padStart(2,"0")}-${String(dy).padStart(2,"0")}`}';
    if(!html.includes(oldDate))throw new Error('Date parser marker not found.');
    html=html.replace(oldDate,newDate);
 
-   // Give irregular/curved receipts a wider crop safety margin so first letters are not clipped.
    html=html.replace('pad=Math.round(c.width*.018)','pad=Math.round(c.width*.045)');
 
-   // Expand promotion/footer recognition so domains/survey text do not stay in PAYMENT.
    html=html.replace('PROMO=/\\b(SURVEY|ENTER TO WIN|WIN A|RETURN POLICY|REWARDS|LOYALTY|POINTS|CUSTOMER\'?S COPY|MERCHANT COPY|HAVE A NICE DAY|SEE YOU NEXT TIME|TAKE HOME MEALS|TAKE AND BAKE|CHANCE TO WIN)\\b/i',
                      'PROMO=/\\b(SURVEY|TELL US|ENTER TO WIN|WIN A|RETURN POLICY|REWARDS|LOYALTY|POINTS|CUSTOMER\'?S COPY|MERCHANT COPY|QUESTIONS OR COMMENTS|HAVE A NICE DAY|SEE YOU NEXT TIME|TAKE HOME MEALS|TAKE AND BAKE|CHANCE TO WIN|FREE CANE\'?S)\\b|HICANES\\.COM|PIZZARANCHFEEDBACK\\.COM|RANCHREWARDS\\.COM|MARKER126\\.COM/i');
 
-   // Merchant identity: first prefer header/meta, then allow strong brand/domain evidence anywhere on receipt.
    const ms=html.indexOf('function merchant(z){');
-   const me=html.indexOf('function labeled',ms);
+   const me=html.indexOf('function parse(',ms);
    if(ms<0||me<0)throw new Error('Merchant parser markers not found.');
-   const merchantFn='function merchant(z){const preferred=z.filter(r=>r.zone==="header"||r.zone==="metadata").slice(0,16).map(r=>r.text).join("\\n"),all=z.map(r=>r.text).join("\\n"),a=[[/PIZZA\\s*RANCH|PIZZARANCHFEEDBACK\\.COM|RANCHREWARDS\\.COM/i,"Pizza Ranch"],[/KWIK\\s*STAR/i,"Kwik Star"],[/HY[\\s-]*VEE.*FAST.*FRESH/i,"Hy-Vee Fast & Fresh"],[/MARKER\\s*126|MARKER126\\.COM/i,"Marker 126"],[/HICANES\\.COM|RAISING\\s*CANE|CANE\'?S/i,"Raising Cane\'s"],[/ACE.*HARDWARE|ACE BIKE AND FITNESS/i,"Ace Hardware"]];for(const [re,n] of a)if(re.test(preferred))return n;for(const [re,n] of a)if(re.test(all))return n;return z.find(r=>r.zone==="header"&&/[A-Za-z]{3}/.test(r.text)&&!/THANK|WELCOME/i.test(r.text))?.text||""}\n';
+   const merchantFn='function merchant(z){const preferred=z.filter(r=>r.zone==="header"||r.zone==="metadata").slice(0,16).map(r=>r.text).join("\\n"),all=z.map(r=>r.text).join("\\n"),a=[[/PIZZA\\s*RANCH|PIZZARANCHFEEDBACK\\.COM|RANCHREWARDS\\.COM/i,"Pizza Ranch"],[/KWIK\\s*STAR/i,"Kwik Star"],[/(?:HY[\\s-]*VEE|Y[\\s-]*VEE).*FAST.*FRESH/i,"Hy-Vee Fast & Fresh"],[/MARKER\\s*126|MARKER126\\.COM/i,"Marker 126"],[/HICANES\\.COM|RAISING\\s*CANE|FREE CANE\'?S/i,"Raising Cane\'s"],[/ACE.*HARDWARE|ACE BIKE AND FITNESS/i,"Ace Hardware"]];for(const [re,n] of a)if(re.test(preferred))return n;for(const [re,n] of a)if(re.test(all))return n;return z.find(r=>r.zone==="header"&&/[A-Za-z]{3}/.test(r.text)&&!/THANK|WELCOME/i.test(r.text))?.text||""}\n';
    html=html.slice(0,ms)+merchantFn+html.slice(me);
 
    document.open();
