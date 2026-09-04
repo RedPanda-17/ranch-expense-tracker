@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ranch Expense Tracker - Complete Sync Test 6</title>
+<style>
+body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#2a231e;display:grid;min-height:100vh;place-items:center}
+.box{max-width:720px;margin:20px;padding:24px;background:#fffdf8;border:1px solid #dfd1bd;border-radius:16px}
+.bad{color:#a6191f;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="box">
+<strong>Loading Complete Sync Test 6…</strong>
+<p>This isolated build tests full automatic cloud sync, clearer dashboard totals, and privacy-safe sign-out. Production Ranch Expense Tracker data is untouched.</p>
+<div id="error" class="bad"></div>
+</div>
+<script>
+(async()=>{
+  try{
+    const res=await fetch('./expense-entry-efficiency-test-2.html?complete-sync=6',{cache:'no-store'});
+    if(!res.ok)throw new Error('Could not load Efficiency Test 2: HTTP '+res.status);
+    let source=await res.text();
+
+    source=source.replaceAll('efficiencytest2','supabasecompletesynctest6');
+
+    const marker="    document.open();document.write(html);document.close();console.info('Expense Entry Efficiency Test patches:',applied);";
+    if(!source.includes(marker))throw new Error('Complete-sync integration marker was not found.');
+
+    const injected=`    html=html.replace('</body>','<script src="./mileage-efficiency-hotfix.js?v=6"><\\/script><script src="./supabase-complete-sync-v6.js?v=6"><\\/script></body>');\n`;
+    source=source.replace(marker,injected+marker);
+
+    document.open();
+    document.write(source);
+    document.close();
+  }catch(error){
+    document.getElementById('error').textContent=error?.stack||String(error);
+  }
+})();
+</script>
+</body>
+</html>
