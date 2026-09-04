@@ -16,12 +16,20 @@ function tryInject(){
     const doc=frame.contentDocument;
     if(!doc?.getElementById("settings")||injected)return setTimeout(tryInject,150);
     injected=true;
-    const script=doc.createElement("script");
-    script.src="./supabase-sync-bridge.js?v=1";
-    script.onerror=()=>{injected=false;setTimeout(tryInject,500)};
-    doc.body.appendChild(script);
+
+    const hotfix=doc.createElement("script");
+    hotfix.src="./mileage-efficiency-hotfix.js?v=1";
+    hotfix.onload=()=>{
+      const script=doc.createElement("script");
+      script.src="./supabase-sync-bridge.js?v=1";
+      script.onerror=()=>{injected=false;setTimeout(tryInject,500)};
+      doc.body.appendChild(script);
+    };
+    hotfix.onerror=()=>{injected=false;setTimeout(tryInject,500)};
+    doc.body.appendChild(hotfix);
+
     const marker=doc.getElementById("efficiencyTestMarker");
-    if(marker)marker.textContent="Supabase Sync Test 1 · Efficiency Test 2 base · Production unchanged";
+    if(marker)marker.textContent="Supabase Sync Test 1 · Efficiency Test 2 base · Mileage fix · Production unchanged";
   }catch(e){setTimeout(tryInject,250)}
 }
 frame.addEventListener("load",()=>{injected=false;setTimeout(tryInject,100)});
