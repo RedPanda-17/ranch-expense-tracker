@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ranch Expense Tracker - Supabase Connection Test</title>
+<style>
+:root {
+  --bg:#f5efe4; --panel:#fffdf8; --text:#2a231e; --muted:#74675d;
+  --border:#dfd1bd; --brand:#a71f25; --brand-dark:#721419;
+  --ok:#557044; --ok-bg:#eaf2e4; --warn:#8b5a0a; --warn-bg:#fff8e7;
+  --bad:#a6191f; --bad-bg:#fff0ef;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,#fbf7ef,#f5efe4);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
+header{background:#27201c;color:#fff;border-bottom:4px solid #d39a30;padding:20px}
+header>div,main{width:min(820px,calc(100% - 28px));margin:auto}
+header h1{margin:0 0 5px;font-size:1.35rem}
+header p{margin:0;color:#d8cbc0;font-size:.85rem}
+main{padding:20px 0 56px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px}
+h2{font-size:1.05rem;margin:0 0 10px}
+p{line-height:1.45}
+label{font-weight:800;font-size:.86rem}
+.field{display:grid;gap:6px;margin-bottom:11px}
+input,button{font:inherit}
+input{width:100%;padding:11px 12px;border:1px solid #cdbda8;border-radius:10px;background:#fff}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{border:0;border-radius:10px;padding:10px 13px;font-weight:850;cursor:pointer;background:#eee5d9;color:#372f29}
+button.primary{background:var(--brand);color:#fff}
+button.danger{background:var(--bad-bg);color:var(--bad)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.status{padding:11px 12px;border-radius:10px;background:#f4eee5;font-size:.84rem;white-space:pre-wrap;word-break:break-word}
+.status.ok{background:var(--ok-bg);color:#315329}
+.status.warn{background:var(--warn-bg);color:var(--warn)}
+.status.bad{background:var(--bad-bg);color:var(--bad)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.metric{padding:11px;border-radius:11px;background:#f8f1e7}
+.metric span{display:block;color:var(--muted);font-size:.7rem;text-transform:uppercase;font-weight:850}
+.metric strong{display:block;margin-top:4px;word-break:break-word}
+pre{white-space:pre-wrap;word-break:break-word;background:#f7f2ea;border-radius:10px;padding:11px;max-height:300px;overflow:auto;font-size:.75rem}
+.small{font-size:.8rem;color:var(--muted)}
+@media(max-width:640px){.grid{grid-template-columns:1fr}.actions button{flex:1 1 auto}}
+</style>
+</head>
+<body>
+<header><div>
+  <h1>Supabase Connection Test</h1>
+  <p>Ranch Expense Tracker research only · production app is untouched</p>
+</div></header>
+
+<main>
+  <section class="card">
+    <h2>1. Project connection</h2>
+    <div class="grid">
+      <div class="metric"><span>Project</span><strong>rdxzqudawzkqetooubee</strong></div>
+      <div class="metric"><span>Client</span><strong>Publishable key + RLS</strong></div>
+    </div>
+    <div id="connectionStatus" class="status" style="margin-top:12px">Loading Supabase client…</div>
+  </section>
+
+  <section class="card">
+    <h2>2. Test account</h2>
+    <p class="small">Use a real email you can access. If email confirmation is enabled, Supabase may ask you to confirm the address before signing in.</p>
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="At least 6 characters">
+    </div>
+    <div class="actions">
+      <button id="signup" class="primary" type="button">Create test account</button>
+      <button id="signin" type="button">Sign in</button>
+      <button id="signout" type="button">Sign out</button>
+    </div>
+    <div id="authStatus" class="status" style="margin-top:12px">Not signed in.</div>
+  </section>
+
+  <section class="card">
+    <h2>3. Database test</h2>
+    <p class="small">This creates one disposable row in <b>public.expenses</b> under your signed-in user ID, then reads it back through the same RLS policy the app will use.</p>
+    <div class="actions">
+      <button id="profileTest" type="button">Read my profile</button>
+      <button id="writeTest" class="primary" type="button">Write test expense</button>
+      <button id="readTest" type="button">Read test expense</button>
+      <button id="deleteTest" class="danger" type="button">Delete test expense</button>
+    </div>
+    <div id="dbStatus" class="status" style="margin-top:12px">Sign in first.</div>
+    <pre id="output">No database result yet.</pre>
+  </section>
+
+  <section class="card">
+    <h2>What success looks like</h2>
+    <p class="small">When this works, we have proven the browser can authenticate safely and that your RLS policies allow only the signed-in employee to read/write their own Ranch Expense Tracker records. Receipt Storage will be tested separately after this passes.</p>
+  </section>
+</main>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL = 'https://rdxzqudawzkqetooubee.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_is8367xzMm8UckiRkyYAMw_jVy8Eyop';
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
+
+const $ = id => document.getElementById(id);
+const TEST_EXPENSE_ID = "supabase_connection_test_v1";
+
+function setStatus(id, message, type = "") {
+  const el = $(id);
+  el.textContent = message;
+  el.className = "status" + (type ? " " + type : "");
+}
+function out(value) {
+  $("output").textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+}
+async function currentUser() {
+  const { data, error } = await supabase.auth.getUser();
+  if (error) return null;
+  return data.user || null;
+}
+async function refreshAuth() {
+  const user = await currentUser();
+  if (!user) {
+    setStatus("authStatus", "Not signed in.");
+    setStatus("dbStatus", "Sign in first.");
+    return null;
+  }
+  setStatus("authStatus", `Signed in as ${user.email}\nUser ID: ${user.id}`, "ok");
+  setStatus("dbStatus", "Ready for database test.", "ok");
+  return user;
+}
+
+try {
+  const { error } = await supabase.auth.getSession();
+  if (error) throw error;
+  setStatus("connectionStatus", "Supabase client loaded successfully.", "ok");
+  await refreshAuth();
+} catch (error) {
+  setStatus("connectionStatus", error.message || String(error), "bad");
+}
+
+supabase.auth.onAuthStateChange(() => setTimeout(refreshAuth, 0));
+
+$("signup").addEventListener("click", async () => {
+  const email = $("email").value.trim();
+  const password = $("password").value;
+  if (!email || password.length < 6) return setStatus("authStatus", "Enter an email and a password with at least 6 characters.", "warn");
+  setStatus("authStatus", "Creating account…");
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) return setStatus("authStatus", error.message, "bad");
+  if (data.session) {
+    setStatus("authStatus", `Account created and signed in as ${data.user?.email || email}.`, "ok");
+    await refreshAuth();
+  } else {
+    setStatus("authStatus", "Account created. Supabase requires email confirmation for this project. Check your inbox, confirm the email, then return here and click Sign in.", "warn");
+  }
+});
+
+$("signin").addEventListener("click", async () => {
+  const email = $("email").value.trim();
+  const password = $("password").value;
+  if (!email || !password) return setStatus("authStatus", "Enter your email and password first.", "warn");
+  setStatus("authStatus", "Signing in…");
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return setStatus("authStatus", error.message, "bad");
+  await refreshAuth();
+});
+
+$("signout").addEventListener("click", async () => {
+  const { error } = await supabase.auth.signOut();
+  if (error) return setStatus("authStatus", error.message, "bad");
+  setStatus("authStatus", "Signed out.", "ok");
+  setStatus("dbStatus", "Sign in first.");
+  out("No database result yet.");
+});
+
+$("profileTest").addEventListener("click", async () => {
+  const user = await currentUser();
+  if (!user) return setStatus("dbStatus", "Sign in first.", "warn");
+  setStatus("dbStatus", "Reading your profile…");
+  const { data, error } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+  if (error) {
+    setStatus("dbStatus", "Profile read failed: " + error.message, "bad");
+    return out(error);
+  }
+  setStatus("dbStatus", "Profile read succeeded.", "ok");
+  out(data || { note: "No profile row returned." });
+});
+
+$("writeTest").addEventListener("click", async () => {
+  const user = await currentUser();
+  if (!user) return setStatus("dbStatus", "Sign in first.", "warn");
+  setStatus("dbStatus", "Writing test expense…");
+  const payload = {
+    id: TEST_EXPENSE_ID,
+    category: "Other",
+    merchant: "Supabase Connection Test",
+    amount: 1.23,
+    date: new Date().toISOString().slice(0, 10),
+    purpose: "Disposable cloud sync verification row",
+    testOnly: true
+  };
+  const { data, error } = await supabase.from("expenses").upsert({
+    user_id: user.id,
+    expense_id: TEST_EXPENSE_ID,
+    payload
+  }, { onConflict: "user_id,expense_id" }).select().single();
+  if (error) {
+    setStatus("dbStatus", "Write failed: " + error.message, "bad");
+    return out(error);
+  }
+  setStatus("dbStatus", "Test expense written successfully.", "ok");
+  out(data);
+});
+
+$("readTest").addEventListener("click", async () => {
+  const user = await currentUser();
+  if (!user) return setStatus("dbStatus", "Sign in first.", "warn");
+  setStatus("dbStatus", "Reading test expense…");
+  const { data, error } = await supabase.from("expenses")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("expense_id", TEST_EXPENSE_ID)
+    .maybeSingle();
+  if (error) {
+    setStatus("dbStatus", "Read failed: " + error.message, "bad");
+    return out(error);
+  }
+  if (!data) {
+    setStatus("dbStatus", "No test expense exists yet. Click Write test expense first.", "warn");
+    return out({ note: "No row found." });
+  }
+  setStatus("dbStatus", "Test expense read successfully.", "ok");
+  out(data);
+});
+
+$("deleteTest").addEventListener("click", async () => {
+  const user = await currentUser();
+  if (!user) return setStatus("dbStatus", "Sign in first.", "warn");
+  setStatus("dbStatus", "Deleting test expense…");
+  const { error } = await supabase.from("expenses")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("expense_id", TEST_EXPENSE_ID);
+  if (error) {
+    setStatus("dbStatus", "Delete failed: " + error.message, "bad");
+    return out(error);
+  }
+  setStatus("dbStatus", "Test expense deleted.", "ok");
+  out({ deleted: TEST_EXPENSE_ID });
+});
+</script>
+</body>
+</html>
