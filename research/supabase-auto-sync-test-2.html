@@ -28,7 +28,7 @@ body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",
     const marker="    document.open();document.write(html);document.close();console.info('Expense Entry Efficiency Test patches:',applied);";
     if(!source.includes(marker))throw new Error('Auto-sync integration marker was not found.');
 
-    const injected=`    html=html.replace('</body>','<script src="./supabase-sync-bridge.js?v=1"><\\/script><script src="./supabase-auto-sync-bridge.js?v=2"><\\/script></body>');\n`;
+    const injected=`    html=html.replace('</body>','<script src="./mileage-efficiency-hotfix.js?v=1"><\\/script><script src="./supabase-sync-bridge.js?v=1"><\\/script><script src="./supabase-auto-sync-bridge.js?v=2"><\\/script></body>');\n`;
     source=source.replace(marker,injected+marker);
 
     document.open();
