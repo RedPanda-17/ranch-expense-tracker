@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ranch Expense Tracker - Expense Entry Efficiency Test 1.1</title>
+<style>
+body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#2a231e;display:grid;min-height:100vh;place-items:center}.box{max-width:720px;margin:20px;padding:24px;background:#fffdf8;border:1px solid #dfd1bd;border-radius:16px}.bad{color:#a6191f;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="box"><strong>Loading Expense Entry Efficiency Test 1.1…</strong><p>This research test uses isolated storage and does not change the production Ranch Expense Tracker.</p><div id="error" class="bad"></div></div>
+<script>
+(async()=>{
+try{
+const res=await fetch('../index.html?efficiency-test=1.1',{cache:'no-store'});if(!res.ok)throw new Error('Could not load current Ranch Expense Tracker: HTTP '+res.status);let html=await res.text();
+const required=(name,before,after)=>{if(!html.includes(before))throw new Error('Patch marker not found: '+name);html=html.replace(before,after)};
+const requiredRe=(name,re,after)=>{if(!re.test(html))throw new Error('Patch pattern not found: '+name);html=html.replace(re,after)};
+
+required('expense storage key','const EXPENSE_KEY = "workExpenseTool.expenses.v1";','const EXPENSE_KEY = "workExpenseTool.expenses.efficiencytest1";');
+required('report storage key','const REPORT_KEY = "workExpenseTool.reports.v1";','const REPORT_KEY = "workExpenseTool.reports.efficiencytest1";');
+required('settings storage key','const SETTINGS_KEY = "workExpenseTool.settings.v1";','const SETTINGS_KEY = "workExpenseTool.settings.efficiencytest1";');
+required('draft storage key','const REPORT_DRAFT_KEY = "workExpenseTool.reportDraft.v1";','const REPORT_DRAFT_KEY = "workExpenseTool.reportDraft.efficiencytest1";');
+required('receipt database','const DB_NAME = "workExpenseReceiptDB";','const DB_NAME = "workExpenseReceiptDB_efficiencytest1";');
+required('saved route normalization','tripType: String(route.tripType || route.roundTrip || "Round trip")','tripType: ""');
+required('test badge','<div class="header-badge">Version 1.5.0</div>','<div class="header-badge">Efficiency Test 1.1 · Based on 1.5.0</div>');
+
+required('description rule','return category === "Education" || category === "Supplies" || category === "Other" || isOtherSubcategory(subcategory);','return category === "Education" || category === "Other" || isOtherSubcategory(subcategory);');
+required('description helper','Required for Education, Supplies, Other, and any subcategory beginning with Other.','Required for Education, Other, and broad Other subcategories.');
+html=html.replace('Expense descriptions are required for Education, Supplies, Other, and broad Other subcategories.','Expense descriptions are required for Education, Other, and broad Other subcategories.');
+required('subcategory empty state','container.innerHTML = category ? `<div class="dynamic-card conditional-detail-card"><h3>Choose a subcategory</h3><p>Selecting a subcategory will show only the follow-up fields that may apply.</p></div>` : "";','container.innerHTML = "";');
+
+required('initial document title','<strong id="documentTitle">Add receipt</strong>','<strong id="documentTitle">Add supporting document</strong>');
+required('initial document help','Take a photo or choose an image/PDF. A preview appears above so you can confirm the correct receipt before saving. Receipt photos are automatically optimized to keep downloaded reports smaller. You can also attach it later before finalizing the report.','Attach a receipt or mileage route image now, then choose the category below. A preview appears above so you can confirm the correct document before saving.');
+required('initial document picker','<label id="documentPickerLabel" class="receipt-picker" for="receipt">Choose receipt</label>','<label id="documentPickerLabel" class="receipt-picker" for="receipt">Choose document</label>');
+required('preview neutral title','if (title) title.textContent = readField("category") === "Mileage" ? "Route document preview" : "Receipt preview";','if (title) { const selectedCategory = readField("category"); title.textContent = selectedCategory === "Mileage" ? "Route document preview" : selectedCategory ? "Receipt preview" : "Supporting document preview"; }');
+required('selected document label','    if (status) status.textContent = `${readField("category") === "Mileage" ? "Route document" : "Receipt"} selected: ${file.name}`;\n    if (picker) picker.textContent = readField("category") === "Mileage" ? "Choose a different route image" : "Choose a different receipt";','    const selectedCategory = readField("category");\n    const documentKind = selectedCategory === "Mileage" ? "Route document" : selectedCategory ? "Receipt" : "Document";\n    if (status) status.textContent = `${documentKind} selected: ${file.name}`;\n    if (picker) picker.textContent = selectedCategory === "Mileage" ? "Choose a different route image" : selectedCategory ? "Choose a different receipt" : "Choose a different document";');
+required('neutral document mode','  const isMileage = category === "Mileage";\n  merchantField.hidden = isMileage;\n  amountField.hidden = isMileage;\n  documentCard.classList.toggle("route-document-card", isMileage);\n  documentTitle.textContent = isMileage ? "Add route documentation" : "Add receipt";\n  documentHelp.textContent = isMileage\n    ? "Upload a map screenshot showing the route and distance. This is recommended but will not block saving the mileage entry."\n    : "Take a photo or choose an image/PDF. A preview appears above so you can confirm the correct receipt before saving. Receipt photos are automatically optimized to keep downloaded reports smaller. You can also attach it later before finalizing the report.";','  const isMileage = category === "Mileage";\n  const hasCategory = Boolean(category);\n  merchantField.hidden = isMileage;\n  amountField.hidden = isMileage;\n  documentCard.classList.toggle("route-document-card", isMileage);\n  documentTitle.textContent = isMileage ? "Add route documentation" : hasCategory ? "Add receipt" : "Add supporting document";\n  documentHelp.textContent = isMileage\n    ? "Upload a map screenshot showing the route and distance. This is recommended but will not block saving the mileage entry."\n    : hasCategory\n      ? "Take a photo or choose an image/PDF. A preview appears above so you can confirm the correct receipt before saving."\n      : "Attach a receipt or mileage route image now, then choose the category below. The selected document stays attached when the category changes.";');
+required('neutral picker mode','      : (isMileage ? "Choose route image" : "Choose receipt");','      : (isMileage ? "Choose route image" : hasCategory ? "Choose receipt" : "Choose document");');
+required('reset neutral picker','  if (picker) picker.textContent = "Choose receipt";','  if (picker) picker.textContent = "Choose document";');
+
+required('mileage trip type field','      ${select("detailRoundTrip", "Trip type", ["Round trip", "One way"], details.roundTrip || "Round trip", true)}\n','');
+required('mileage input listeners','["detailMiles", "detailStartLocation", "detailDestination", "detailRoundTrip"].forEach(id => document.getElementById(id)?.addEventListener("input", () => { updateMileagePreview(); updateExpenseSubmitButton(); }));','["detailMiles", "detailStartLocation", "detailDestination"].forEach(id => document.getElementById(id)?.addEventListener("input", () => { updateMileagePreview(); updateExpenseSubmitButton(); }));');
+required('apply saved route trip type','  document.getElementById("detailRoundTrip").value = route.tripType;\n','');
+required('mileage validation trip type','    missing(!details.roundTrip, "One-way or round-trip selection is missing.");\n','');
+required('mileage detail text trip type','    if (details.roundTrip) pieces.push(details.roundTrip);\n','');
+required('saved route settings field','              <div class="field"><label for="routeTripType">Trip type</label><select id="routeTripType"><option>Round trip</option><option>One way</option></select></div>\n','');
+required('saved route trip type data','    tripType: readField("routeTripType") || "Round trip"\n','    tripType: ""\n');
+required('saved route display','<small>${route.miles} miles · ${safe(route.tripType)} · ${money(route.miles * FIXED_MILEAGE_RATE)}</small>','<small>${route.miles} miles · ${money(route.miles * FIXED_MILEAGE_RATE)}</small>');
+required('saved route picker display','<option value="${safe(route.id)}" ${selectedRoute?.id === route.id ? "selected" : ""}>${safe(route.start)} → ${safe(route.destination)} · ${route.miles} miles · ${safe(route.tripType)}</option>','<option value="${safe(route.id)}" ${selectedRoute?.id === route.id ? "selected" : ""}>${safe(route.start)} → ${safe(route.destination)} · ${route.miles} miles</option>');
+
+requiredRe('Auto followups',/  if \(category === "Auto"\) \{[\s\S]*?  \} else if \(category === "Education"\) \{/,`  if (category === "Auto") {\n    if (["Oil change", "Tires", "Car wash", "Vehicle maintenance"].includes(subcategory)) { fields = \`\${input("detailVehicle", "Vehicle", details.vehicle, { optional: true, list: "savedVehiclesList" })}\`; } else { fields = ""; }\n  } else if (category === "Education") {`);
+requiredRe('Education followups',/  \} else if \(category === "Education"\) \{[\s\S]*?  \} else if \(category === "Meals & Snacks"\) \{/,`  } else if (category === "Education") { fields = "";\n  } else if (category === "Meals & Snacks") {`);
+requiredRe('Meals followups',/  \} else if \(category === "Meals & Snacks"\) \{[\s\S]*?  \} else if \(category === "Meetings \(PR Employees\)"\) \{/,`  } else if (category === "Meals & Snacks") {\n    if (subcategory === "Meeting meal") { fields = \`\${input("detailAttendees", "Attendees", details.attendees, { optional: true, list: "savedPeopleList" })}\`; }\n    else if (["Vendor meal", "Franchisee meal"].includes(subcategory)) { fields = \`\${input("detailOrganization", "Vendor, franchise, or organization", details.organization, { optional: true, list: "savedOrganizationsList" })}\`; }\n    else { fields = ""; }\n  } else if (category === "Meetings (PR Employees)") {`);
+requiredRe('Meeting followups',/  \} else if \(category === "Meetings \(PR Employees\)"\) \{[\s\S]*?  \} else if \(category === "Supplies"\) \{/,`  } else if (category === "Meetings (PR Employees)") { fields = \`\${input("detailAttendees", "PR employee names", details.attendees, { optional: true, list: "savedPeopleList" })}\`;\n  } else if (category === "Supplies") {`);
+requiredRe('Supplies followups',/  \} else if \(category === "Supplies"\) \{[\s\S]*?  \} else if \(category === "Travel"\) \{/,`  } else if (category === "Supplies") { fields = "";\n  } else if (category === "Travel") {`);
+requiredRe('Travel followups',/  \} else if \(category === "Travel"\) \{[\s\S]*?  \}\n\n  container\.innerHTML = fields/,`  } else if (category === "Travel") { fields = "";\n  }\n\n  container.innerHTML = fields`);
+
+required('post-save destination','    showView("current");\n  } catch (error) {','    showView("add");\n  } catch (error) {');
+html=html.replace('<div><span>Release</span><strong>PDF Accounting Review Update</strong></div>','<div><span>Release</span><strong>Expense Entry Efficiency Test 1.1</strong></div>');
+html=html.replace('<body>','<body><div style="background:#fff4dc;border-bottom:1px solid #dfd1bd;padding:8px 14px;text-align:center;font:700 12px system-ui;color:#72500c">Expense Entry Efficiency Test 1.1 · Production app is unchanged</div>');
+document.open();document.write(html);document.close();
+}catch(e){document.getElementById('error').textContent=e?.stack||String(e)}
+})();
+</script>
+</body>
+</html>
