@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ranch Expense Tracker - Expense Entry Efficiency Test 2</title>
+<style>
+body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#2a231e;display:grid;min-height:100vh;place-items:center}
+.box{max-width:720px;margin:20px;padding:24px;background:#fffdf8;border:1px solid #dfd1bd;border-radius:16px}
+.bad{color:#a6191f;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="box">
+<strong>Loading Expense Entry Efficiency Test 2…</strong>
+<p>This test uses the current Ranch Expense Tracker and changes only expense-entry workflow behavior. This test uses isolated local storage so anything you enter here will not change the normal Ranch Expense Tracker data on this device.</p>
+<div id="error" class="bad"></div>
+</div>
+<script>
+(async()=>{
+  try{
+    const res=await fetch('../index.html?efficiency-test=2',{cache:'no-store'});
+    if(!res.ok)throw new Error('Could not load current Ranch Expense Tracker: HTTP '+res.status);
+    let html=await res.text();
+    const applied=[];
+    const required=(name,before,after)=>{
+      if(!html.includes(before))throw new Error('Patch marker not found: '+name);
+      html=html.replace(before,after);
+      applied.push(name);
+    };
+    const requiredRe=(name,re,after)=>{
+      if(!re.test(html))throw new Error('Patch pattern not found: '+name);
+      html=html.replace(re,after);
+      applied.push(name);
+    };
+
+    required('expense storage key','const EXPENSE_KEY = "workExpenseTool.expenses.v1";','const EXPENSE_KEY = "workExpenseTool.expenses.efficiencytest2";');
+    required('report storage key','const REPORT_KEY = "workExpenseTool.reports.v1";','const REPORT_KEY = "workExpenseTool.reports.efficiencytest2";');
+    required('settings storage key','const SETTINGS_KEY = "workExpenseTool.settings.v1";','const SETTINGS_KEY = "workExpenseTool.settings.efficiencytest2";');
+    required('draft storage key','const REPORT_DRAFT_KEY = "workExpenseTool.reportDraft.v1";','const REPORT_DRAFT_KEY = "workExpenseTool.reportDraft.efficiencytest2";');
+    required('receipt database','const DB_NAME = "workExpenseReceiptDB";','const DB_NAME = "workExpenseReceiptDB_efficiencytest2";');
+    required('saved route normalization','tripType: String(route.tripType || route.roundTrip || "Round trip")','tripType: ""');
+    required('test badge','<div class="header-badge">Version 1.5.0</div>','<div class="header-badge">Efficiency Test 2 · Based on 1.5.0</div>');
+    required('description rule','return category === "Education" || category === "Supplies" || category === "Other" || isOtherSubcategory(subcategory);','return category === "Education" || category === "Other" || isOtherSubcategory(subcategory);');
+    required('subcategory empty state','container.innerHTML = category ? `<div class="dynamic-card conditional-detail-card"><h3>Choose a subcategory</h3><p>Selecting a subcategory will show only the follow-up fields that may apply.</p></div>` : "";','container.innerHTML = "";');
+    required('mileage trip type field','      ${select("detailRoundTrip", "Trip type", ["Round trip", "One way"], details.roundTrip || "Round trip", true)}\n','');
+    required('mileage input listeners','["detailMiles", "detailStartLocation", "detailDestination", "detailRoundTrip"].forEach(id => document.getElementById(id)?.addEventListener("input", () => { updateMileagePreview(); updateExpenseSubmitButton(); }));','["detailMiles", "detailStartLocation", "detailDestination"].forEach(id => document.getElementById(id)?.addEventListener("input", () => { updateMileagePreview(); updateExpenseSubmitButton(); }));');
+    required('apply saved route trip type','  document.getElementById("detailRoundTrip").value = route.tripType;\n','');
+    required('mileage validation trip type','    missing(!details.roundTrip, "One-way or round-trip selection is missing.");\n','');
+    required('mileage detail text trip type','    if (details.roundTrip) pieces.push(details.roundTrip);\n','');
+    required('saved route settings field','              <div class="field"><label for="routeTripType">Trip type</label><select id="routeTripType"><option>Round trip</option><option>One way</option></select></div>\n','');
+    required('saved route trip type data','    tripType: readField("routeTripType") || "Round trip"\n','    tripType: ""\n');
+    required('saved route display','<small>${route.miles} miles · ${safe(route.tripType)} · ${money(route.miles * FIXED_MILEAGE_RATE)}</small>','<small>${route.miles} miles · ${money(route.miles * FIXED_MILEAGE_RATE)}</small>');
+    required('saved route picker display','<option value="${safe(route.id)}" ${selectedRoute?.id === route.id ? "selected" : ""}>${safe(route.start)} → ${safe(route.destination)} · ${route.miles} miles · ${safe(route.tripType)}</option>','<option value="${safe(route.id)}" ${selectedRoute?.id === route.id ? "selected" : ""}>${safe(route.start)} → ${safe(route.destination)} · ${route.miles} miles</option>');
+
+    requiredRe('Auto followups',/  if \(category === "Auto"\) \{[\s\S]*?  \} else if \(category === "Education"\) \{/,`  if (category === "Auto") {\n    if (["Oil change", "Tires", "Car wash", "Vehicle maintenance"].includes(subcategory)) {\n      fields = \`\${input("detailVehicle", "Vehicle", details.vehicle, { optional: true, list: "savedVehiclesList" })}\`;\n    } else {\n      fields = "";\n    }\n  } else if (category === "Education") {`);
+    requiredRe('Education followups',/  \} else if \(category === "Education"\) \{[\s\S]*?  \} else if \(category === "Meals & Snacks"\) \{/,`  } else if (category === "Education") {\n    fields = "";\n  } else if (category === "Meals & Snacks") {`);
+    requiredRe('Meals followups',/  \} else if \(category === "Meals & Snacks"\) \{[\s\S]*?  \} else if \(category === "Meetings \(PR Employees\)"\) \{/,`  } else if (category === "Meals & Snacks") {\n    if (subcategory === "Meeting meal") {\n      fields = \`\${input("detailAttendees", "Attendees", details.attendees, { optional: true, list: "savedPeopleList" })}\`;\n    } else if (["Vendor meal", "Franchisee meal"].includes(subcategory)) {\n      fields = \`\${input("detailOrganization", "Vendor, franchise, or organization", details.organization, { optional: true, list: "savedOrganizationsList" })}\`;\n    } else {\n      fields = "";\n    }\n  } else if (category === "Meetings (PR Employees)") {`);
+    requiredRe('Meeting followups',/  \} else if \(category === "Meetings \(PR Employees\)"\) \{[\s\S]*?  \} else if \(category === "Supplies"\) \{/,`  } else if (category === "Meetings (PR Employees)") {\n    fields = \`\${input("detailAttendees", "PR employee names", details.attendees, { optional: true, list: "savedPeopleList" })}\`;\n  } else if (category === "Supplies") {`);
+    requiredRe('Supplies followups',/  \} else if \(category === "Supplies"\) \{[\s\S]*?  \} else if \(category === "Travel"\) \{/,`  } else if (category === "Supplies") {\n    fields = "";\n  } else if (category === "Travel") {`);
+    requiredRe('Travel followups',/  \} else if \(category === "Travel"\) \{[\s\S]*?  \}\n\n  container\.innerHTML = fields/,`  } else if (category === "Travel") {\n    fields = "";\n  }\n\n  container.innerHTML = fields`);
+
+    required('post-save destination','    showView("current");\n  } catch (error) {','    showView("add");\n  } catch (error) {');
+    required('description helper text','Required for Education, Supplies, Other, and any subcategory beginning with Other.','Required for Education, Other, and broad Other subcategories.');
+    html=html.replace('Expense descriptions are required for Education, Supplies, Other, and broad Other subcategories.','Expense descriptions are required for Education, Other, and broad Other subcategories.');
+    html=html.replace('<div><span>Release</span><strong>PDF Accounting Review Update</strong></div>','<div><span>Release</span><strong>Expense Entry Efficiency Test 2</strong></div>');
+    html=html.replace('<body>','<body><div id="efficiencyTestMarker" style="background:#fff4dc;border-bottom:1px solid #dfd1bd;padding:8px 14px;text-align:center;font:700 12px system-ui;color:#72500c">Expense Entry Efficiency Test 2 · Entry + compact Settings · Production unchanged</div>');
+
+    const compactSettingsCss = `<style id="compactSettingsStyles">
+      #settings .page-heading{margin-bottom:12px}#settings.compact-settings .settings-grid{display:block;margin:0}#settings.compact-settings .settings-grid>.card:first-child{margin:0 0 12px;padding:18px}#settings.compact-settings .settings-grid>.card:first-child h2{font-size:1.2rem;margin-bottom:12px}#settings.compact-settings .settings-grid>.card:first-child .fixed-rate-card{margin-top:12px;padding:10px 12px}#settings.compact-settings .settings-grid>.card:first-child .fixed-rate-card small{display:none}#settings.compact-settings .settings-grid>.card:first-child .button-row{margin-top:12px}#settings.compact-settings .compact-settings-stack{display:grid;gap:9px}#settings.compact-settings .compact-settings-item{margin:0;padding:0;overflow:hidden;border-radius:14px;box-shadow:none}#settings.compact-settings .compact-settings-item>summary{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px;padding:13px 16px;cursor:pointer;list-style:none;background:var(--panel)}#settings.compact-settings .compact-settings-item>summary::-webkit-details-marker{display:none}#settings.compact-settings .compact-settings-summary-copy{min-width:0}#settings.compact-settings .compact-settings-summary-copy strong,#settings.compact-settings .compact-settings-summary-copy small{display:block}#settings.compact-settings .compact-settings-summary-copy strong{font-size:.95rem}#settings.compact-settings .compact-settings-summary-copy small{margin-top:2px;color:var(--muted);font-size:.76rem;line-height:1.3}#settings.compact-settings .compact-settings-chevron{flex:0 0 auto;color:var(--brand-dark);font-size:1.2rem;font-weight:900;transition:transform .14s ease}#settings.compact-settings .compact-settings-item[open] .compact-settings-chevron{transform:rotate(45deg)}#settings.compact-settings .compact-settings-body{padding:0 16px 16px;border-top:1px solid var(--border);background:var(--panel)}#settings.compact-settings .compact-settings-body>.card,#settings.compact-settings .compact-settings-body>section.card,#settings.compact-settings .compact-settings-body>details.card{margin:0;padding:14px 0 0;border:0;border-radius:0;box-shadow:none;background:transparent}#settings.compact-settings .compact-settings-body .section-heading{margin-bottom:10px}#settings.compact-settings .compact-settings-body h2{font-size:1.08rem}#settings.compact-settings .compact-settings-body .data-action-grid{margin-top:12px}#settings.compact-settings .compact-settings-body .privacy-note{margin-top:12px}#settings.compact-settings .compact-settings-body .details-body{padding:14px 0 0}#settings.compact-settings .compact-settings-body .settings-details>summary{display:none}#settings.compact-settings .compact-settings-body .danger-zone{display:block;background:transparent}#settings.compact-settings .compact-danger>summary{color:var(--danger)}#settings.compact-settings .compact-danger .compact-settings-chevron{color:var(--danger)}#settings.compact-settings .about-card .section-heading{align-items:center}#settings.compact-settings .about-card .changelog-details{margin-top:10px}@media(max-width:720px){#settings.compact-settings .settings-grid>.card:first-child{padding:15px}#settings.compact-settings .compact-settings-item>summary{min-height:58px;padding:12px 14px}#settings.compact-settings .compact-settings-body{padding:0 14px 14px}}
+      </style>`;
+    html=html.replace('</head>',compactSettingsCss+'</head>');
+
+    const compactSettingsScript=`<script>(()=>{function makeCompactDetails(title,subtitle,node,danger=false){if(!node)return null;const details=document.createElement('details');details.className='card compact-settings-item'+(danger?' compact-danger':'');const summary=document.createElement('summary');summary.innerHTML='<div class="compact-settings-summary-copy"><strong>'+title+'</strong><small>'+subtitle+'</small></div><span class="compact-settings-chevron" aria-hidden="true">+</span>';const body=document.createElement('div');body.className='compact-settings-body';body.appendChild(node);details.append(summary,body);return details}function compactSettings(){const settingsView=document.getElementById('settings');if(!settingsView||settingsView.dataset.compacted==='true')return;const grid=settingsView.querySelector('.settings-grid');if(!grid)return;settingsView.dataset.compacted='true';settingsView.classList.add('compact-settings');const cards=[...grid.children].filter(el=>el.classList.contains('card'));const profileCard=cards[0]||null;const preferenceCard=cards[1]||null;if(profileCard){profileCard.querySelector('.eyebrow')?.remove();const heading=profileCard.querySelector('h2');if(heading)heading.textContent='Your information'}if(preferenceCard)preferenceCard.remove();const dataCard=settingsView.querySelector('.data-card');const savedDefaults=settingsView.querySelector('.settings-details');const dangerZone=settingsView.querySelector('.danger-zone');const aboutCard=settingsView.querySelector('.about-card');const stack=document.createElement('div');stack.className='compact-settings-stack';const saved=makeCompactDetails('Saved defaults','People, merchants, locations, vehicles, and mileage routes',savedDefaults);const data=makeCompactDetails('Data & backups','Download, import, and protect your local records',dataCard);const prefs=makeCompactDetails('Preferences & support','Backup reminders, feedback contact, and help options',preferenceCard);const about=makeCompactDetails('About this app','Version, storage, mileage rate, and release details',aboutCard);const danger=makeCompactDetails('Clear expense history','Permanently remove expense records and receipts from this device',dangerZone,true);[saved,data,prefs,about,danger].forEach(item=>item&&stack.appendChild(item));grid.after(stack);const pageCopy=settingsView.querySelector('.page-heading p');if(pageCopy)pageCopy.textContent='Update your profile or expand a section below for less-used settings.'}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',compactSettings,{once:true})}else{compactSettings()}})();<\/script>`;
+    html=html.replace('</body>',compactSettingsScript+'</body>');
+
+    document.open();document.write(html);document.close();console.info('Expense Entry Efficiency Test patches:',applied);
+  }catch(e){document.getElementById('error').textContent=e?.stack||String(e)}
+})();
+</script>
+</body>
+</html>
