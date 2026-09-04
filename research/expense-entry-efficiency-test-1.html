@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ranch Expense Tracker - Expense Entry Efficiency Test 1</title>
+<style>
+body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#2a231e;display:grid;min-height:100vh;place-items:center}
+.box{max-width:720px;margin:20px;padding:24px;background:#fffdf8;border:1px solid #dfd1bd;border-radius:16px}
+.bad{color:#a6191f;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="box">
+<strong>Loading Expense Entry Efficiency Test 1…</strong>
+<p>This test uses the current Ranch Expense Tracker and changes only expense-entry workflow behavior. Production data and storage keys remain compatible.</p>
+<div id="error" class="bad"></div>
+</div>
+<script>
+(async()=>{
+  try{
+    const res=await fetch('../index.html?efficiency-test=1',{cache:'no-store'});
+    if(!res.ok)throw new Error('Could not load current Ranch Expense Tracker: HTTP '+res.status);
+    let html=await res.text();
+    const applied=[];
+    const required=(name,before,after)=>{
+      if(!html.includes(before))throw new Error('Patch marker not found: '+name);
+      html=html.replace(before,after);
+      applied.push(name);
+    };
+    const requiredRe=(name,re,after)=>{
+      if(!re.test(html))throw new Error('Patch pattern not found: '+name);
+      html=html.replace(re,after);
+      applied.push(name);
+    };
+
+    required('test badge','<div class="header-badge">Version 1.5.0</div>','<div class="header-badge">Efficiency Test 1 · Based on 1.5.0</div>');
+    required('description rule','return category === "Education" || category === "Supplies" || category === "Other" || isOtherSubcategory(subcategory);','return category === "Education" || category === "Other" || isOtherSubcategory(subcategory);');
+    required('subcategory empty state','container.innerHTML = category ? `<div class="dynamic-card conditional-detail-card"><h3>Choose a subcategory</h3><p>Selecting a subcategory will show only the follow-up fields that may apply.</p></div>` : "";','container.innerHTML = "";');
+    required('mileage trip type field','      ${select("detailRoundTrip", "Trip type", ["Round trip", "One way"], details.roundTrip || "Round trip", true)}\n','');
+    required('mileage input listeners','["detailMiles", "detailStartLocation", "detailDestination", "detailRoundTrip"].forEach(id => document.getElementById(id)?.addEventListener("input", () => { updateMileagePreview(); updateExpenseSubmitButton(); }));','["detailMiles", "detailStartLocation", "detailDestination"].forEach(id => document.getElementById(id)?.addEventListener("input", () => { updateMileagePreview(); updateExpenseSubmitButton(); }));');
+    required('apply saved route trip type','  document.getElementById("detailRoundTrip").value = route.tripType;\n','');
+    required('mileage validation trip type','    missing(!details.roundTrip, "One-way or round-trip selection is missing.");\n','');
+    required('mileage detail text trip type','    if (details.roundTrip) pieces.push(details.roundTrip);\n','');
+    required('saved route settings field','              <div class="field"><label for="routeTripType">Trip type</label><select id="routeTripType"><option>Round trip</option><option>One way</option></select></div>\n','');
+    required('saved route trip type data','    tripType: readField("routeTripType") || "Round trip"\n','    tripType: ""\n');
+    required('saved route display','<small>${route.miles} miles · ${safe(route.tripType)} · ${money(route.miles * FIXED_MILEAGE_RATE)}</small>','<small>${route.miles} miles · ${money(route.miles * FIXED_MILEAGE_RATE)}</small>');
+
+    requiredRe('Auto followups',/  if \(category === "Auto"\) \{[\s\S]*?  \} else if \(category === "Education"\) \{/,`  if (category === "Auto") {\n    if (["Oil change", "Tires", "Car wash", "Vehicle maintenance"].includes(subcategory)) {\n      fields = \`\${input("detailVehicle", "Vehicle", details.vehicle, { optional: true, list: "savedVehiclesList" })}\`;\n    } else {\n      fields = "";\n    }\n  } else if (category === "Education") {`);
+    requiredRe('Education followups',/  \} else if \(category === "Education"\) \{[\s\S]*?  \} else if \(category === "Meals & Snacks"\) \{/,`  } else if (category === "Education") {\n    fields = "";\n  } else if (category === "Meals & Snacks") {`);
+    requiredRe('Meals followups',/  \} else if \(category === "Meals & Snacks"\) \{[\s\S]*?  \} else if \(category === "Meetings \(PR Employees\)"\) \{/,`  } else if (category === "Meals & Snacks") {\n    if (subcategory === "Meeting meal") {\n      fields = \`\${input("detailAttendees", "Attendees", details.attendees, { optional: true, list: "savedPeopleList" })}\`;\n    } else if (["Vendor meal", "Franchisee meal"].includes(subcategory)) {\n      fields = \`\${input("detailOrganization", "Vendor, franchise, or organization", details.organization, { optional: true, list: "savedOrganizationsList" })}\`;\n    } else {\n      fields = "";\n    }\n  } else if (category === "Meetings (PR Employees)") {`);
+    requiredRe('Meeting followups',/  \} else if \(category === "Meetings \(PR Employees\)"\) \{[\s\S]*?  \} else if \(category === "Supplies"\) \{/,`  } else if (category === "Meetings (PR Employees)") {\n    fields = \`\${input("detailAttendees", "PR employee names", details.attendees, { optional: true, list: "savedPeopleList" })}\`;\n  } else if (category === "Supplies") {`);
+    requiredRe('Supplies followups',/  \} else if \(category === "Supplies"\) \{[\s\S]*?  \} else if \(category === "Travel"\) \{/,`  } else if (category === "Supplies") {\n    fields = "";\n  } else if (category === "Travel") {`);
+    requiredRe('Travel followups',/  \} else if \(category === "Travel"\) \{[\s\S]*?  \}\n\n  container\.innerHTML = fields/,`  } else if (category === "Travel") {\n    fields = "";\n  }\n\n  container.innerHTML = fields`);
+    required('post-save destination','    showView("current");\n  } catch (error) {','    showView("add");\n  } catch (error) {');
+    required('description helper text','Required for Education, Supplies, Other, and any subcategory beginning with Other.','Required for Education, Other, and broad Other subcategories.');
+    html=html.replace('<div><span>Release</span><strong>PDF Accounting Review Update</strong></div>','<div><span>Release</span><strong>Expense Entry Efficiency Test 1</strong></div>');
+    html=html.replace('<body>','<body><div id="efficiencyTestMarker" style="background:#fff4dc;border-bottom:1px solid #dfd1bd;padding:8px 14px;text-align:center;font:700 12px system-ui;color:#72500c">Expense Entry Efficiency Test 1 · Production app is unchanged</div>');
+    document.open();
+    document.write(html);
+    document.close();
+    console.info('Expense Entry Efficiency Test patches:', applied);
+  }catch(e){
+    document.getElementById('error').textContent=e?.stack||String(e);
+  }
+})();
+</script>
+</body>
+</html>
