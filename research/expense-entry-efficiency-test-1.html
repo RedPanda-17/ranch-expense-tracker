@@ -13,7 +13,7 @@ body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",
 <body>
 <div class="box">
 <strong>Loading Expense Entry Efficiency Test 1…</strong>
-<p>This test uses the current Ranch Expense Tracker and changes only expense-entry workflow behavior. Production data and storage keys remain compatible.</p>
+<p>This test uses the current Ranch Expense Tracker and changes only expense-entry workflow behavior. This test uses isolated local storage so anything you enter here will not change the normal Ranch Expense Tracker data on this device.</p>
 <div id="error" class="bad"></div>
 </div>
 <script>
@@ -34,6 +34,13 @@ body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",
       applied.push(name);
     };
 
+    // Isolate this research page from normal Ranch Expense Tracker records.
+    required('expense storage key','const EXPENSE_KEY = "workExpenseTool.expenses.v1";','const EXPENSE_KEY = "workExpenseTool.expenses.efficiencytest1";');
+    required('report storage key','const REPORT_KEY = "workExpenseTool.reports.v1";','const REPORT_KEY = "workExpenseTool.reports.efficiencytest1";');
+    required('settings storage key','const SETTINGS_KEY = "workExpenseTool.settings.v1";','const SETTINGS_KEY = "workExpenseTool.settings.efficiencytest1";');
+    required('draft storage key','const REPORT_DRAFT_KEY = "workExpenseTool.reportDraft.v1";','const REPORT_DRAFT_KEY = "workExpenseTool.reportDraft.efficiencytest1";');
+    required('receipt database','const DB_NAME = "workExpenseReceiptDB";','const DB_NAME = "workExpenseReceiptDB_efficiencytest1";');
+
     required('test badge','<div class="header-badge">Version 1.5.0</div>','<div class="header-badge">Efficiency Test 1 · Based on 1.5.0</div>');
     required('description rule','return category === "Education" || category === "Supplies" || category === "Other" || isOtherSubcategory(subcategory);','return category === "Education" || category === "Other" || isOtherSubcategory(subcategory);');
     required('subcategory empty state','container.innerHTML = category ? `<div class="dynamic-card conditional-detail-card"><h3>Choose a subcategory</h3><p>Selecting a subcategory will show only the follow-up fields that may apply.</p></div>` : "";','container.innerHTML = "";');
@@ -52,10 +59,12 @@ body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",
     requiredRe('Meeting followups',/  \} else if \(category === "Meetings \(PR Employees\)"\) \{[\s\S]*?  \} else if \(category === "Supplies"\) \{/,`  } else if (category === "Meetings (PR Employees)") {\n    fields = \`\${input("detailAttendees", "PR employee names", details.attendees, { optional: true, list: "savedPeopleList" })}\`;\n  } else if (category === "Supplies") {`);
     requiredRe('Supplies followups',/  \} else if \(category === "Supplies"\) \{[\s\S]*?  \} else if \(category === "Travel"\) \{/,`  } else if (category === "Supplies") {\n    fields = "";\n  } else if (category === "Travel") {`);
     requiredRe('Travel followups',/  \} else if \(category === "Travel"\) \{[\s\S]*?  \}\n\n  container\.innerHTML = fields/,`  } else if (category === "Travel") {\n    fields = "";\n  }\n\n  container.innerHTML = fields`);
+
     required('post-save destination','    showView("current");\n  } catch (error) {','    showView("add");\n  } catch (error) {');
     required('description helper text','Required for Education, Supplies, Other, and any subcategory beginning with Other.','Required for Education, Other, and broad Other subcategories.');
     html=html.replace('<div><span>Release</span><strong>PDF Accounting Review Update</strong></div>','<div><span>Release</span><strong>Expense Entry Efficiency Test 1</strong></div>');
     html=html.replace('<body>','<body><div id="efficiencyTestMarker" style="background:#fff4dc;border-bottom:1px solid #dfd1bd;padding:8px 14px;text-align:center;font:700 12px system-ui;color:#72500c">Expense Entry Efficiency Test 1 · Production app is unchanged</div>');
+
     document.open();
     document.write(html);
     document.close();
