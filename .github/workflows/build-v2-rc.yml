@@ -58,17 +58,50 @@ jobs:
       - name: Apply final V2 UI cleanup
         run: node scripts/v2-final-ui-cleanup.mjs
 
-      - name: Check generated changes
+      - name: Check generated RC changes
         run: git diff --check -- v2-rc
 
-      - name: Publish generated V2 RC files
+      - name: Promote approved V2 to production
+        if: ${{ hashFiles('.promote-v2-production') != '' }}
+        run: node scripts/promote-v2-production.mjs
+
+      - name: Check production build
+        if: ${{ hashFiles('.promote-v2-production') != '' }}
+        shell: bash
         run: |
-          if [ -z "$(git status --porcelain -- v2-rc)" ]; then
-            echo "V2 RC output is already current."
-            exit 0
+          git diff --check -- index.html manifest.webmanifest service-worker.js
+          if grep -q '2.0.0 RC' index.html; then
+            echo 'Production index still contains an RC version label.' >&2
+            exit 1
           fi
+          if grep -q 'Cloud Sync Release Candidate' index.html; then
+            echo 'Production index still contains the RC release name.' >&2
+            exit 1
+          fi
+          if grep -Fq '@supabase/supabase-js@2/+esm' index.html service-worker.js; then
+            echo 'Production app still uses the floating Supabase SDK tag.' >&2
+            exit 1
+          fi
+
+      - name: Publish generated files
+        shell: bash
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add v2-rc
-          git commit -m "Build Ranch Expense Tracker 2.0.0 RC [skip ci]"
+
+          if [ -f .promote-v2-production ]; then
+            git add v2-rc index.html manifest.webmanifest service-worker.js
+            git rm .promote-v2-production
+            message="Promote Ranch Expense Tracker 2.0.0 to production [skip ci]"
+          else
+            git add v2-rc
+            message="Build Ranch Expense Tracker 2.0.0 RC [skip ci]"
+          fi
+
+          if git diff --cached --quiet; then
+            echo "Generated output is already current."
+            exit 0
+          fi
+
+          git commit -m "$message"
           git push
