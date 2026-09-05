@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ranch Expenses">
-  <title>Ranch Expense Tracker - Version 2.0.0</title>
+  <title>Ranch Expense Tracker - Version 2.0.1</title>
   <style>
 :root {
   --bg: #f5efe4;
@@ -621,7 +621,7 @@ input[type="date"]::-webkit-date-and-time-value{
           <p>Record business expenses and mileage, organize reports, and download clear PDF and CSV files.</p>
         </div>
       </div>
-      <div class="header-badge">Version 2.0.0</div>
+      <div class="header-badge">Version 2.0.1</div>
     </div>
   </header>
 
@@ -1060,7 +1060,7 @@ input[type="date"]::-webkit-date-and-time-value{
           <summary><div class="compact-settings-summary-copy"><strong>About this app</strong><small>Version, storage, mileage rate, and release details</small></div><span class="compact-settings-chevron">+</span></summary>
           <div class="compact-settings-body">
             <section class="about-card">
-              <div class="section-heading"><div><div class="eyebrow">About</div><h2>Ranch Expense Tracker</h2></div><span class="version-chip">Version 2.0.0</span></div>
+              <div class="section-heading"><div><div class="eyebrow">About</div><h2>Ranch Expense Tracker</h2></div><span class="version-chip">Version 2.0.1</span></div>
               <div class="about-grid">
                 <div><span>Release</span><strong>Cloud Sync</strong></div>
                 <div><span>Storage</span><strong>Cloud + offline cache</strong></div>
@@ -1096,7 +1096,7 @@ input[type="date"]::-webkit-date-and-time-value{
 
 
   <footer class="site-footer">
-    <div>Ranch Expense Tracker · Version 2.0.0 · Cloud Sync</div>
+    <div>Ranch Expense Tracker · Version 2.0.1 · Cloud Sync</div>
     <div>Copyright © 2026 Saul Garcia. All Rights Reserved.</div>
     <div>Licensed for Pizza Ranch internal business use and IT evaluation.</div>
   </footer>
@@ -1104,7 +1104,7 @@ input[type="date"]::-webkit-date-and-time-value{
   <script>
 "use strict";
 
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "2.0.1";
 const RELEASE_NAME = "Cloud Sync";
 // Accounting can update this single value in a future release after confirming the company rate.
 const FIXED_MILEAGE_RATE = 0.40;
@@ -1123,7 +1123,7 @@ const RECEIPT_PDF_TARGET_BYTES = 120 * 1024;
 const RECEIPT_PDF_MIN_DIMENSION = 960;
 const RECEIPT_PDF_MIN_JPEG_QUALITY = 0.48;
 
-// Keep the production storage keys so Version 2.0.0 opens data created by Version 1.x releases.
+// Keep the production storage keys so Version 2.0.1 opens data created by Version 1.x releases.
 const EXPENSE_KEY = "workExpenseTool.expenses.v2";
 const REPORT_KEY = "workExpenseTool.reports.v2";
 const SETTINGS_KEY = "workExpenseTool.settings.v2";
@@ -1754,8 +1754,9 @@ async function showStoredInlineReceiptPreview(receiptId) {
   if (!receiptId) return clearInlineReceiptPreview();
   try {
     const record = await getReceipt(receiptId);
-    if (!record?.blob) return clearInlineReceiptPreview();
-    renderInlineReceiptPreview(record.blob, record.name || "Stored receipt", record.type || record.blob.type || "");
+    const blob = record?.blob?.size ? record.blob : (record?.bytes ? new Blob([record.bytes], { type: record.type || "application/octet-stream" }) : null);
+    if (!blob?.size) return clearInlineReceiptPreview();
+    renderInlineReceiptPreview(blob, record.name || "Stored receipt", record.type || blob.type || "");
   } catch (error) {
     console.warn("Could not load the stored receipt preview.", error);
     clearInlineReceiptPreview();
@@ -2840,10 +2841,10 @@ async function openInlineReceiptViewer() {
 async function openReceipt(receiptId) {
   try {
     const record = await getReceipt(receiptId);
-    if (!record?.blob && record?.bytes) {
+    if ((!record?.blob || !record.blob.size) && record?.bytes) {
       record.blob = new Blob([record.bytes], { type: record.type || "application/octet-stream" });
     }
-    if (!record?.blob) throw new Error("Receipt file data was not found on this device.");
+    if (!record?.blob?.size) throw new Error("Receipt file data was not found on this device.");
     return openReceiptBlob(
       record.blob,
       record.name || "Receipt",
@@ -3287,7 +3288,7 @@ async function getPdfSupportingDocument(pdf, expense, imageCache) {
   let record = null;
   try { record = await getReceipt(expense.receiptId); }
   catch (error) { console.warn("Could not retrieve supporting document.", error); }
-  const blob = record?.blob || (record?.bytes ? new Blob([record.bytes], { type: record.type || "application/octet-stream" }) : null);
+  const blob = (record?.blob?.size ? record.blob : null) || (record?.bytes ? new Blob([record.bytes], { type: record.type || "application/octet-stream" }) : null);
   const filename = record?.name || expense.receiptName || "supporting-document";
   const type = record?.type || blob?.type || expense.receiptType || "application/octet-stream";
   const result = { record, blob, filename, type, isImage: false, imageRef: null, width: 0, height: 0 };
@@ -4265,6 +4266,7 @@ else init();
 
 if (window.__ranchCloudSyncV2) return;
 window.__ranchCloudSyncV2 = true;
+window.__ranchAuthResolvedV2 = false;
 
 const SUPABASE_URL = "https://rdxzqudawzkqetooubee.supabase.co";
 const SUPABASE_KEY = "sb_publishable_is8367xzMm8UckiRkyYAMw_jVy8Eyop";
@@ -4313,6 +4315,12 @@ const reportVersion = report => timeOf(report?.statusUpdatedAt || report?.update
 const safeName = value => String(value || "document")
   .replace(/[^A-Za-z0-9._-]+/g, "-")
   .replace(/^-+|-+$/g, "") || "document";
+
+function markAuthResolved() {
+  const firstResolution = window.__ranchAuthResolvedV2 !== true;
+  window.__ranchAuthResolvedV2 = true;
+  if (firstResolution) document.dispatchEvent(new Event("ranch-auth-resolved"));
+}
 
 function defaultMeta() {
   return {
@@ -4490,7 +4498,7 @@ function mountSyncUi() {
   if (signOutButton) signOutButton.onclick = signOutSafely;
   if (saveInfoButton) saveInfoButton.onclick = () => saveAccountInfo(true);
   const badge = document.querySelector(".header-badge");
-  if (badge) badge.textContent = "Version 2.0.0";
+  if (badge) badge.textContent = "Version 2.0.1";
   renderStatus();
 }
 
@@ -4594,6 +4602,7 @@ async function refreshUser() {
   user = nextUser;
   saveMeta();
   renderStatus();
+  markAuthResolved();
   return user;
 }
 
@@ -4646,6 +4655,7 @@ async function createAccount() {
   const name = String(document.getElementById("employeeName")?.value || "").trim();
   const department = String(document.getElementById("defaultDepartment")?.value || "").trim();
   if (!name) { setMessage("Add your name before creating the account.", "warn"); document.getElementById("employeeName")?.focus(); return; }
+  if (!email.toLowerCase().endsWith("@pizzaranch.com")) return setMessage("Use your @pizzaranch.com email address.", "warn");
   if (!email || password.length < 6) return setMessage("Enter an email and a password with at least 6 characters.", "warn");
   settings.employeeName = name; settings.defaultDepartment = department; saveAll();
   busy = true; renderStatus(); setMessage("Creating account…");
@@ -4737,20 +4747,42 @@ async function signOutSafely() {
   }
 }
 
+function receiptArrayBuffer(value) {
+  if (!value) return null;
+  if (value instanceof ArrayBuffer) return value.byteLength ? value : null;
+  if (ArrayBuffer.isView(value)) {
+    if (!value.byteLength) return null;
+    return value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength);
+  }
+  return null;
+}
+
 async function localReceipt(expense) {
   if (!expense?.receiptId) return null;
   const record = await getReceipt(expense.receiptId);
   if (!record) return null;
 
-  const blob = record.blob || (record.bytes
-    ? new Blob([record.bytes], { type: record.type || "application/octet-stream" })
-    : null);
+  const type = record.type || expense.receiptType || record.blob?.type || "application/octet-stream";
+  const storedBytes = receiptArrayBuffer(record.bytes);
+  let blob = record.blob instanceof Blob && record.blob.size > 0 ? record.blob : null;
+  let uploadBody = storedBytes;
 
-  return blob ? {
+  if (!uploadBody && blob) {
+    const buffer = await blob.arrayBuffer();
+    if (buffer.byteLength) uploadBody = buffer;
+  }
+  if (!blob && uploadBody?.byteLength) {
+    blob = new Blob([uploadBody], { type });
+  }
+  if (!blob?.size || !uploadBody?.byteLength) return null;
+
+  return {
     blob,
+    uploadBody,
+    size: uploadBody.byteLength,
     name: record.name || expense.receiptName || "document",
-    type: record.type || blob.type || "application/octet-stream"
-  } : null;
+    type
+  };
 }
 
 async function pushExpense(expense, row) {
@@ -4759,7 +4791,7 @@ async function pushExpense(expense, row) {
 
   const sameReceipt = file && row?.receipt_path &&
     String(row.payload?.receiptFingerprint || "") === String(expense.receiptFingerprint || "") &&
-    Number(row.receipt_size || 0) === Number(file.blob.size || 0);
+    Number(row.receipt_size || 0) === Number(file.size || 0);
 
   if (file) {
     if (sameReceipt) {
@@ -4770,7 +4802,7 @@ async function pushExpense(expense, row) {
     } else {
       name = safeName(file.name);
       type = file.type;
-      size = file.blob.size;
+      size = file.size;
       path = `${user.id}/expenses/${safeName(expense.id)}/${name}`;
 
       if (row?.receipt_path && row.receipt_path !== path) {
@@ -4778,7 +4810,7 @@ async function pushExpense(expense, row) {
         if (remove.error) throw remove.error;
       }
 
-      const upload = await sb.storage.from(BUCKET).upload(path, file.blob, {
+      const upload = await sb.storage.from(BUCKET).upload(path, file.uploadBody, {
         upsert: true,
         contentType: type || undefined,
         cacheControl: "3600"
@@ -4824,6 +4856,7 @@ async function pullExpense(row, oldExpense) {
         name: row.receipt_name || expense.receiptName || "document",
         type: row.receipt_type || download.data.type || "application/octet-stream",
         blob: download.data,
+        bytes: await download.data.arrayBuffer(),
         originalName: row.receipt_name || expense.receiptName || "document",
         originalSize: Number(row.receipt_size || download.data.size || 0),
         optimized: true,
@@ -5340,6 +5373,7 @@ async function init() {
       if (user && navigator.onLine) syncAll();
     }, PERIODIC_SYNC_MS);
   } catch (error) {
+    markAuthResolved();
     setPill("Cloud unavailable", "err");
     setMessage("Supabase could not initialize: " + (error.message || String(error)), "bad");
   }
@@ -5452,7 +5486,7 @@ function showSignedOut(card) {
   rememberHome(card);
   clearTimeout(revealTimer);
   revealTimer = setTimeout(() => {
-    if (isSignedIn()) return queueSync();
+    if (window.__ranchAuthResolvedV2 !== true || isSignedIn()) return queueSync();
     setChecking("Checking your account…", false);
     if (host && card.parentNode !== host) host.appendChild(card);
     const email = q("completeSyncEmail");
@@ -5485,6 +5519,17 @@ function runGate() {
   createGate();
   const card = q("completeSyncCard");
 
+  if (!signOutInProgress && window.__ranchAuthResolvedV2 !== true) {
+    const gate = createGate();
+    document.documentElement.classList.add("ranch-auth-pending");
+    document.documentElement.classList.remove("ranch-auth-ready");
+    document.body.classList.add("ranch-auth-gated");
+    gate.hidden = false;
+    if (card) { rememberHome(card); returnCardHome(card); }
+    setChecking("Checking your saved sign-in…", true);
+    return;
+  }
+
   if (signOutInProgress) {
     if (!isSignedIn()) {
       signOutInProgress = false;
@@ -5515,6 +5560,8 @@ document.addEventListener("click", event => {
   gate.hidden = false;
   setChecking("Signing out and clearing this device…", true);
 }, true);
+
+document.addEventListener("ranch-auth-resolved", queueSync);
 
 const observer = new MutationObserver(queueSync);
 observer.observe(document.documentElement, {childList:true,subtree:true,attributes:true,attributeFilter:["hidden","data-account-polished"]});
@@ -5547,7 +5594,7 @@ async function oldReceipts(){let database=null;try{database=await openOldDb();if
 function mergeById(current, legacy, versionField){const map=new Map((Array.isArray(current)?current:[]).map(x=>[String(x.id),x]));for(const item of (Array.isArray(legacy)?legacy:[])){if(!item?.id)continue;const old=map.get(String(item.id));if(!old){map.set(String(item.id),item);continue}const a=Date.parse(old?.[versionField]||old?.updatedAt||old?.createdAt||"")||0;const b=Date.parse(item?.[versionField]||item?.updatedAt||item?.createdAt||"")||0;if(b>a)map.set(String(item.id),item)}return[...map.values()]}
 function mergeText(a,b){return[...new Set([...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])].map(v=>String(v||"").trim()).filter(Boolean))].sort((x,y)=>x.localeCompare(y))}
 async function migrate(){if(!signedIn())return;const email=identity();if(!email||email==="Not signed in")return;const marker="ranchExpense.v2.legacyMigration."+email.toLowerCase();if(localStorage.getItem(marker))return;const legacy=legacyData();if(!hasLegacy(legacy)){localStorage.setItem(marker,"none");return}const count=(legacy.expenses?.length||0);if(!confirm(`Existing Ranch Expense Tracker 1.x data was found on this device.\n\nSigned in as: ${email}\nLegacy expenses found: ${count}\n\nImport this data into this cloud account? The original 1.x copy will remain untouched.`)){localStorage.setItem(marker,"declined");return}
-try{expenses=mergeById(expenses,legacy.expenses,"updatedAt");reports=mergeById(reports,legacy.reports,"statusUpdatedAt");const ls=legacy.settings||{};settings=normalizeSettings({...settings,employeeName:settings.employeeName||ls.employeeName||"",defaultDepartment:settings.defaultDepartment||ls.defaultDepartment||ls.department||"",savedPeople:mergeText(settings.savedPeople,ls.savedPeople),savedOrganizations:mergeText(settings.savedOrganizations,ls.savedOrganizations),savedLocations:mergeText(settings.savedLocations,ls.savedLocations),savedVehicles:mergeText(settings.savedVehicles,ls.savedVehicles),savedTags:mergeText(settings.savedTags,ls.savedTags),savedRoutes:[...(settings.savedRoutes||[]),...(Array.isArray(ls.savedRoutes)?ls.savedRoutes:[])]});if(!meaningfulDraft(reportDraft)&&meaningfulDraft(legacy.draft))reportDraft=normalizeReportDraft(legacy.draft);else if(Array.isArray(legacy.draft?.selectedExpenseIds)){reportDraft.selectedExpenseIds=[...new Set([...(reportDraft.selectedExpenseIds||[]),...legacy.draft.selectedExpenseIds])]}const receipts=await oldReceipts();for(const record of receipts){try{await putReceipt(record)}catch(error){console.warn("Legacy receipt could not be copied",record?.id,error)}}saveAll();renderAll();localStorage.setItem(marker,new Date().toISOString());showToast(`Imported ${count} legacy expense${count===1?"":"s"}. Cloud sync will keep uploading any remaining records automatically.`,"success");setTimeout(()=>document.getElementById("completeSyncNow")?.click(),150)}catch(error){console.error(error);showToast("Legacy data could not be imported. Your original 1.x data was not changed.","error")}}
+try{expenses=mergeById(expenses,legacy.expenses,"updatedAt");reports=mergeById(reports,legacy.reports,"statusUpdatedAt");const ls=legacy.settings||{};settings=normalizeSettings({...settings,employeeName:settings.employeeName||ls.employeeName||"",defaultDepartment:settings.defaultDepartment||ls.defaultDepartment||ls.department||"",savedPeople:mergeText(settings.savedPeople,ls.savedPeople),savedOrganizations:mergeText(settings.savedOrganizations,ls.savedOrganizations),savedLocations:mergeText(settings.savedLocations,ls.savedLocations),savedVehicles:mergeText(settings.savedVehicles,ls.savedVehicles),savedTags:mergeText(settings.savedTags,ls.savedTags),savedRoutes:[...(settings.savedRoutes||[]),...(Array.isArray(ls.savedRoutes)?ls.savedRoutes:[])]});if(!meaningfulDraft(reportDraft)&&meaningfulDraft(legacy.draft))reportDraft=normalizeReportDraft(legacy.draft);else if(Array.isArray(legacy.draft?.selectedExpenseIds)){reportDraft.selectedExpenseIds=[...new Set([...(reportDraft.selectedExpenseIds||[]),...legacy.draft.selectedExpenseIds])]}const receipts=await oldReceipts();for(const record of receipts){try{const bytes=record?.bytes instanceof ArrayBuffer?record.bytes:(ArrayBuffer.isView(record?.bytes)?record.bytes.buffer.slice(record.bytes.byteOffset,record.bytes.byteOffset+record.bytes.byteLength):null);let blob=record?.blob instanceof Blob&&record.blob.size>0?record.blob:null;if(!blob&&bytes?.byteLength)blob=new Blob([bytes],{type:record.type||"application/octet-stream"});if(blob?.size)await putReceipt({...record,blob,bytes:bytes?.byteLength?bytes:await blob.arrayBuffer()});else console.warn("Legacy receipt had no usable file content",record?.id)}catch(error){console.warn("Legacy receipt could not be copied",record?.id,error)}}saveAll();renderAll();localStorage.setItem(marker,new Date().toISOString());showToast(`Imported ${count} legacy expense${count===1?"":"s"}. Cloud sync will keep uploading any remaining records automatically.`,"success");setTimeout(()=>document.getElementById("completeSyncNow")?.click(),150)}catch(error){console.error(error);showToast("Legacy data could not be imported. Your original 1.x data was not changed.","error")}}
 let queued=false;const check=()=>{if(queued)return;queued=true;setTimeout(()=>{queued=false;migrate()},250)};new MutationObserver(check).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:["hidden"]});window.addEventListener("focus",check);document.addEventListener("DOMContentLoaded",check,{once:true});setTimeout(check,1200);
 })();
 </script>

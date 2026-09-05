@@ -1,6 +1,6 @@
 # Ranch Expense Tracker
 
-Current release: **Version 2.0.0 — Cloud Sync**
+Current release: **Version 2.0.1 — Cloud Sync Hotfix**
 
 Live app: https://redpanda-17.github.io/ranch-expense-tracker/
 
