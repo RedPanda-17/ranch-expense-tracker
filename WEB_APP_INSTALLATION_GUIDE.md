@@ -2,7 +2,7 @@
 
 Website: https://redpanda-17.github.io/ranch-expense-tracker/
 
-Use the app directly in a browser or install it for quicker access. Use the same browser and browser profile each time because expense data and receipts are stored locally on the device/browser.
+Use the app directly in a browser or install it for quicker access. Version 2.0 requires an account and synchronizes supported expense data with the signed-in cloud account.
 
 ## Windows - Microsoft Edge
 1. Open the website in Microsoft Edge.
@@ -38,20 +38,33 @@ On supported macOS versions:
 3. Confirm the app name and select **Add**.
 
 ## After installation
-- Open the app and confirm it shows the current release version.
-- Complete Settings before creating a reimbursement report.
-- Do not use Private or Incognito browsing for real expense records.
-- Download backups regularly.
-- Automatic receipt OCR may require internet access when the OCR resources have not already been loaded.
+- Open the app and confirm it shows **Version 2.0.0**.
+- Sign in or create your account.
+- If older Version 1.x data is found, verify the signed-in email before accepting the one-time import.
+- Do not use Private or Incognito browsing for real expense work.
+- Allow the app to load successfully online at least once before relying on offline use.
+- Automatic receipt OCR may require internet access when OCR resources have not already been loaded.
+
+## Cloud sync and offline use
+Expenses, receipts, reports, the current report draft, and saved defaults synchronize with the signed-in account.
+
+The browser still keeps a local working cache so the app can continue operating after a successful online load. Offline changes retry synchronization after connectivity returns.
+
+Signing out clears that account's Version 2 local working cache from the device while leaving cloud records intact.
 
 ## When an installed app looks outdated
-The app checks for a newer service worker and normally updates itself. If an installed copy still looks old:
+The app uses network-first update behavior and normally refreshes the cached application shell automatically.
+
+If an installed copy still looks old:
 1. Close the installed app completely.
 2. Open the website in the original browser while online.
 3. Refresh the page.
 4. Reopen the installed app.
+5. Confirm the About section shows the current version.
 
-Do not clear site data as a routine update step. Site data contains locally stored expense records and receipts.
+Routine update troubleshooting should not require clearing site data.
 
 ## Removing the app
-Removing an installed web app may offer an option to delete its browsing data. Do not delete site data unless a current backup has been saved and verified.
+Removing an installed web app can also remove its local offline cache, depending on the device/browser option selected. Cloud-synchronized records remain tied to the user's account and can be restored by signing back in on a supported browser/device.
+
+Do not delete browser/site data while unsynchronized offline changes are still pending.
