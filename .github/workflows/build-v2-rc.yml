@@ -60,7 +60,7 @@ jobs:
 
       - name: Publish generated V2 RC files
         run: |
-          if git diff --quiet -- v2-rc; then
+          if [ -z "$(git status --porcelain -- v2-rc)" ]; then
             echo "V2 RC output is already current."
             exit 0
           fi
