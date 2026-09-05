@@ -13,7 +13,8 @@ Version 2.0.0 is appropriate. The product architecture has changed from a device
 - Signing out clears the authenticated user's V2 local cache from that device while leaving cloud data intact.
 - Missing local data never implies deletion.
 - Expense deletion is allowed only for an unsubmitted expense and must originate from an explicit user delete action.
-- Submitted reports and the expenses attached to them are immutable to the employee.
+- A cloud expense tombstone wins over a stale local cache; stable expense IDs are never reused.
+- Submitted reports, their attached expenses, and their supporting receipt files are immutable to the employee.
 - A future Accounting "Returned for correction" workflow will be the only supported path for reopening submitted records.
 
 ## Legacy 1.x architecture that must not ship inside V2
@@ -27,10 +28,10 @@ The clean V2 production source must remove, rather than hide, the following:
 - Feedback-recipient / reimbursement-recipient configuration fields.
 - Bulk Clear Expense History.
 - Employee Reopen Report action.
-- Mileage One Way / Round Trip field and validation.
+- Mileage One Way / Round Trip field, stored route property, and validation.
 - 1.5 release notes and "Local to device" storage language.
 - Test banners, research-only storage namespaces, hotfix wrappers, and runtime patch loaders.
-- Automatic report-delete/tombstone behavior in the sync engine.
+- Automatic report-delete/tombstone behavior in the V2 sync engine.
 
 ## Features validated in Test 6 that should be integrated directly into V2
 
@@ -65,6 +66,7 @@ Migration rules:
 5. Merge saved defaults and the current report draft.
 6. Leave the original V1 local data untouched after migration.
 7. Record a per-user migration marker after cloud sync succeeds so the same data is not repeatedly offered.
+8. If migration fails, keep the legacy V1 copy untouched and allow the V2 sync to retry without destructive replacement.
 
 Only the two known existing users require this migration path, so a mass administrative migration tool is not necessary.
 
@@ -82,16 +84,19 @@ Only the two known existing users require this migration path, so a mass adminis
 ### Security changes applied during this audit
 
 - Revoked public/authenticated execution rights from internal `SECURITY DEFINER` trigger functions.
+- Corrected the history-protection trigger return behavior for allowed `DELETE` operations (`OLD` is returned for a PostgreSQL `BEFORE DELETE` trigger).
 - Removed employee DELETE permission for submitted reports.
 - Restricted expense DELETE policy to expenses that do not have a `submittedReportId`.
 - Added database triggers that prevent an employee from altering/deleting submitted expense content.
 - Added database triggers that prevent submitted report contents from being altered/deleted while still allowing Submitted/Reimbursed status tracking.
+- Restricted receipt Storage INSERT/UPDATE/DELETE policies so an employee cannot replace or remove the supporting file for an already-submitted expense. Read/download access remains available to the owning employee.
+- Updated new-user profile creation so name and department can be carried in authenticated signup metadata instead of being staged in an unauthenticated local profile first.
 
-### Remaining Supabase configuration item
+### Remaining Supabase configuration items
 
 Supabase Security Advisor still reports that leaked-password protection is disabled. Enable Supabase Auth leaked-password protection before the final production rollout if the project plan supports it.
 
-The final Auth Site URL / redirect allow-list should also point to the production Ranch Expense Tracker URL rather than a research or localhost URL.
+The final Auth Site URL / redirect allow-list should point to the production Ranch Expense Tracker URL rather than a research or localhost URL.
 
 ## PWA / offline audit
 
@@ -103,29 +108,32 @@ V2 service-worker requirements:
 - Cache the V2 app shell after a successful online load.
 - Keep network-first navigation so releases update normally.
 - Preserve a cached application shell for offline use after the app has previously loaded.
-- Ensure the Supabase browser client needed to open an existing authenticated offline session is available from cache, rather than depending on an uncached CDN request.
+- Cache the pinned Supabase browser client required to open an existing authenticated offline session rather than depending on an uncached CDN request.
+- Pin the Supabase browser SDK to an explicit tested 2.x version instead of floating on the `@2` tag.
 - Never cache Supabase API responses containing user data in the service-worker app-shell cache.
+- Hide/inert the cached application UI until the persisted authenticated session has been resolved so prior-user data cannot flash before the account gate appears.
 
 ## Final release gates
 
 Before replacing production 1.5.0 with 2.0.0:
 
 1. Generate a clean V2 source file with no runtime research/hotfix scripts.
-2. Static-search the V2 source for obsolete backup/history/reopen architecture.
+2. Static-search the V2 source for obsolete backup/history/reopen/trip-type architecture.
 3. JavaScript syntax check all V2 scripts.
 4. Test account creation and email confirmation.
 5. Test existing-account sign in.
 6. Test name/department editing without account-gate flicker.
 7. Test expense create/edit/delete on two devices.
-8. Confirm submitted expenses cannot be edited/deleted.
-9. Confirm submitted reports cannot be reopened/deleted.
-10. Test saved-default add/remove sync.
-11. Test current-report selection and completed-report sync.
-12. Test sign out clears the V2 local user cache and sign in restores cloud data.
-13. Test two-account isolation once more on the release candidate.
-14. Test offline use after one successful online load.
-15. Test optional V1-to-V2 migration on a copy of existing local data before using it on the two real legacy devices.
-16. Update README, CHANGELOG, RELEASE_NOTES, USER_GUIDE, TECHNICAL_HANDOFF, manifest, service worker, and version metadata to 2.0.0.
+8. Confirm submitted expenses cannot be edited/deleted at both UI and database layers.
+9. Confirm submitted reports cannot be reopened/deleted at both UI and database layers.
+10. Confirm submitted receipt objects cannot be replaced/deleted by the employee.
+11. Test saved-default add/remove sync.
+12. Test current-report selection and completed-report sync.
+13. Test sign out clears the V2 local user cache and sign in restores cloud data.
+14. Test two-account isolation once more on the release candidate.
+15. Test offline use after one successful online load.
+16. Test optional V1-to-V2 migration on a copy of existing local data before using it on the two real legacy devices.
+17. Update README, CHANGELOG, RELEASE_NOTES, USER_GUIDE, TECHNICAL_HANDOFF, manifest, service worker, and version metadata to 2.0.0.
 
 ## Production rule
 
