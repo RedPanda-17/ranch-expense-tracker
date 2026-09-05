@@ -13,13 +13,13 @@ body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",
 <body>
 <div class="box">
 <strong>Loading Complete Sync Test 6…</strong>
-<p>This isolated build tests full automatic cloud sync, account-required access, protected submitted history, clearer dashboard totals, privacy-safe sign-out, and the pre-1.6 account/settings layout. Production Ranch Expense Tracker data is untouched.</p>
+<p>This isolated build tests full automatic cloud sync, account-required access, protected submitted history, simplified data/support settings, clearer dashboard totals, privacy-safe sign-out, and the pre-1.6 account/settings layout. Production Ranch Expense Tracker data is untouched.</p>
 <div id="error" class="bad"></div>
 </div>
 <script>
 (async()=>{
   try{
-    const res=await fetch('./expense-entry-efficiency-test-2.html?complete-sync=6&saved-defaults-fix=2&auth-fix=2&account-polish=1&auth-gate=3&history-lock=1',{cache:'no-store'});
+    const res=await fetch('./expense-entry-efficiency-test-2.html?complete-sync=6&saved-defaults-fix=2&auth-fix=2&account-polish=1&auth-gate=3&history-lock=1&backup-ui=0',{cache:'no-store'});
     if(!res.ok)throw new Error('Could not load Efficiency Test 2: HTTP '+res.status);
     let source=await res.text();
 
@@ -28,7 +28,7 @@ body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",
     const marker="    document.open();document.write(html);document.close();console.info('Expense Entry Efficiency Test patches:',applied);";
     if(!source.includes(marker))throw new Error('Complete-sync integration marker was not found.');
 
-    const injected=`    html=html.replace('</head>','<style id="authPrerequisitePrehide">html.ranch-auth-pending .site-header,html.ranch-auth-pending .app-nav,html.ranch-auth-pending .app-shell{visibility:hidden!important}html.ranch-auth-pending body{background:#f5efe4}html.ranch-auth-pending body::before{content:"Ranch Expense Tracker";position:fixed;z-index:9000;left:50%;top:42%;transform:translate(-50%,-50%);font-size:1.25rem;font-weight:900;color:#721419;white-space:nowrap}html.ranch-auth-pending body::after{content:"Checking your account…";position:fixed;z-index:9000;left:50%;top:calc(42% + 38px);transform:translateX(-50%);font-size:.9rem;font-weight:700;color:#766a60;white-space:nowrap}</style><script>document.documentElement.classList.add("ranch-auth-pending")<\\/script></head>');\n    html=html.replace('</body>','<script src="./mileage-efficiency-hotfix.js?v=6"><\\/script><script src="./saved-defaults-compact-hotfix.js?v=1"><\\/script><script src="./saved-defaults-removal-hotfix-v6.js?v=1"><\\/script><script src="./supabase-complete-sync-v6.js?v=6"><\\/script><script src="./supabase-auth-confirmation-hotfix-v2.js?v=3"><\\/script><script src="./account-settings-polish-hotfix-v6.js?v=1"><\\/script><script src="./auth-prerequisite-gate-v3.js?v=3"><\\/script><script src="./submitted-history-lock-v6.js?v=1"><\\/script></body>');\n`;
+    const injected=`    html=html.replace('</head>','<style id="authPrerequisitePrehide">html.ranch-auth-pending .site-header,html.ranch-auth-pending .app-nav,html.ranch-auth-pending .app-shell{visibility:hidden!important}html.ranch-auth-pending body{background:#f5efe4}html.ranch-auth-pending body::before{content:"Ranch Expense Tracker";position:fixed;z-index:9000;left:50%;top:42%;transform:translate(-50%,-50%);font-size:1.25rem;font-weight:900;color:#721419;white-space:nowrap}html.ranch-auth-pending body::after{content:"Checking your account…";position:fixed;z-index:9000;left:50%;top:calc(42% + 38px);transform:translateX(-50%);font-size:.9rem;font-weight:700;color:#766a60;white-space:nowrap}</style><script>document.documentElement.classList.add("ranch-auth-pending")<\\/script></head>');\n    html=html.replace('</body>','<script src="./mileage-efficiency-hotfix.js?v=6"><\\/script><script src="./saved-defaults-compact-hotfix.js?v=1"><\\/script><script src="./saved-defaults-removal-hotfix-v6.js?v=1"><\\/script><script src="./supabase-complete-sync-v6.js?v=6"><\\/script><script src="./supabase-auth-confirmation-hotfix-v2.js?v=3"><\\/script><script src="./account-settings-polish-hotfix-v6.js?v=1"><\\/script><script src="./auth-prerequisite-gate-v3.js?v=3"><\\/script><script src="./submitted-history-lock-v6.js?v=1"><\\/script><script src="./remove-backup-ui-v6.js?v=1"><\\/script></body>');\n`;
     source=source.replace(marker,injected+marker);
 
     document.open();
