@@ -63,7 +63,7 @@ function polishAccountCard() {
   info.style.marginTop = "14px";
   info.innerHTML = `
     <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--brand);margin-bottom:8px">Your information</div>
-    <p style="margin:0 0 10px;color:var(--muted);font-size:.8rem;line-height:1.45">New account? Add your name before creating it. Existing account? Your saved information loads after you sign in.</p>`;
+    <p style="margin:0 0 10px;color:var(--muted);font-size:.8rem;line-height:1.45">New account? Add your name before creating it. Existing account? Sign in and your saved information loads automatically.</p>`;
 
   if (profileGrid) info.appendChild(profileGrid);
 
@@ -77,16 +77,11 @@ function polishAccountCard() {
   info.appendChild(saveButton);
 
   const authFields = q("completeSyncAuthFields");
-  const authActions = q("completeSyncAuthActions");
-  const signedInActions = q("completeSyncSignedInActions");
-
   if (authFields) authFields.after(info);
   else card.appendChild(info);
 
-  if (signedInActions) {
-    const signOut = q("completeSyncSignOut");
-    if (signOut) signOut.textContent = "Sign out";
-  }
+  const signOut = q("completeSyncSignOut");
+  if (signOut) signOut.textContent = "Sign out";
 
   const create = q("completeSyncCreate");
   if (create && !create.dataset.accountWrapped) {
@@ -136,14 +131,6 @@ function polishDataSupport() {
   const reminderSelect = q("backupReminderDays");
   const reminderField = reminderSelect?.closest(".field") || null;
 
-  const supportPanel = document.createElement("div");
-  supportPanel.id = "supportContactPanel";
-  supportPanel.style.cssText = "margin-top:14px;padding:13px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel-alt);";
-  supportPanel.innerHTML = `
-    <div style="font-size:.76rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">Support contact</div>
-    <strong style="display:block;margin-top:4px">${SUPPORT_CONTACT}</strong>
-    <small style="display:block;margin-top:3px;color:var(--muted)">Questions, feedback, or app issues should be directed here.</small>`;
-
   const preferencesBlock = document.createElement("div");
   preferencesBlock.id = "consolidatedPreferences";
   preferencesBlock.style.cssText = "margin-top:16px;padding-top:14px;border-top:1px solid var(--border);";
@@ -163,6 +150,14 @@ function polishDataSupport() {
   });
   preferencesBlock.appendChild(savePref);
 
+  const supportPanel = document.createElement("div");
+  supportPanel.id = "supportContactPanel";
+  supportPanel.style.cssText = "margin-top:14px;padding:13px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel-alt);";
+  supportPanel.innerHTML = `
+    <div style="font-size:.76rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">Support contact</div>
+    <strong style="display:block;margin-top:4px">${SUPPORT_CONTACT}</strong>
+    <small style="display:block;margin-top:3px;color:var(--muted)">Questions, feedback, or app issues should be directed here.</small>`;
+
   dataCard.appendChild(preferencesBlock);
   dataCard.appendChild(supportPanel);
 
@@ -172,29 +167,27 @@ function polishDataSupport() {
 }
 
 function updateSignedInPresentation() {
-  const signedIn = !q("completeSyncSignedInActions")?.hidden;
+  const signedInActions = q("completeSyncSignedInActions");
+  if (!signedInActions) return;
+
+  const signedIn = !signedInActions.hidden;
   const saveButton = q("saveAccountInfoButton");
   const helper = q("accountProfileInfo")?.querySelector("p");
+  const desiredHelper = signedIn
+    ? "Your name and department are tied to this cloud account. Update them here anytime."
+    : "New account? Add your name before creating it. Existing account? Sign in and your saved information loads automatically.";
 
-  if (saveButton) saveButton.hidden = !signedIn;
-  if (helper) {
-    helper.textContent = signedIn
-      ? "Your name and department are tied to this cloud account. Update them here anytime."
-      : "New account? Add your name before creating it. Existing account? Sign in and your saved information will load.";
-  }
+  if (saveButton && saveButton.hidden !== !signedIn) saveButton.hidden = !signedIn;
+  if (helper && helper.textContent !== desiredHelper) helper.textContent = desiredHelper;
 }
 
 function run() {
-  const a = polishAccountCard();
-  const b = polishDataSupport();
+  polishAccountCard();
+  polishDataSupport();
   updateSignedInPresentation();
-  return a || b;
 }
 
-const observer = new MutationObserver(() => {
-  run();
-  updateSignedInPresentation();
-});
+const observer = new MutationObserver(() => run());
 observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["hidden"] });
 
 let tries = 0;
