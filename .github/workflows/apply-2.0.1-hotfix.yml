@@ -1,0 +1,208 @@
+name: Apply Ranch Expense Tracker 2.0.1 hotfix
+
+on:
+  push:
+    branches:
+      - hotfix-2.0.1-sync-receipts
+
+permissions:
+  contents: write
+
+jobs:
+  patch-production-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out hotfix branch
+        uses: actions/checkout@v4
+        with:
+          ref: hotfix-2.0.1-sync-receipts
+          fetch-depth: 0
+
+      - name: Apply targeted 2.0.1 fixes
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import json
+
+          def replace_exact(text, old, new, label, expected=1):
+              count = text.count(old)
+              if count != expected:
+                  raise SystemExit(f"{label}: expected {expected} match(es), found {count}")
+              return text.replace(old, new, expected)
+
+          index_path = Path("index.html")
+          text = index_path.read_text(encoding="utf-8")
+
+          version_count = text.count("2.0.0")
+          if version_count < 5:
+              raise SystemExit(f"Version bump guard: expected at least 5 Version 2.0.0 references, found {version_count}")
+          text = text.replace("2.0.0", "2.0.1")
+
+          text = replace_exact(
+              text,
+              '''    const record = await getReceipt(receiptId);\n    if (!record?.blob) return clearInlineReceiptPreview();\n    renderInlineReceiptPreview(record.blob, record.name || "Stored receipt", record.type || record.blob.type || "");''',
+              '''    const record = await getReceipt(receiptId);\n    const blob = record?.blob?.size ? record.blob : (record?.bytes ? new Blob([record.bytes], { type: record.type || "application/octet-stream" }) : null);\n    if (!blob?.size) return clearInlineReceiptPreview();\n    renderInlineReceiptPreview(blob, record.name || "Stored receipt", record.type || blob.type || "");''',
+              "stored receipt preview fallback"
+          )
+
+          text = replace_exact(
+              text,
+              '''    const record = await getReceipt(receiptId);\n    if (!record?.blob && record?.bytes) {\n      record.blob = new Blob([record.bytes], { type: record.type || "application/octet-stream" });\n    }\n    if (!record?.blob) throw new Error("Receipt file data was not found on this device.");''',
+              '''    const record = await getReceipt(receiptId);\n    if ((!record?.blob || !record.blob.size) && record?.bytes) {\n      record.blob = new Blob([record.bytes], { type: record.type || "application/octet-stream" });\n    }\n    if (!record?.blob?.size) throw new Error("Receipt file data was not found on this device.");''',
+              "receipt viewer byte fallback"
+          )
+
+          text = replace_exact(
+              text,
+              '''  const blob = record?.blob || (record?.bytes ? new Blob([record.bytes], { type: record.type || "application/octet-stream" }) : null);''',
+              '''  const blob = (record?.blob?.size ? record.blob : null) || (record?.bytes ? new Blob([record.bytes], { type: record.type || "application/octet-stream" }) : null);''',
+              "PDF supporting-document byte fallback"
+          )
+
+          text = replace_exact(
+              text,
+              '''if (window.__ranchCloudSyncV2) return;\nwindow.__ranchCloudSyncV2 = true;''',
+              '''if (window.__ranchCloudSyncV2) return;\nwindow.__ranchCloudSyncV2 = true;\nwindow.__ranchAuthResolvedV2 = false;''',
+              "auth resolution initialization"
+          )
+
+          text = replace_exact(
+              text,
+              '''const safeName = value => String(value || "document")\n  .replace(/[^A-Za-z0-9._-]+/g, "-")\n  .replace(/^-+|-+$/g, "") || "document";\n\nfunction defaultMeta() {''',
+              '''const safeName = value => String(value || "document")\n  .replace(/[^A-Za-z0-9._-]+/g, "-")\n  .replace(/^-+|-+$/g, "") || "document";\n\nfunction markAuthResolved() {\n  const firstResolution = window.__ranchAuthResolvedV2 !== true;\n  window.__ranchAuthResolvedV2 = true;\n  if (firstResolution) document.dispatchEvent(new Event("ranch-auth-resolved"));\n}\n\nfunction defaultMeta() {''',
+              "auth resolution helper"
+          )
+
+          text = replace_exact(
+              text,
+              '''  user = nextUser;\n  saveMeta();\n  renderStatus();\n  return user;''',
+              '''  user = nextUser;\n  saveMeta();\n  renderStatus();\n  markAuthResolved();\n  return user;''',
+              "auth resolution completion"
+          )
+
+          text = replace_exact(
+              text,
+              '''  if (!name) { setMessage("Add your name before creating the account.", "warn"); document.getElementById("employeeName")?.focus(); return; }\n  if (!email || password.length < 6) return setMessage("Enter an email and a password with at least 6 characters.", "warn");''',
+              '''  if (!name) { setMessage("Add your name before creating the account.", "warn"); document.getElementById("employeeName")?.focus(); return; }\n  if (!email.toLowerCase().endsWith("@pizzaranch.com")) return setMessage("Use your @pizzaranch.com email address.", "warn");\n  if (!email || password.length < 6) return setMessage("Enter an email and a password with at least 6 characters.", "warn");''',
+              "friendly Pizza Ranch domain validation"
+          )
+
+          old_local_receipt = '''async function localReceipt(expense) {\n  if (!expense?.receiptId) return null;\n  const record = await getReceipt(expense.receiptId);\n  if (!record) return null;\n\n  const blob = record.blob || (record.bytes\n    ? new Blob([record.bytes], { type: record.type || "application/octet-stream" })\n    : null);\n\n  return blob ? {\n    blob,\n    name: record.name || expense.receiptName || "document",\n    type: record.type || blob.type || "application/octet-stream"\n  } : null;\n}'''
+          new_local_receipt = '''function receiptArrayBuffer(value) {\n  if (!value) return null;\n  if (value instanceof ArrayBuffer) return value.byteLength ? value : null;\n  if (ArrayBuffer.isView(value)) {\n    if (!value.byteLength) return null;\n    return value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength);\n  }\n  return null;\n}\n\nasync function localReceipt(expense) {\n  if (!expense?.receiptId) return null;\n  const record = await getReceipt(expense.receiptId);\n  if (!record) return null;\n\n  const type = record.type || expense.receiptType || record.blob?.type || "application/octet-stream";\n  const storedBytes = receiptArrayBuffer(record.bytes);\n  let blob = record.blob instanceof Blob && record.blob.size > 0 ? record.blob : null;\n  let uploadBody = storedBytes;\n\n  if (!uploadBody && blob) {\n    const buffer = await blob.arrayBuffer();\n    if (buffer.byteLength) uploadBody = buffer;\n  }\n  if (!blob && uploadBody?.byteLength) {\n    blob = new Blob([uploadBody], { type });\n  }\n  if (!blob?.size || !uploadBody?.byteLength) return null;\n\n  return {\n    blob,\n    uploadBody,\n    size: uploadBody.byteLength,\n    name: record.name || expense.receiptName || "document",\n    type\n  };\n}'''
+          text = replace_exact(text, old_local_receipt, new_local_receipt, "ArrayBuffer receipt upload preparation")
+
+          if text.count("file.blob.size") != 2:
+              raise SystemExit(f"receipt size patch: expected 2 file.blob.size references, found {text.count('file.blob.size')}")
+          text = text.replace("file.blob.size", "file.size")
+
+          text = replace_exact(
+              text,
+              '''      const upload = await sb.storage.from(BUCKET).upload(path, file.blob, {''',
+              '''      const upload = await sb.storage.from(BUCKET).upload(path, file.uploadBody, {''',
+              "ArrayBuffer Storage upload body"
+          )
+
+          text = replace_exact(
+              text,
+              '''        blob: download.data,\n        originalName: row.receipt_name || expense.receiptName || "document",''',
+              '''        blob: download.data,\n        bytes: await download.data.arrayBuffer(),\n        originalName: row.receipt_name || expense.receiptName || "document",''',
+              "cloud receipt byte cache"
+          )
+
+          text = replace_exact(
+              text,
+              '''  } catch (error) {\n    setPill("Cloud unavailable", "err");\n    setMessage("Supabase could not initialize: " + (error.message || String(error)), "bad");\n  }''',
+              '''  } catch (error) {\n    markAuthResolved();\n    setPill("Cloud unavailable", "err");\n    setMessage("Supabase could not initialize: " + (error.message || String(error)), "bad");\n  }''',
+              "auth resolution on initialization failure"
+          )
+
+          text = replace_exact(
+              text,
+              '''  const card = q("completeSyncCard");\n\n  if (signOutInProgress) {''',
+              '''  const card = q("completeSyncCard");\n\n  if (!signOutInProgress && window.__ranchAuthResolvedV2 !== true) {\n    const gate = createGate();\n    document.documentElement.classList.add("ranch-auth-pending");\n    document.documentElement.classList.remove("ranch-auth-ready");\n    document.body.classList.add("ranch-auth-gated");\n    gate.hidden = false;\n    if (card) { rememberHome(card); returnCardHome(card); }\n    setChecking("Checking your saved sign-in…", true);\n    return;\n  }\n\n  if (signOutInProgress) {''',
+              "auth gate waits for persisted-session check"
+          )
+
+          text = replace_exact(
+              text,
+              '''    if (isSignedIn()) return queueSync();\n    setChecking("Checking your account…", false);''',
+              '''    if (window.__ranchAuthResolvedV2 !== true || isSignedIn()) return queueSync();\n    setChecking("Checking your account…", false);''',
+              "auth gate reveal guard"
+          )
+
+          text = replace_exact(
+              text,
+              '''const observer = new MutationObserver(queueSync);''',
+              '''document.addEventListener("ranch-auth-resolved", queueSync);\n\nconst observer = new MutationObserver(queueSync);''',
+              "auth resolved event listener"
+          )
+
+          old_migration_copy = '''const receipts=await oldReceipts();for(const record of receipts){try{await putReceipt(record)}catch(error){console.warn("Legacy receipt could not be copied",record?.id,error)}}saveAll();renderAll();localStorage.setItem(marker,new Date().toISOString());showToast(`Imported ${count} legacy expense${count===1?"":"s"}. Cloud sync will keep uploading any remaining records automatically.`,"success");setTimeout(()=>document.getElementById("completeSyncNow")?.click(),150)'''
+          new_migration_copy = '''const receipts=await oldReceipts();for(const record of receipts){try{const bytes=record?.bytes instanceof ArrayBuffer?record.bytes:(ArrayBuffer.isView(record?.bytes)?record.bytes.buffer.slice(record.bytes.byteOffset,record.bytes.byteOffset+record.bytes.byteLength):null);let blob=record?.blob instanceof Blob&&record.blob.size>0?record.blob:null;if(!blob&&bytes?.byteLength)blob=new Blob([bytes],{type:record.type||"application/octet-stream"});if(blob?.size)await putReceipt({...record,blob,bytes:bytes?.byteLength?bytes:await blob.arrayBuffer()});else console.warn("Legacy receipt had no usable file content",record?.id)}catch(error){console.warn("Legacy receipt could not be copied",record?.id,error)}}saveAll();renderAll();localStorage.setItem(marker,new Date().toISOString());showToast(`Imported ${count} legacy expense${count===1?"":"s"}. Cloud sync will keep uploading any remaining records automatically.`,"success");setTimeout(()=>document.getElementById("completeSyncNow")?.click(),150)'''
+          text = replace_exact(text, old_migration_copy, new_migration_copy, "legacy receipt canonicalization")
+
+          index_path.write_text(text, encoding="utf-8")
+
+          sw = Path("service-worker.js")
+          sw_text = sw.read_text(encoding="utf-8")
+          if sw_text.count("2.0.0") != 2:
+              raise SystemExit(f"service worker version guard: expected 2 references, found {sw_text.count('2.0.0')}")
+          sw.write_text(sw_text.replace("2.0.0", "2.0.1"), encoding="utf-8")
+
+          version_path = Path("version.json")
+          version = json.loads(version_path.read_text(encoding="utf-8"))
+          version["version"] = "2.0.1"
+          version["release"] = "Cloud Sync Hotfix"
+          version["released"] = "2026-09-05"
+          version_path.write_text(json.dumps(version, indent=2) + "\n", encoding="utf-8")
+
+          readme = Path("README.md")
+          readme_text = readme.read_text(encoding="utf-8")
+          readme_text = replace_exact(readme_text, "Current release: **Version 2.0.0 — Cloud Sync**", "Current release: **Version 2.0.1 — Cloud Sync Hotfix**", "README release line")
+          readme.write_text(readme_text, encoding="utf-8")
+
+          changelog = Path("CHANGELOG.md")
+          changelog_text = changelog.read_text(encoding="utf-8")
+          hotfix_notes = '''## 2.0.1 - September 5, 2026\n\n### Fixed\n- Migrated Version 1.x receipt files now synchronize reliably from iPhone/iPad by sending verified binary ArrayBuffer content to Supabase Storage instead of relying on a restored Blob object.\n- Legacy receipt migration normalizes stored file bytes so future pilot accounts can upload their existing supporting documents safely.\n- Stored receipt preview/PDF paths recover from legacy records whose Blob is empty but whose binary bytes are intact.\n- Returning signed-in users now remain behind a short account-check screen while the saved Supabase session is restored, preventing a brief false sign-in prompt on app launch.\n- Account creation now gives an immediate friendly warning for non-`@pizzaranch.com` addresses in addition to the server-side signup restriction.\n\n'''
+          changelog_text = replace_exact(changelog_text, "# Changelog\n\n", "# Changelog\n\n" + hotfix_notes, "changelog heading")
+          changelog.write_text(changelog_text, encoding="utf-8")
+
+          release = Path("RELEASE_NOTES.md")
+          release_text = release.read_text(encoding="utf-8")
+          release_text = replace_exact(release_text, "# Release Notes - Version 2.0.0", "# Release Notes - Version 2.0.1", "release-notes heading")
+          release_text = replace_exact(release_text, "**Release name:** Cloud Sync\n\n", "**Release name:** Cloud Sync Hotfix\n\n## Version 2.0.1 hotfix\n- Fixes Version 1.x receipt migration uploads on iPhone/iPad by using verified binary content for Supabase Storage.\n- Restores migrated receipt previews/PDF access when legacy binary bytes are present.\n- Prevents the sign-in form from flashing briefly while an existing saved session is being restored.\n- Keeps the server-side Pizza Ranch email-domain restriction and adds a matching friendly client-side message.\n\n", "release-notes hotfix section")
+          release.write_text(release_text, encoding="utf-8")
+
+          Path(".github/workflows/apply-2.0.1-hotfix.yml").unlink()
+          PY
+
+      - name: Validate inline JavaScript and release markers
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+          html = Path('index.html').read_text(encoding='utf-8')
+          scripts = re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>', html, flags=re.S|re.I)
+          if not scripts:
+              raise SystemExit('No inline scripts found')
+          for i, script in enumerate(scripts):
+              Path(f'/tmp/ranch-script-{i}.js').write_text(script, encoding='utf-8')
+          print(f'Extracted {len(scripts)} inline scripts')
+          PY
+          for f in /tmp/ranch-script-*.js; do node --check "$f"; done
+          grep -q 'Version 2.0.1' index.html
+          grep -q 'file.uploadBody' index.html
+          grep -q 'ranch-expense-tracker-v2-2.0.1' service-worker.js
+          grep -q '"version": "2.0.1"' version.json
+          test ! -f .github/workflows/apply-2.0.1-hotfix.yml
+
+      - name: Commit hotfix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html service-worker.js version.json README.md CHANGELOG.md RELEASE_NOTES.md .github/workflows/apply-2.0.1-hotfix.yml
+          git commit -m "Fix migrated receipt sync and persisted-session gate in 2.0.1"
+          git push origin HEAD:hotfix-2.0.1-sync-receipts
