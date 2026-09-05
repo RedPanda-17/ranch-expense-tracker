@@ -1,5 +1,45 @@
 # Changelog
 
+## 2.0.0 - September 5, 2026
+
+### Added
+- Account-required Supabase Auth sign-in and account creation
+- Secure cloud synchronization for expenses, reports, current report draft, profile information, and saved defaults
+- Private Supabase Storage synchronization for receipts and mileage-support files
+- Offline local working cache with retry after reconnect
+- One-time authenticated Version 1.x local-data migration path
+- Record-level delete tombstones to prevent stale-device resurrection
+- Submitted-history protection at both the user interface and database/storage policy layers
+- Per-user Row Level Security and private Storage isolation
+
+### Changed
+- Supabase Postgres and Storage are now the Version 2 cloud systems of record
+- Settings reorganized into Account, Saved Defaults, Data & Support, and About
+- Dashboard separates Unreported Expenses from Current Report Total
+- Name is captured during account creation and can be edited with department under Account settings
+- Signing out clears the authenticated user's Version 2 local cache while leaving cloud data intact
+- Mileage entry now uses total miles only; One Way/Round Trip was removed
+- Description is no longer required for Supplies
+- Successful expense save returns to Add Expense for faster entry
+- Mobile date-input sizing improved for iPhone and Android browsers
+- Supabase browser SDK pinned to 2.115.0 in the production app shell
+
+### Removed
+- Download Backup / Import Backup and `.ranchbackup` workflows from Version 2
+- Backup reminders and backup timestamps
+- Bulk Clear Expense History
+- Employee Reopen Report
+- Feedback/reimbursement recipient configuration fields
+- Employee-facing reimbursement-status control for the current release
+
+### Retained
+- PDF and CSV reimbursement exports
+- Version 1.5 PDF Accounting Review checks and receipt-total reconciliation
+- Browser-based receipt OCR
+- Searchable saved defaults, tags, pay-period helper, and mileage routes
+- Network-first PWA update behavior with offline app-shell fallback
+- Original Version 1.x local data left untouched for migration safety
+
 ## 1.5.0 - September 1, 2026
 
 ### Added
