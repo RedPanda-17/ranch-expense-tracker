@@ -1,54 +1,74 @@
-# Employee User Guide - Version 1.5.0
+# Employee User Guide - Version 2.0.0
 
-## 1. Complete Settings
-Enter your name and department. These profile settings remain when expense history is cleared.
+## 1. Sign in or create your account
+Ranch Expense Tracker now requires an account.
 
-## 2. Add an expense
+For a new account, enter your email, password, and name, then create the account and complete any email confirmation required by the sign-in process. Department can also be saved with your account information.
+
+For an existing account, sign in and your synchronized information will load automatically.
+
+## 2. Existing Version 1.x data
+If the device contains older Ranch Expense Tracker data, Version 2 may offer to import it after you sign in.
+
+Before importing, verify that the email shown is the account that should own that expense history. The original Version 1.x data remains on the device as a safety copy.
+
+## 3. Add an expense
 Attach a receipt when available, then enter the amount, merchant, category, date, and any useful category details.
 
 Description is required for:
 - Education
-- Supplies
 - Other
-- Any subcategory beginning with Other
+- Broad subcategories beginning with Other
 
-It is optional for the remaining categories.
+It is optional for the remaining categories, including Supplies.
 
-Project or trip tags are optional and can help group or filter related expenses.
+Project or trip tags remain optional.
 
-## 3. Mileage
-Mileage does not use a purchase receipt. Enter the start, destination, miles, and trip type. Upload a route screenshot under Route Documentation when available. Accounting may verify the shortest reasonable route.
+After an expense is saved, the app returns to Add Expense so another entry can be added quickly.
 
-## 4. Tags and saved defaults
-Saved merchants, locations, vehicles, people, and tags can be selected or added directly from expense entry. Use tags when they help organize a trip, training event, project, test, or store visit.
+## 4. Mileage
+Mileage does not use a purchase receipt. Enter the starting location, destination, and total miles traveled.
 
-## 5. Build the current report
-Use **Choose Pay Period** to select:
-- 1st-15th
-- 16th-end of month
+Upload route documentation when useful. Version 2 no longer asks whether the trip was One Way or Round Trip; enter the actual total miles being reimbursed.
 
-The app fills the report dates and suggests a name. You can type a different report name. Select expenses individually, Select All, or filter and Select Filtered.
+## 5. Saved defaults
+Saved people, organizations/merchants, locations, vehicles, tags, and mileage routes can synchronize with your account.
 
-## 6. Download the report
+Manage them under **Settings > Saved defaults**.
+
+## 6. Build the current report
+Use the pay-period helper when appropriate, then select the expenses to include in the current report.
+
+The Dashboard separates:
+- **Unreported Expenses** — expenses not currently included in the report
+- **Current Report Total** — expenses currently selected for the report
+
+## 7. Download the report
 - **Download PDF** creates the reimbursement report with supporting documents.
 - **Download CSV** creates a spreadsheet-friendly export.
-- Open the downloaded file from your device to print, move, or attach it to an email.
 
-Version 1.5.0 may add an **Accounting Review** section to the PDF. These warnings are for Accounting review and do not appear on the normal expense-entry screen.
+The PDF can include an **Accounting Review** section with advisory checks such as possible amount/date mismatches, tips over 20%, duplicate expenses, missing supporting documents, or selected potentially non-reimbursable items. Accounting should verify the attached receipt before making a reimbursement decision.
 
-## 7. Past Reports
-Finalized reports are marked Submitted. Change the status to Reimbursed after payment if you want to track it. Reopen Report returns the report and its expenses to Current Report for corrections.
+## 8. Submitted reports
+Submitted reports and their attached expenses are locked from employee editing or deletion.
 
-## 8. Backups
-Download backups regularly. A backup contains expenses, reports, settings, drafts, and supporting documents. Store it securely.
+Supporting receipt files for submitted expenses also cannot be replaced or removed by the employee. Submitted reports remain available for viewing and download.
 
-Create a fresh backup before:
-- changing devices or browser profiles;
-- clearing website/app data;
-- uninstalling the installed web app;
-- troubleshooting a storage problem.
+There is no employee Reopen Report action in Version 2. A future Accounting correction workflow is the intended path for returned submissions.
 
-Backup files use the `.ranchbackup` extension. Older JSON backups remain supported.
+## 9. Cloud sync and offline use
+While signed in, expenses, receipts, reports, the current report draft, and saved defaults synchronize automatically with your account.
 
-## 9. Local-storage reminder
-Ranch Expense Tracker does not currently synchronize between devices. Use the same website address, browser, and browser profile for the same local records. Clearing site data can remove expense history and receipts if you do not have a valid backup.
+After the app has loaded successfully online, it can keep working from its local offline cache. Changes made offline will retry synchronization after connectivity returns.
+
+Do not treat missing local cache data as deleted cloud data.
+
+## 10. Sign out
+Use **Settings > Account > Sign out**.
+
+Signing out clears that account's Version 2 local working cache from the device while leaving cloud records intact. Signing back in restores the account's synchronized data.
+
+## 11. Data exports and support
+Version 2 no longer uses manual `.ranchbackup` files.
+
+Use **Settings > Data & support** for available data exports and support information.
