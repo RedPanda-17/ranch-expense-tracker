@@ -1,107 +1,17 @@
-name: Build Ranch Expense Tracker 2.0 RC
+name: Ranch Expense Tracker 2.0 RC Archive
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - 'v2-rc/**'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  build-v2-rc:
+  archived-release-candidate:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Prepare clean V2 build source
-        shell: bash
+      - name: Release candidate archived
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          import re
-
-          p = Path('scripts/build-v2-rc.mjs')
-          text = p.read_text()
-          lines = text.splitlines()
-          for i, line in enumerate(lines):
-              if "replaceRequired('const RELEASE_NAME" in line:
-                  lines[i] = line.replace('PDF Accounting Review Update', 'Cloud Sync Release Candidate')
-          text = '\n'.join(lines) + '\n'
-          text = text.replace("const finalExpenses/');", "const finalExpenses');")
-          p.write_text(text)
-
-          index = Path('index.html')
-          text = index.read_text()
-          text, setup_count = re.subn(r'\s*<div id="setupBanner" class="setup-banner" hidden>[\s\S]*?<button class="primary" type="button" onclick="showView\(\'settings\', \{ focus: \'employeeName\' \}\)">Open Settings</button>\s*</div>', '', text, count=1)
-          text, backup_count = re.subn(r'\s*<div id="backupReminder" class="card backup-reminder" hidden>[\s\S]*?<button class="secondary" type="button" onclick="dismissBackupReminder\(\)">Remind Me Later</button>\s*</div>\s*</div>', '', text, count=1)
-          if setup_count != 1:
-              raise SystemExit(f'Expected one legacy setup banner, removed {setup_count}')
-          if backup_count != 1:
-              raise SystemExit(f'Expected one legacy backup banner, removed {backup_count}')
-          index.write_text(text)
-          PY
-
-      - name: Build and audit V2 release candidate
-        run: node scripts/build-v2-rc.mjs
-
-      - name: Apply final V2 UI cleanup
-        run: node scripts/v2-final-ui-cleanup.mjs
-
-      - name: Check generated RC changes
-        run: git diff --check -- v2-rc
-
-      - name: Promote approved V2 to production
-        if: ${{ hashFiles('.promote-v2-production') != '' }}
-        run: node scripts/promote-v2-production.mjs
-
-      - name: Check production build
-        if: ${{ hashFiles('.promote-v2-production') != '' }}
-        shell: bash
-        run: |
-          git diff --check -- index.html manifest.webmanifest service-worker.js
-          if grep -q '2.0.0 RC' index.html; then
-            echo 'Production index still contains an RC version label.' >&2
-            exit 1
-          fi
-          if grep -q 'Cloud Sync Release Candidate' index.html; then
-            echo 'Production index still contains the RC release name.' >&2
-            exit 1
-          fi
-          if grep -Fq '@supabase/supabase-js@2/+esm' index.html service-worker.js; then
-            echo 'Production app still uses the floating Supabase SDK tag.' >&2
-            exit 1
-          fi
-
-      - name: Publish generated files
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          if [ -f .promote-v2-production ]; then
-            git add v2-rc index.html manifest.webmanifest service-worker.js
-            git rm .promote-v2-production
-            message="Promote Ranch Expense Tracker 2.0.0 to production [skip ci]"
-          else
-            git add v2-rc
-            message="Build Ranch Expense Tracker 2.0.0 RC [skip ci]"
-          fi
-
-          if git diff --cached --quiet; then
-            echo "Generated output is already current."
-            exit 0
-          fi
-
-          git commit -m "$message"
-          git push
+          echo "Ranch Expense Tracker 2.0.0 was promoted to production on 2026-09-05."
+          echo "The former RC build workflow is intentionally retired because main now contains the V2 production source."
+          echo "Use the archive-pre-2.0.0-production-2026-09-05 branch to reproduce the pre-production RC state."
