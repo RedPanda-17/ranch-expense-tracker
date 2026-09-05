@@ -24,17 +24,55 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Normalize V2 build marker
+      - name: Prepare clean V2 build source
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
+
+          # Normalize the release-name marker in the build script after the
+          # global display-text replacement performed near the top of the build.
           p = Path('scripts/build-v2-rc.mjs')
           lines = p.read_text().splitlines()
           for i, line in enumerate(lines):
               if "replaceRequired('const RELEASE_NAME" in line:
                   lines[i] = line.replace('PDF Accounting Review Update', 'Cloud Sync Release Candidate')
           p.write_text('\n'.join(lines) + '\n')
+
+          # V2 authentication replaces the old unauthenticated setup and backup
+          # banners. Remove them from the temporary build source rather than
+          # carrying hidden 1.x architecture into the generated RC.
+          index = Path('index.html')
+          text = index.read_text()
+          setup = '''      <div id="setupBanner" class="setup-banner" hidden>
+        <div>
+          <div class="eyebrow">One-time setup</div>
+          <h2>Add your name before creating a report</h2>
+          <p>Your profile stays saved when expense history is cleared.</p>
+        </div>
+        <button class="primary" type="button" onclick="showView('settings', { focus: 'employeeName' })">Open Settings</button>
+      </div>
+
+'''
+          backup = '''      <div id="backupReminder" class="card backup-reminder" hidden>
+        <div>
+          <div class="eyebrow">Protect your records</div>
+          <h2>It is time to create a backup</h2>
+          <p id="backupReminderText" class="muted"></p>
+        </div>
+        <div class="button-row compact-row">
+          <button class="primary" type="button" onclick="exportBackup()">Download Backup</button>
+          <button class="secondary" type="button" onclick="dismissBackupReminder()">Remind Me Later</button>
+        </div>
+      </div>
+
+'''
+          if setup not in text:
+              raise SystemExit('V2 prep could not find legacy setup banner')
+          if backup not in text:
+              raise SystemExit('V2 prep could not find legacy backup banner')
+          text = text.replace(setup, '').replace(backup, '')
+          index.write_text(text)
           PY
 
       - name: Build and audit V2 release candidate
