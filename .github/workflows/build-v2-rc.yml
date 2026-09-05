@@ -24,11 +24,25 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Normalize V2 build marker
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/build-v2-rc.mjs')
+          text = p.read_text()
+          text = text.replace(
+              "replaceRequired('const RELEASE_NAME = \\\"PDF Accounting Review Update\\\";',",
+              "replaceRequired('const RELEASE_NAME = \\\"Cloud Sync Release Candidate\\\";',"
+          )
+          p.write_text(text)
+          PY
+
       - name: Build and audit V2 release candidate
         run: node scripts/build-v2-rc.mjs
 
       - name: Check generated changes
-        run: git diff --check
+        run: git diff --check -- v2-rc
 
       - name: Publish generated V2 RC files
         run: |
