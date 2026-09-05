@@ -13,13 +13,13 @@ body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",
 <body>
 <div class="box">
 <strong>Loading Complete Sync Test 6…</strong>
-<p>This isolated build tests full automatic cloud sync, clearer dashboard totals, privacy-safe sign-out, and the pre-1.6 account/settings layout. Production Ranch Expense Tracker data is untouched.</p>
+<p>This isolated build tests full automatic cloud sync, account-required access, clearer dashboard totals, privacy-safe sign-out, and the pre-1.6 account/settings layout. Production Ranch Expense Tracker data is untouched.</p>
 <div id="error" class="bad"></div>
 </div>
 <script>
 (async()=>{
   try{
-    const res=await fetch('./expense-entry-efficiency-test-2.html?complete-sync=6&saved-defaults-fix=2&auth-fix=1&account-polish=1',{cache:'no-store'});
+    const res=await fetch('./expense-entry-efficiency-test-2.html?complete-sync=6&saved-defaults-fix=2&auth-fix=1&account-polish=1&auth-gate=1',{cache:'no-store'});
     if(!res.ok)throw new Error('Could not load Efficiency Test 2: HTTP '+res.status);
     let source=await res.text();
 
@@ -28,7 +28,7 @@ body{margin:0;background:#f5efe4;font-family:system-ui,-apple-system,"Segoe UI",
     const marker="    document.open();document.write(html);document.close();console.info('Expense Entry Efficiency Test patches:',applied);";
     if(!source.includes(marker))throw new Error('Complete-sync integration marker was not found.');
 
-    const injected=`    html=html.replace('</body>','<script src="./mileage-efficiency-hotfix.js?v=6"><\\/script><script src="./saved-defaults-compact-hotfix.js?v=1"><\\/script><script src="./saved-defaults-removal-hotfix-v6.js?v=1"><\\/script><script src="./supabase-complete-sync-v6.js?v=6"><\\/script><script src="./supabase-auth-confirmation-hotfix-v1.js?v=1"><\\/script><script src="./account-settings-polish-hotfix-v6.js?v=1"><\\/script></body>');\n`;
+    const injected=`    html=html.replace('</head>','<style id="authPrerequisitePrehide">html.ranch-auth-pending .site-header,html.ranch-auth-pending .app-nav,html.ranch-auth-pending .app-shell{visibility:hidden!important}html.ranch-auth-pending body{background:#f5efe4}</style><script>document.documentElement.classList.add("ranch-auth-pending")<\\/script></head>');\n    html=html.replace('</body>','<script src="./mileage-efficiency-hotfix.js?v=6"><\\/script><script src="./saved-defaults-compact-hotfix.js?v=1"><\\/script><script src="./saved-defaults-removal-hotfix-v6.js?v=1"><\\/script><script src="./supabase-complete-sync-v6.js?v=6"><\\/script><script src="./supabase-auth-confirmation-hotfix-v1.js?v=1"><\\/script><script src="./account-settings-polish-hotfix-v6.js?v=1"><\\/script><script src="./auth-prerequisite-gate-v6.js?v=1"><\\/script></body>');\n`;
     source=source.replace(marker,injected+marker);
 
     document.open();
