@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="ranch-auth-pending">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ranch Expenses">
-  <title>Ranch Expense Tracker - Version 1.5.0</title>
+  <title>Ranch Expense Tracker - Version 2.0.0</title>
   <style>
 :root {
   --bg: #f5efe4;
@@ -573,6 +573,42 @@ textarea { min-height: 92px; resize: vertical; }
 }
 
   </style>
+<style id="v2RcStyles">
+html.ranch-auth-pending .site-header,html.ranch-auth-pending .app-nav,html.ranch-auth-pending .app-shell,html.ranch-auth-pending .site-footer{visibility:hidden!important}
+.complete-sync-row{display:flex;justify-content:flex-end;margin:-8px 0 10px}.complete-sync-pill{min-height:29px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel);color:var(--muted);font-size:.76rem;font-weight:900;cursor:pointer;box-shadow:var(--shadow-soft)}.complete-sync-pill::before{content:"●";font-size:.62rem;margin-right:6px}.complete-sync-pill.ok{background:var(--olive-soft);border-color:#c8d8bd;color:#315329}.complete-sync-pill.wait{background:var(--amber-soft);border-color:#ead29f;color:var(--warning)}.complete-sync-pill.err{background:var(--danger-soft);border-color:#efc9c7;color:var(--danger)}
+.complete-sync-card{margin:0 0 12px;padding:18px;border:1px solid #c9d9bf;border-left:5px solid var(--olive);border-radius:15px;background:linear-gradient(135deg,#f8fbf5,var(--olive-soft));box-shadow:var(--shadow-soft)}.complete-sync-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.complete-sync-head h2{font-size:1.08rem;margin:2px 0 3px}.complete-sync-head p{margin:0;color:var(--muted);font-size:.8rem}.complete-sync-identity{font-size:.76rem;font-weight:850;color:#315329;word-break:break-word;text-align:right}.complete-sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.complete-sync-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.complete-sync-message{margin-top:9px;min-height:18px;font-size:.78rem;line-height:1.4;color:var(--muted)}.complete-sync-message.ok{color:#315329}.complete-sync-message.warn{color:var(--warning)}.complete-sync-message.bad{color:var(--danger)}
+.account-profile-info{margin-top:14px}.account-profile-info>p{margin:0 0 10px;color:var(--muted);font-size:.8rem;line-height:1.45}.account-profile-label{font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--brand);margin-bottom:8px}#saveAccountInfoButton{margin-top:10px}
+.compact-settings-stack{display:grid;gap:9px}.compact-settings-item{margin:0;padding:0;overflow:hidden;border-radius:14px;box-shadow:none}.compact-settings-item>summary{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px;padding:13px 16px;cursor:pointer;list-style:none;background:var(--panel)}.compact-settings-item>summary::-webkit-details-marker{display:none}.compact-settings-summary-copy strong,.compact-settings-summary-copy small{display:block}.compact-settings-summary-copy small{margin-top:2px;color:var(--muted);font-size:.76rem;line-height:1.3}.compact-settings-chevron{flex:0 0 auto;color:var(--brand-dark);font-size:1.2rem;font-weight:900;transition:transform .14s ease}.compact-settings-item[open] .compact-settings-chevron{transform:rotate(45deg)}.compact-settings-body{padding:16px;border-top:1px solid var(--border);background:var(--panel)}.compact-settings-body .about-card,.compact-settings-body .data-card{margin:0}.support-contact{margin-top:14px;padding:13px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel-alt)}.support-contact span,.support-contact strong,.support-contact small{display:block}.support-contact span{font-size:.76rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.support-contact strong{margin-top:4px}.support-contact small{margin-top:3px;color:var(--muted)}
+#dashboard .metric-grid{grid-template-columns:repeat(auto-fit,minmax(175px,1fr))}.date-field-compact,#date{min-width:0;max-width:100%}
+@media(max-width:760px){#history .filter-grid{grid-template-columns:1fr 1fr!important}.report-filter-grid{grid-template-columns:1fr}.expense-topline{row-gap:7px}.complete-sync-head{flex-direction:column}.complete-sync-identity{text-align:left}.complete-sync-grid{grid-template-columns:1fr}.complete-sync-actions{display:grid;grid-template-columns:1fr 1fr}.complete-sync-actions button{width:100%}}
+@media(max-width:520px){#history .filter-grid{grid-template-columns:1fr!important}#history .filter-grid .field{min-width:0}.expense-title{flex:1 1 100%}.expense-topline .amount{margin-left:0}.expense-item{overflow:hidden}.expense-item>div{min-width:0}input[type="date"]{width:100%;min-width:0}}
+</style>
+<style id="v2FinalMobileDateFix">
+input[type="date"]{
+  display:block;
+  box-sizing:border-box;
+  inline-size:100%;
+  width:100%;
+  min-inline-size:0;
+  min-width:0;
+  max-inline-size:100%;
+  max-width:100%;
+  min-height:44px;
+  -webkit-min-logical-width:0;
+}
+input[type="date"]::-webkit-date-and-time-value{
+  min-width:0;
+  text-align:left;
+}
+@media(max-width:680px){
+  .field,.form-grid>*,.filter-grid>*,.report-filter-grid>*{min-width:0;max-width:100%}
+  input[type="date"]{
+    font-size:16px;
+    line-height:1.2;
+    padding:11px 12px;
+  }
+}
+</style>
 </head>
 <body>
   <header class="site-header">
@@ -585,7 +621,7 @@ textarea { min-height: 92px; resize: vertical; }
           <p>Record business expenses and mileage, organize reports, and download clear PDF and CSV files.</p>
         </div>
       </div>
-      <div class="header-badge">Version 1.5.0</div>
+      <div class="header-badge">Version 2.0.0</div>
     </div>
   </header>
 
@@ -604,26 +640,6 @@ textarea { min-height: 92px; resize: vertical; }
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <section id="dashboard" class="view active">
-      <div id="setupBanner" class="setup-banner" hidden>
-        <div>
-          <div class="eyebrow">One-time setup</div>
-          <h2>Add your name before creating a report</h2>
-          <p>Your profile stays saved when expense history is cleared.</p>
-        </div>
-        <button class="primary" type="button" onclick="showView('settings', { focus: 'employeeName' })">Open Settings</button>
-      </div>
-
-      <div id="backupReminder" class="card backup-reminder" hidden>
-        <div>
-          <div class="eyebrow">Protect your records</div>
-          <h2>It is time to create a backup</h2>
-          <p id="backupReminderText" class="muted"></p>
-        </div>
-        <div class="button-row compact-row">
-          <button class="primary" type="button" onclick="exportBackup()">Download Backup</button>
-          <button class="secondary" type="button" onclick="dismissBackupReminder()">Remind Me Later</button>
-        </div>
-      </div>
 
       <div class="hero-panel">
         <div>
@@ -636,7 +652,12 @@ textarea { min-height: 92px; resize: vertical; }
 
       <div class="metric-grid">
         <article class="metric-card">
-          <div class="metric-label">Selected report total</div>
+          <div class="metric-label">Unreported expenses</div>
+          <div id="dashUnreported" class="metric-value">$0.00</div>
+          <div id="dashUnreportedCount" class="metric-note">0 unreported expenses stored</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">Current report total</div>
           <div id="dashTotal" class="metric-value">$0.00</div>
           <div id="dashSelectedCount" class="metric-note">0 expenses selected</div>
         </article>
@@ -650,7 +671,7 @@ textarea { min-height: 92px; resize: vertical; }
           <div id="dashAttention" class="metric-value">0</div>
           <div class="metric-note">Missing details or receipts</div>
         </article>
-        <article class="metric-card">
+        <article class="metric-card reimbursement-status-ui" hidden aria-hidden="true">
           <div class="metric-label">Awaiting reimbursement</div>
           <div id="dashOutstanding" class="metric-value">$0.00</div>
           <div class="metric-note">Submitted reports not yet marked reimbursed</div>
@@ -735,7 +756,7 @@ textarea { min-height: 92px; resize: vertical; }
           <div id="descriptionField" class="field full">
             <label id="descriptionLabel" for="purpose">Description <span class="optional-label">Optional</span></label>
             <textarea id="purpose" placeholder="Add a description when it will help explain the expense"></textarea>
-            <small id="descriptionHelp" class="field-help">Required for Education, Supplies, Other, and any subcategory beginning with Other.</small>
+            <small id="descriptionHelp" class="field-help">Required for Education, Other, and broad Other subcategories.</small>
           </div>
           <div class="field">
             <label class="required" for="category">Category</label>
@@ -856,7 +877,7 @@ textarea { min-height: 92px; resize: vertical; }
               <div class="field full">
                 <label for="reportPurpose">Report note <span class="muted">(optional)</span></label>
                 <textarea id="reportPurpose" placeholder="Add a note about the report, trip, or project if helpful"></textarea>
-                <p class="muted small-copy">Use this only when one note helps explain the report as a whole. Expense descriptions are required for Education, Supplies, Other, and broad Other subcategories.</p>
+                <p class="muted small-copy">Use this only when one note helps explain the report as a whole. Expense descriptions are required for Education, Other, and broad Other subcategories.</p>
               </div>
             </div>
           </section>
@@ -914,7 +935,7 @@ textarea { min-height: 92px; resize: vertical; }
         <div>
           <div class="eyebrow">Personal history</div>
           <h2>All Expenses</h2>
-          <p>Review draft and previously reported expenses stored on this device.</p>
+          <p>Review your draft and previously submitted expenses.</p>
         </div>
         <button class="primary" type="button" onclick="showView('add')">+ Add Expense</button>
       </div>
@@ -951,208 +972,106 @@ textarea { min-height: 92px; resize: vertical; }
         <div>
           <div class="eyebrow">Completed reports</div>
           <h2>Past Reports</h2>
-          <p>Download a PDF or CSV, then print it or attach it to an email using your device. You can also track whether a report is Submitted or Reimbursed and reopen it when corrections are needed.</p>
+          <p>Download a PDF or CSV, then print it or attach it to an email using your device. Submitted reports stay locked and remain available for download.</p>
         </div>
       </div>
       <div id="pastReportsList" class="report-card-list"></div>
     </section>
 
-    <section id="settings" class="view">
+    <section id="settings" class="view compact-settings">
       <div class="page-heading">
         <div>
-          <div class="eyebrow">Your preferences</div>
+          <div class="eyebrow">Account & preferences</div>
           <h2>Settings</h2>
-          <p>Your name and profile settings remain saved when expense history is cleared.</p>
+          <p>Manage your account, saved defaults, data exports, and app information.</p>
         </div>
       </div>
 
-      <div class="settings-grid">
-        <section class="card">
-          <div class="eyebrow">Profile</div>
-          <h2>Your information</h2>
-          <div class="form-grid">
-            <div class="field">
-              <label class="required" for="employeeName">Your name</label>
-              <input id="employeeName" type="text" placeholder="Your name">
-            </div>
-            <div class="field">
-              <label for="defaultDepartment">Department</label>
-              <input id="defaultDepartment" type="text" placeholder="Department">
-            </div>
-          </div>
-          <div class="fixed-rate-card">
-            <div>
-              <strong>Company mileage rate</strong>
-              <small>This rate is fixed in this release and cannot be changed in Settings.</small>
-            </div>
-            <span id="fixedMileageRateDisplay">$0.40 / mile</span>
-          </div>
-          <div class="button-row">
-            <button class="primary" type="button" onclick="saveSettings()">Save Profile</button>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="eyebrow">Backup preferences</div>
-          <h2>Backups and feedback</h2>
-          <div class="form-grid">
-            <div class="field full">
-              <label for="feedbackEmail">Feedback recipient</label>
-              <input id="feedbackEmail" type="email" placeholder="Optional support or project contact">
-            </div>
-            <div class="field">
-              <label for="backupReminderDays">Backup reminder</label>
-              <select id="backupReminderDays">
-                <option value="3">Every 3 days</option>
-                <option value="7">Every 7 days</option>
-                <option value="14">Every 14 days</option>
-                <option value="30">Every 30 days</option>
-              </select>
-            </div>
-          </div>
-          <div class="privacy-note" style="margin-top:12px">
-            <strong>Download-first:</strong> reports and backups save through your device's normal download system. On iPhone/iPad, PDF downloads are forced into a single-file download path instead of a PDF share/preview path. Open the downloaded file to print it, move it, or attach it to an email.
-          </div>
-          <div class="button-row">
-            <button class="primary" type="button" onclick="saveSettings()">Save Preferences</button>
-            <button class="secondary" type="button" onclick="sendFeedbackEmail()">Send Feedback</button>
-            <button class="secondary" type="button" onclick="reportProblemEmail()">Report a Problem</button>
-          </div>
-        </section>
-      </div>
-
-      <section class="card data-card">
-        <div class="section-heading">
+      <section id="completeSyncCard" class="complete-sync-card" data-account-polished="true">
+        <div class="complete-sync-head">
           <div>
-            <div class="eyebrow">Data and backups</div>
-            <h2>Protect or move your records</h2>
+            <div class="eyebrow">Account</div>
+            <h2>Your account</h2>
+            <p>Your expenses, receipts, reports, and saved defaults stay tied to this account and sync across your devices.</p>
           </div>
-          <div id="backupStatus" class="backup-status"></div>
+          <div id="completeSyncIdentity" class="complete-sync-identity">Not signed in</div>
         </div>
-        <input id="backupImportInput" type="file" accept=".ranchbackup,.json,application/json,application/octet-stream" hidden>
-        <div class="data-action-grid">
-          <button class="primary" type="button" onclick="exportBackup()">Download Backup</button>
-          <button class="secondary" type="button" onclick="document.getElementById('backupImportInput').click()">Import Backup</button>
-          <button class="secondary" type="button" onclick="exportAllExpensesCSV()">Download Full History CSV</button>
+        <div id="completeSyncAuthFields" class="complete-sync-grid">
+          <div class="field"><label for="completeSyncEmail">Email</label><input id="completeSyncEmail" type="email" autocomplete="email"></div>
+          <div class="field"><label for="completeSyncPassword">Password</label><input id="completeSyncPassword" type="password" autocomplete="current-password"></div>
         </div>
-        <div class="privacy-note">
-          <strong>Local storage reminder:</strong> clearing browser data, deleting the browser profile, or losing the device can remove expenses and receipts. Download backups regularly and keep them somewhere you can recover later.
+        <div id="accountProfileInfo" class="account-profile-info">
+          <div class="account-profile-label">Your information</div>
+          <p>New account? Add your name before creating it. Existing account? Sign in and your saved information loads automatically.</p>
+          <div class="form-grid">
+            <div class="field"><label class="required" for="employeeName">Your name</label><input id="employeeName" type="text" placeholder="Your name"></div>
+            <div class="field"><label for="defaultDepartment">Department</label><input id="defaultDepartment" type="text" placeholder="Department"></div>
+          </div>
+          <button id="saveAccountInfoButton" class="secondary" type="button" hidden>Save account info</button>
         </div>
+        <div id="completeSyncAuthActions" class="complete-sync-actions">
+          <button id="completeSyncSignIn" class="primary" type="button">Sign in</button>
+          <button id="completeSyncCreate" class="secondary" type="button">Create account</button>
+          <button id="completeSyncResend" class="secondary" type="button" hidden>Resend confirmation</button>
+        </div>
+        <div id="completeSyncSignedInActions" class="complete-sync-actions" hidden>
+          <button id="completeSyncNow" class="secondary" type="button">Sync now</button>
+          <button id="completeSyncSignOut" class="secondary" type="button">Sign out</button>
+        </div>
+        <div id="completeSyncMessage" class="complete-sync-message"></div>
       </section>
 
-      <details class="card settings-details">
-        <summary>
-          <span><strong>Saved defaults</strong><small>Manage the choices shown in searchable dropdowns throughout Add Expense</small></span>
-          <span class="summary-symbol">+</span>
-        </summary>
-        <div class="details-body">
-          <div class="reference-grid">
-            <div class="field">
-              <label for="savedPeopleText">People</label>
-              <textarea id="savedPeopleText" placeholder="One name per line"></textarea>
+      <div class="compact-settings-stack">
+        <details class="card compact-settings-item">
+          <summary><div class="compact-settings-summary-copy"><strong>Saved defaults</strong><small>People, merchants, locations, vehicles, tags, and mileage routes</small></div><span class="compact-settings-chevron">+</span></summary>
+          <div class="compact-settings-body">
+            <div class="reference-grid">
+              <div class="field"><label for="savedPeopleText">People</label><textarea id="savedPeopleText" placeholder="One name per line"></textarea></div>
+              <div class="field"><label for="savedOrganizationsText">Organizations and merchants</label><textarea id="savedOrganizationsText" placeholder="One organization per line"></textarea></div>
+              <div class="field"><label for="savedLocationsText">Locations</label><textarea id="savedLocationsText" placeholder="One location per line"></textarea></div>
+              <div class="field"><label for="savedVehiclesText">Vehicles</label><textarea id="savedVehiclesText" placeholder="One vehicle per line"></textarea></div>
             </div>
-            <div class="field">
-              <label for="savedOrganizationsText">Organizations and merchants</label>
-              <textarea id="savedOrganizationsText" placeholder="One organization per line"></textarea>
-            </div>
-            <div class="field">
-              <label for="savedLocationsText">Locations</label>
-              <textarea id="savedLocationsText" placeholder="One location per line"></textarea>
-            </div>
-            <div class="field">
-              <label for="savedVehiclesText">Vehicles</label>
-              <textarea id="savedVehiclesText" placeholder="One vehicle per line"></textarea>
+            <div class="button-row"><button class="primary" type="button" onclick="saveReferenceLists()">Save defaults</button></div>
+            <div class="subsection">
+              <h3>Saved mileage routes</h3>
+              <div class="form-grid">
+                <div class="field"><label for="routeStart">Starting location</label><div class="saved-picker" data-saved-picker data-kind="locations" data-input-id="routeStart"><div class="saved-picker-control"><input id="routeStart" type="text" placeholder="Select or add a location" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="routeStartSavedMenu"><button class="saved-picker-toggle" type="button" aria-label="Show saved locations">⌄</button></div><div id="routeStartSavedMenu" class="saved-picker-menu" hidden></div></div></div>
+                <div class="field"><label for="routeDestination">Destination</label><div class="saved-picker" data-saved-picker data-kind="locations" data-input-id="routeDestination"><div class="saved-picker-control"><input id="routeDestination" type="text" placeholder="Select or add a location" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="routeDestinationSavedMenu"><button class="saved-picker-toggle" type="button" aria-label="Show saved locations">⌄</button></div><div id="routeDestinationSavedMenu" class="saved-picker-menu" hidden></div></div></div>
+                <div class="field"><label for="routeMiles">Total miles</label><input id="routeMiles" type="number" min="0" step="0.1"></div>
+              </div>
+              <div class="button-row"><button class="primary" type="button" onclick="addSavedRoute()">Add route</button></div>
+              <div id="savedRoutesList" class="saved-route-list"></div>
             </div>
           </div>
-          <div class="button-row">
-            <button class="primary" type="button" onclick="saveReferenceLists()">Save Defaults</button>
-          </div>
-
-          <div class="subsection">
-            <h3>Saved mileage routes</h3>
-            <div class="form-grid">
-              <div class="field"><label for="routeStart">Starting location</label><div class="saved-picker" data-saved-picker data-kind="locations" data-input-id="routeStart"><div class="saved-picker-control"><input id="routeStart" type="text" placeholder="Select or add a location" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="routeStartSavedMenu"><button class="saved-picker-toggle" type="button" aria-label="Show saved locations">⌄</button></div><div id="routeStartSavedMenu" class="saved-picker-menu" hidden></div></div></div>
-              <div class="field"><label for="routeDestination">Destination</label><div class="saved-picker" data-saved-picker data-kind="locations" data-input-id="routeDestination"><div class="saved-picker-control"><input id="routeDestination" type="text" placeholder="Select or add a location" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="routeDestinationSavedMenu"><button class="saved-picker-toggle" type="button" aria-label="Show saved locations">⌄</button></div><div id="routeDestinationSavedMenu" class="saved-picker-menu" hidden></div></div></div>
-              <div class="field"><label for="routeMiles">Total miles</label><input id="routeMiles" type="number" min="0" step="0.1"></div>
-              <div class="field"><label for="routeTripType">Trip type</label><select id="routeTripType"><option>Round trip</option><option>One way</option></select></div>
-            </div>
-            <div class="button-row"><button class="primary" type="button" onclick="addSavedRoute()">Add Route</button></div>
-            <div id="savedRoutesList" class="saved-route-list"></div>
-          </div>
-        </div>
-      </details>
-
-      <section class="card danger-zone">
-        <div>
-          <div class="eyebrow">Clear history</div>
-          <h2>Remove expense records from this device</h2>
-          <p>This removes expenses, reports, drafts, and receipts. Your name, department, backup preferences, and saved defaults remain.</p>
-        </div>
-        <button class="danger" type="button" onclick="clearExpenseHistory()">Clear Expense History</button>
-      </section>
-
-      <section class="card about-card">
-        <div class="section-heading">
-          <div>
-            <div class="eyebrow">About</div>
-            <h2>Ranch Expense Tracker</h2>
-          </div>
-          <span class="version-chip">Version 1.5.0</span>
-        </div>
-        <div class="about-grid">
-          <div><span>Release</span><strong>PDF Accounting Review Update</strong></div>
-          <div><span>Storage</span><strong>Local to device</strong></div>
-          <div><span>Mileage rate</span><strong id="aboutMileageRate">$0.40 per mile</strong></div>
-        </div>
-        <details class="changelog-details">
-          <summary>What is included in Version 1.5.0</summary>
-          <ul>
-            <li>PDF Expense Summary is grouped by category and amount.</li>
-            <li>Expense details include a blank Accounting Code field, receipt thumbnail, and full-size supporting-document appendix.</li>
-            <li>PDF-only accounting review checks can flag possible receipt-total mismatches and tips over 20%.</li>
-            <li>Receipt OCR can flag possible alcohol, tobacco/nicotine, gift card/prepaid, lottery, and cash-equivalent items for manual review.</li>
-            <li>PDF-only checks also flag possible duplicate expenses, missing supporting documents, and dates outside the report period.</li>
-            <li>Receipt dates are compared with entered expense dates and flagged when they appear different.</li>
-            <li>Receipt totals are reconciled against subtotal, tax, tip, and common fee lines before an amount-mismatch warning is issued.</li>
-            <li>Faded receipts can recover a plausible tip amount from receipt layout when OCR misses the TIP label.</li>
-            <li>Receipt-reading warnings are advisory only; Accounting verifies the attached receipt.</li>
-            <li>Backup restore keeps the safer record-first recovery behavior from the 1.4.7 candidate.</li>
-            <li>Fixed iPhone/iPad PDF downloads so Download PDF targets a single .pdf file rather than opening a PDF/share flow that can include both a webpage link and the document.</li>
-            <li>Apple mobile devices now receive generated PDFs through a generic binary-download MIME type while preserving the normal .pdf filename.</li>
-            <li>PDF downloads use same-window download handling instead of creating a second link/tab fallback.</li>
-            <li>Fixed stale-version behavior caused by the offline service worker continuing to serve an older cached app after GitHub Pages was updated.</li>
-            <li>The hosted app now explicitly checks for a newer service worker and bypasses HTTP caching for service-worker update checks.</li>
-            <li>New service-worker versions activate immediately and take control without requiring employees to clear site data.</li>
-            <li>When online, navigation uses the newest network copy of Ranch Expense Tracker; the cached copy is now an offline fallback instead of the first choice.</li>
-            <li>Future app updates can automatically reload once when a newly activated service worker takes control.</li>
-            <li>Receipt previews can now be tapped/clicked to open a larger viewer before the expense is saved.</li>
-            <li>Image receipts support 75%–400% zoom, plus tap/click toggling between fit and 200%.</li>
-            <li>PDF receipt previews open in the larger viewer and can use the browser/PDF viewer's own zoom controls.</li>
-            <li>PDF export now uses adaptive receipt-image compression targeting roughly 120 KB per image when practical, while keeping a minimum quality/resolution floor for legibility.</li>
-            <li>Add Expense now shows the selected receipt or route document at the top of the form before the expense is saved.</li>
-            <li>Image receipts display an inline image preview; PDF receipts display an embedded preview when supported by the browser.</li>
-            <li>Editing an existing expense also shows its currently stored receipt so the user can verify it before replacing it.</li>
-            <li>Report and backup actions now use a simpler download-first workflow for broader device/browser compatibility.</li>
-            <li>Email and Share buttons were removed from report exports; download the PDF/CSV and attach or share it using the device itself.</li>
-            <li>Backup actions were simplified to Download Backup and Import Backup.</li>
-            <li>New backups use a .ranchbackup file extension for more predictable mobile downloading; older .json backups can still be imported.</li>
-            <li>The download helper now keeps generated file URLs alive longer on mobile devices and falls back to opening the file when direct download is unsupported.</li>
-            <li>Receipt photos are automatically resized and JPEG-optimized when attached, reducing local storage, backups, and report size.</li>
-            <li>PDF export also optimizes older image receipts and avoids duplicating the same photo as both a rendered receipt page and an embedded attachment.</li>
-            <li>PDF and other non-image supporting documents are preserved as attachments without image conversion.</li>
-            <li>A faster receipt-first Add Expense layout with the original broad categories.</li>
-            <li>Subcategory-specific fields appear only when they apply.</li>
-            <li>Description is required for Education, Supplies, Other, and any broad Other subcategory.</li>
-            <li>Mileage uses route documentation instead of a purchase receipt.</li>
-            <li>Optional project or trip tags support searching, filtering, and report selection.</li>
-            <li>Saved people, organizations, locations, vehicles, and tags use searchable dropdowns with an Add New option.</li>
-            <li>Choose Pay Period fills the 1st-15th or 16th-end-of-month dates and suggests a report name that can be overridden.</li>
-            <li>Current Report uses an optional Report Note instead of a required overall business purpose.</li>
-            <li>Past Reports use Submitted and Reimbursed statuses and can be reopened for corrections.</li>
-            <li>PDF download, CSV download, backup/restore, and local receipt storage remain available.</li>
-          </ul>
         </details>
-      </section>
+
+        <details class="card compact-settings-item">
+          <summary><div class="compact-settings-summary-copy"><strong>Data & support</strong><small>Data export, cloud sync information, and help</small></div><span class="compact-settings-chevron">+</span></summary>
+          <div class="compact-settings-body">
+            <section class="data-card">
+              <div class="privacy-note"><strong>Cloud sync:</strong> your signed-in account automatically keeps expenses, receipts, reports, and saved defaults synchronized across your devices. Local storage is used only as an offline working cache.</div>
+              <div class="data-action-grid"><button class="secondary" type="button" onclick="exportAllExpensesCSV()">Download Full History CSV</button></div>
+              <div class="support-contact"><span>Support contact</span><strong>Saul Garcia</strong><small>Questions, feedback, or app issues should be directed here.</small></div>
+            </section>
+          </div>
+        </details>
+
+        <details class="card compact-settings-item">
+          <summary><div class="compact-settings-summary-copy"><strong>About this app</strong><small>Version, storage, mileage rate, and release details</small></div><span class="compact-settings-chevron">+</span></summary>
+          <div class="compact-settings-body">
+            <section class="about-card">
+              <div class="section-heading"><div><div class="eyebrow">About</div><h2>Ranch Expense Tracker</h2></div><span class="version-chip">Version 2.0.0</span></div>
+              <div class="about-grid">
+                <div><span>Release</span><strong>Cloud Sync</strong></div>
+                <div><span>Storage</span><strong>Cloud + offline cache</strong></div>
+                <div><span>Mileage rate</span><strong id="aboutMileageRate">$0.40 per mile</strong></div>
+              </div>
+              <div class="fixed-rate-card"><div><strong>Company mileage rate</strong><small>This rate is fixed for this release.</small></div><span id="fixedMileageRateDisplay">$0.40 / mile</span></div>
+              <div class="privacy-note"><strong>Submitted history:</strong> finalized reports and their expenses are locked. A future Accounting return-for-correction workflow can reopen a report when needed.</div>
+            </section>
+          </div>
+        </details>
+      </div>
     </section>
   </main>
 
@@ -1160,7 +1079,7 @@ textarea { min-height: 92px; resize: vertical; }
     <div class="modal-backdrop" onclick="closeReceiptViewer()"></div>
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="receiptViewerTitle">
       <div class="modal-header">
-        <div><div class="eyebrow">Local receipt</div><h2 id="receiptViewerTitle">Receipt</h2><p id="receiptViewerMeta"></p></div>
+        <div><div class="eyebrow">Supporting document</div><h2 id="receiptViewerTitle">Receipt</h2><p id="receiptViewerMeta"></p></div>
         <button class="icon-button" type="button" onclick="closeReceiptViewer()" aria-label="Close">×</button>
       </div>
       <div id="receiptViewerContent" class="receipt-viewer-content"></div>
@@ -1177,7 +1096,7 @@ textarea { min-height: 92px; resize: vertical; }
 
 
   <footer class="site-footer">
-    <div>Ranch Expense Tracker · Version 1.5.0 · PDF Accounting Review Update</div>
+    <div>Ranch Expense Tracker · Version 2.0.0 · Cloud Sync</div>
     <div>Copyright © 2026 Saul Garcia. All Rights Reserved.</div>
     <div>Licensed for Pizza Ranch internal business use and IT evaluation.</div>
   </footer>
@@ -1185,8 +1104,8 @@ textarea { min-height: 92px; resize: vertical; }
   <script>
 "use strict";
 
-const APP_VERSION = "1.5.0";
-const RELEASE_NAME = "PDF Accounting Review Update";
+const APP_VERSION = "2.0.0";
+const RELEASE_NAME = "Cloud Sync";
 // Accounting can update this single value in a future release after confirming the company rate.
 const FIXED_MILEAGE_RATE = 0.40;
 
@@ -1204,12 +1123,12 @@ const RECEIPT_PDF_TARGET_BYTES = 120 * 1024;
 const RECEIPT_PDF_MIN_DIMENSION = 960;
 const RECEIPT_PDF_MIN_JPEG_QUALITY = 0.48;
 
-// Keep the production storage keys so Version 1.5.0 opens data created by Version 1.x releases.
-const EXPENSE_KEY = "workExpenseTool.expenses.v1";
-const REPORT_KEY = "workExpenseTool.reports.v1";
-const SETTINGS_KEY = "workExpenseTool.settings.v1";
-const REPORT_DRAFT_KEY = "workExpenseTool.reportDraft.v1";
-const DB_NAME = "workExpenseReceiptDB";
+// Keep the production storage keys so Version 2.0.0 opens data created by Version 1.x releases.
+const EXPENSE_KEY = "workExpenseTool.expenses.v2";
+const REPORT_KEY = "workExpenseTool.reports.v2";
+const SETTINGS_KEY = "workExpenseTool.settings.v2";
+const REPORT_DRAFT_KEY = "workExpenseTool.reportDraft.v2";
+const DB_NAME = "workExpenseReceiptDB_v2";
 const DB_STORE = "receipts";
 
 const SUBCATEGORY_OPTIONS = {
@@ -1244,8 +1163,6 @@ let activeInlineReceiptName = "";
 let activeInlineReceiptType = "";
 let receiptZoom = 1;
 let activeReceiptRecord = null;
-let preparedBackupFile = null;
-let preparedBackupEmail = "";
 let preparedReportFile = null;
 let preparedReportEmail = "";
 let preparedReportPackage = null;
@@ -1263,35 +1180,21 @@ function loadJSON(key, fallback) {
 }
 
 function normalizeSettings(value = {}) {
-  const unique = items => [...new Set((Array.isArray(items) ? items : [])
-    .map(item => String(item || "").trim())
-    .filter(Boolean))]
-    .sort((a, b) => a.localeCompare(b));
-
+  const unique = items => [...new Set((Array.isArray(items) ? items : []).map(item => String(item || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
   return {
     employeeName: String(value.employeeName || ""),
     defaultDepartment: String(value.defaultDepartment || value.department || ""),
-    reimbursementEmail: String(value.reimbursementEmail || ""),
-    backupEmail: String(value.backupEmail || ""),
-    feedbackEmail: String(value.feedbackEmail || ""),
-    backupReminderDays: Number(value.backupReminderDays || 7),
-    lastBackupAt: value.lastBackupAt || null,
-    backupDismissedAt: value.backupDismissedAt || null,
     savedPeople: unique(value.savedPeople),
     savedOrganizations: unique(value.savedOrganizations),
     savedLocations: unique(value.savedLocations),
     savedVehicles: unique(value.savedVehicles),
     savedTags: unique(value.savedTags),
-    savedRoutes: (Array.isArray(value.savedRoutes) ? value.savedRoutes : [])
-      .map(route => ({
-        id: route.id || makeId("route"),
-        start: String(route.start || route.startLocation || "").trim(),
-        destination: String(route.destination || "").trim(),
-        miles: Number(route.miles || 0),
-        tripType: String(route.tripType || route.roundTrip || "Round trip")
-      }))
-      .filter(route => route.start && route.destination && route.miles > 0),
-    // Retained for backup compatibility, but the UI and calculations use FIXED_MILEAGE_RATE.
+    savedRoutes: (Array.isArray(value.savedRoutes) ? value.savedRoutes : []).map(route => ({
+      id: route.id || makeId("route"),
+      start: String(route.start || route.startLocation || "").trim(),
+      destination: String(route.destination || "").trim(),
+      miles: Number(route.miles || 0)
+    })).filter(route => route.start && route.destination && route.miles > 0),
     mileageRate: FIXED_MILEAGE_RATE
   };
 }
@@ -1408,8 +1311,6 @@ function bindEvents() {
       openInlineReceiptViewer();
     }
   });
-  document.getElementById("backupImportInput").addEventListener("change", importBackupFile);
-
   ["reportTitle", "reportDepartment", "reportPeriodStart", "reportPeriodEnd", "reportPurpose"].forEach(id => {
     document.getElementById(id).addEventListener("input", saveReportDraftFromForm);
     document.getElementById(id).addEventListener("change", saveReportDraftFromForm);
@@ -1747,7 +1648,7 @@ function isOtherSubcategory(value) {
 }
 
 function descriptionIsRequired(category, subcategory) {
-  return category === "Education" || category === "Supplies" || category === "Other" || isOtherSubcategory(subcategory);
+  return category === "Education" || category === "Other" || isOtherSubcategory(subcategory);
 }
 
 function updateDescriptionRequirementUI() {
@@ -1950,15 +1851,14 @@ function renderDynamicFields(existing = null) {
       route.start === details.startLocation && route.destination === details.destination && Math.abs(route.miles - Number(details.miles || 0)) < 0.1
     );
     container.innerHTML = `<div class="dynamic-card required-mileage-card"><h3>Mileage details</h3><p class="muted">Enter the route and reimbursable miles. Accounting may use the shortest reasonable route when reviewing the entry.</p><div class="form-grid">
-      <div class="field full"><label for="savedRoutePicker">Use a saved route</label><select id="savedRoutePicker"><option value="">Choose a route or enter one below</option>${settings.savedRoutes.map(route => `<option value="${safe(route.id)}" ${selectedRoute?.id === route.id ? "selected" : ""}>${safe(route.start)} → ${safe(route.destination)} · ${route.miles} miles · ${safe(route.tripType)}</option>`).join("")}</select></div>
+      <div class="field full"><label for="savedRoutePicker">Use a saved route</label><select id="savedRoutePicker"><option value="">Choose a route or enter one below</option>${settings.savedRoutes.map(route => `<option value="${safe(route.id)}" ${selectedRoute?.id === route.id ? "selected" : ""}>${safe(route.start)} → ${safe(route.destination)} · ${route.miles} miles</option>`).join("")}</select></div>
       ${input("detailStartLocation", "Starting location", details.startLocation, { required: true, list: "savedLocationsList" })}
       ${input("detailDestination", "Destination", details.destination, { required: true, list: "savedLocationsList" })}
       ${input("detailMiles", "Total reimbursable miles", details.miles || "", { required: true, type: "number", min: 0, step: "0.1" })}
-      ${select("detailRoundTrip", "Trip type", ["Round trip", "One way"], details.roundTrip || "Round trip", true)}
       <div class="field full"><div class="fixed-rate-card"><div><strong>Mileage reimbursement</strong><small>${money(FIXED_MILEAGE_RATE)} per mile · fixed in this test build</small></div><span id="mileagePreview">${money(Number(details.miles || 0) * FIXED_MILEAGE_RATE)}</span></div><div class="document-mode-note">Route documentation is recommended. If none is attached, Accounting can verify the shortest reasonable route.</div></div>
     </div></div>`;
     document.getElementById("savedRoutePicker")?.addEventListener("change", applySavedRoute);
-    ["detailMiles", "detailStartLocation", "detailDestination", "detailRoundTrip"].forEach(id => document.getElementById(id)?.addEventListener("input", () => { updateMileagePreview(); updateExpenseSubmitButton(); }));
+    ["detailMiles", "detailStartLocation", "detailDestination"].forEach(id => document.getElementById(id)?.addEventListener("input", () => { updateMileagePreview(); updateExpenseSubmitButton(); }));
     updateMileagePreview();
     updateExpenseSubmitButton();
     return;
@@ -1979,36 +1879,27 @@ function renderDynamicFields(existing = null) {
   }
 
   if (category === "Auto") {
-    if (subcategory === "Fuel") fields = `${select("detailVehicleType", "Vehicle type", ["Company vehicle", "Personal vehicle", "Rental vehicle", "Other"], details.vehicleType || "")}${input("detailTripLocation", "Trip route or work location", details.tripLocation, { list: "savedLocationsList", optional: true, placeholder: "Starting location to destination" })}`;
-    else if (subcategory === "Rental car") fields = `${input("detailRentalCompany", "Rental company", details.rentalCompany, { optional: true, list: "savedOrganizationsList" })}${input("detailPickupLocation", "Pickup location", details.pickupLocation, { optional: true, list: "savedLocationsList" })}${input("detailReturnLocation", "Return location", details.returnLocation, { optional: true, list: "savedLocationsList" })}${input("detailRentalStart", "Rental start date", details.rentalStart, { optional: true, type: "date" })}${input("detailRentalEnd", "Rental end date", details.rentalEnd, { optional: true, type: "date" })}`;
-    else if (subcategory === "Parking") fields = `${input("detailParkingLocation", "Parking location", details.parkingLocation, { optional: true, list: "savedLocationsList" })}${input("detailRelatedDestination", "Related destination or event", details.relatedDestination, { optional: true })}`;
-    else if (subcategory === "Tolls") fields = `${input("detailTollRoute", "Route or toll location", details.tollRoute, { optional: true, full: true })}`;
-    else if (["Oil change", "Tires", "Car wash", "Vehicle maintenance"].includes(subcategory)) fields = `${input("detailVehicle", "Vehicle", details.vehicle, { optional: true, list: "savedVehiclesList" })}${input("detailServicePerformed", "Service performed", details.servicePerformed, { optional: true })}`;
-    else fields = `${input("detailCategoryExplanation", "Additional auto details", details.categoryExplanation, { optional: true, full: true })}`;
+    if (["Oil change", "Tires", "Car wash", "Vehicle maintenance"].includes(subcategory)) {
+      fields = `${input("detailVehicle", "Vehicle", details.vehicle, { optional: true, list: "savedVehiclesList" })}`;
+    } else {
+      fields = "";
+    }
   } else if (category === "Education") {
-    if (subcategory === "Books") fields = `${input("detailEducationName", "Book or material title", details.educationName, { optional: true, full: true })}`;
-    else if (subcategory === "Conference") fields = `${input("detailEducationName", "Conference name", details.educationName, { optional: true })}${input("detailMeetingLocation", "Conference location", details.meetingLocation, { optional: true, list: "savedLocationsList" })}${input("detailConferenceDates", "Conference dates", details.conferenceDates, { optional: true })}`;
-    else if (["Course or training", "Webinar"].includes(subcategory)) fields = `${input("detailEducationName", "Course, training, or webinar name", details.educationName, { optional: true })}${input("detailOrganization", "Provider", details.organization, { optional: true, list: "savedOrganizationsList" })}${input("detailConferenceDates", "Date or date range", details.conferenceDates, { optional: true })}`;
-    else fields = `${input("detailCategoryExplanation", "Additional education details", details.categoryExplanation, { optional: true, full: true })}`;
+    fields = "";
   } else if (category === "Meals & Snacks") {
-    if (subcategory === "Employee travel meal") fields = `${select("detailMealType", "Meal type", ["Breakfast", "Lunch", "Dinner", "Snack"], details.mealType || "")}${input("detailTripLocation", "Trip or work location", details.tripLocation, { optional: true, list: "savedLocationsList" })}`;
-    else if (subcategory === "Meeting meal") fields = `${select("detailMealType", "Meal type", ["Breakfast", "Lunch", "Dinner", "Refreshments"], details.mealType || "")}${input("detailAttendees", "Attendees", details.attendees, { optional: true, list: "savedPeopleList" })}${input("detailMeetingLocation", "Meeting location", details.meetingLocation, { optional: true, list: "savedLocationsList" })}`;
-    else if (["Vendor meal", "Franchisee meal"].includes(subcategory)) fields = `${select("detailMealType", "Meal type", ["Breakfast", "Lunch", "Dinner"], details.mealType || "")}${input("detailAttendees", "Attendees", details.attendees, { optional: true, list: "savedPeopleList" })}${input("detailOrganization", "Vendor, franchise, or organization", details.organization, { optional: true, list: "savedOrganizationsList" })}`;
-    else if (subcategory === "Department function") fields = `${input("detailAttendees", "Attendees or department", details.attendees, { optional: true })}${input("detailMeetingLocation", "Function location", details.meetingLocation, { optional: true, list: "savedLocationsList" })}`;
-    else if (subcategory === "Snacks or refreshments") fields = `${input("detailRelatedDestination", "Meeting, event, or work purpose", details.relatedDestination, { optional: true, full: true })}`;
-    else fields = `${input("detailCategoryExplanation", "Additional meal details", details.categoryExplanation, { optional: true, full: true })}`;
+    if (subcategory === "Meeting meal") {
+      fields = `${input("detailAttendees", "Attendees", details.attendees, { optional: true, list: "savedPeopleList" })}`;
+    } else if (["Vendor meal", "Franchisee meal"].includes(subcategory)) {
+      fields = `${input("detailOrganization", "Vendor, franchise, or organization", details.organization, { optional: true, list: "savedOrganizationsList" })}`;
+    } else {
+      fields = "";
+    }
   } else if (category === "Meetings (PR Employees)") {
-    fields = `${input("detailAttendees", "PR employee names", details.attendees, { optional: true, list: "savedPeopleList" })}${input("detailMeetingLocation", "Meeting location", details.meetingLocation, { optional: true, list: "savedLocationsList" })}${subcategory === "Training meeting" ? input("detailEducationName", "Training topic", details.educationName, { optional: true, full: true }) : ""}`;
+    fields = `${input("detailAttendees", "PR employee names", details.attendees, { optional: true, list: "savedPeopleList" })}`;
   } else if (category === "Supplies") {
-    if (["Store supplies", "Project supplies", "Equipment or smallwares", "Printing"].includes(subcategory)) fields = `${input("detailProjectLocation", "Store, project, or department", details.projectLocation, { optional: true, full: true, list: "savedLocationsList" })}`;
-    else if (subcategory === "Other supplies") fields = `${input("detailCategoryExplanation", "Additional supply details", details.categoryExplanation, { optional: true, full: true })}`;
-    else fields = "";
+    fields = "";
   } else if (category === "Travel") {
-    if (subcategory === "Hotel") fields = `${input("detailDestination", "Destination", details.destination, { optional: true, list: "savedLocationsList" })}${input("detailCheckIn", "Check-in date", details.checkIn, { optional: true, type: "date" })}${input("detailCheckOut", "Check-out date", details.checkOut, { optional: true, type: "date" })}`;
-    else if (subcategory === "Airfare") fields = `${input("detailDepartureLocation", "Departure location", details.departureLocation, { optional: true, list: "savedLocationsList" })}${input("detailDestination", "Destination", details.destination, { optional: true, list: "savedLocationsList" })}${input("detailTravelDates", "Travel dates", details.travelDates, { optional: true })}`;
-    else if (subcategory === "Baggage") fields = `${input("detailOrganization", "Airline", details.organization, { optional: true, list: "savedOrganizationsList" })}${input("detailDestination", "Trip destination", details.destination, { optional: true, list: "savedLocationsList" })}`;
-    else if (subcategory === "Ground transportation") fields = `${input("detailStartLocation", "Pickup location", details.startLocation, { optional: true, list: "savedLocationsList" })}${input("detailDestination", "Drop-off location", details.destination, { optional: true, list: "savedLocationsList" })}`;
-    else fields = `${input("detailCategoryExplanation", "Additional travel details", details.categoryExplanation, { optional: true, full: true })}`;
+    fields = "";
   }
 
   container.innerHTML = fields ? card(title, help, fields) : "";
@@ -2022,7 +1913,6 @@ function applySavedRoute(event) {
   document.getElementById("detailStartLocation").value = route.start;
   document.getElementById("detailDestination").value = route.destination;
   document.getElementById("detailMiles").value = route.miles;
-  document.getElementById("detailRoundTrip").value = route.tripType;
   updateMileagePreview();
   updateExpenseSubmitButton();
 }
@@ -2060,7 +1950,6 @@ function collectExpenseDetails(category) {
   });
   if (category === "Mileage") {
     details.miles = Number(readField("detailMiles") || 0);
-    details.roundTrip = readField("detailRoundTrip");
   }
   return details;
 }
@@ -2099,7 +1988,6 @@ function minimalExpenseValidation(candidate) {
     if (!candidate.details.startLocation) errors.push("Enter the mileage starting location.");
     if (!candidate.details.destination) errors.push("Enter the mileage destination.");
     if (Number(candidate.details.miles || 0) <= 0) errors.push("Enter mileage greater than zero.");
-    if (!candidate.details.roundTrip) errors.push("Choose one way or round trip.");
   } else {
     if (!candidate.merchant) errors.push("Enter the merchant or provider.");
     if (Number(candidate.amount || 0) <= 0) errors.push("Enter an amount greater than zero.");
@@ -2183,7 +2071,7 @@ async function saveExpense(event) {
       ? ` Receipt photo optimized from ${formatBytes(receiptOptimization.originalSize)} to ${formatBytes(receiptOptimization.storedSize)}.`
       : "";
     showToast((vagueDescription ? "Expense saved. You may want to make the description more specific before finalizing the report." : "Expense saved.") + optimizationNote, vagueDescription ? "neutral" : "success");
-    showView("current");
+    showView("add");
   } catch (error) {
     console.error(error);
     showFormError(error.message || "The expense or receipt could not be saved.");
@@ -2212,7 +2100,7 @@ function resetExpenseForm() {
 function editExpense(id) {
   const expense = expenses.find(item => item.id === id);
   if (!expense) return;
-  if (expense.submittedReportId) return showToast("Reopen the past report before editing this expense.");
+  if (expense.submittedReportId) return showToast("Submitted expenses are locked.", "error");
   showView("add");
   document.getElementById("formTitle").textContent = "Edit Expense";
   document.getElementById("expenseId").value = expense.id;
@@ -2284,7 +2172,6 @@ function detailText(expense) {
   if (expense.category === "Mileage") {
     pieces.push(`${details.startLocation || ""} → ${details.destination || ""}`);
     pieces.push(`${Number(details.miles || 0).toLocaleString("en-US", { maximumFractionDigits: 1 })} miles at ${money(FIXED_MILEAGE_RATE)}/mile`);
-    if (details.roundTrip) pieces.push(details.roundTrip);
   }
   const labeled = [
     ["Vehicle type", details.vehicleType], ["Route or location", details.tripLocation], ["Vehicle", details.vehicle],
@@ -2320,7 +2207,6 @@ function validateExpenseForReport(expense) {
     missing(!details.startLocation, "Starting location is missing.");
     missing(!details.destination, "Destination is missing.");
     missing(Number(details.miles || 0) <= 0, "Mileage must be greater than zero.");
-    missing(!details.roundTrip, "One-way or round-trip selection is missing.");
     if (!expense.receiptId) warnings.push("Route documentation is not attached. Accounting can verify the shortest reasonable route.");
     const expectedAmount = Number(details.miles || 0) * FIXED_MILEAGE_RATE;
     if (Math.abs(Number(expense.amount || 0) - expectedAmount) > 0.01) warnings.push(`Mileage amount will be recalculated using ${money(FIXED_MILEAGE_RATE)} per mile.`);
@@ -2591,14 +2477,17 @@ function renderDashboard() {
   const mileageMiles = mileageItems.reduce((sum, expense) => sum + Number(expense.details?.miles || 0), 0);
   const needsAttention = selected.filter(expense => validateExpenseForReport(expense).blocking.length > 0).length;
   const outstanding = reports.filter(report => normalizeReportStatus(report.status) === "Submitted").reduce((sum, report) => sum + reportTotal(report), 0);
+  const unreportedItems = expenses.filter(expense => !expense.submittedReportId);
+  const unreportedTotal = unreportedItems.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
 
+  document.getElementById("dashUnreported").textContent = money(unreportedTotal);
+  document.getElementById("dashUnreportedCount").textContent = `${unreportedItems.length} unreported expense${unreportedItems.length === 1 ? "" : "s"} stored`;
   document.getElementById("dashTotal").textContent = money(total);
   document.getElementById("dashSelectedCount").textContent = `${selected.length} expense${selected.length === 1 ? "" : "s"} selected`;
   document.getElementById("dashMileage").textContent = money(mileageTotal);
   document.getElementById("dashMileageMiles").textContent = `${mileageMiles.toLocaleString("en-US", { maximumFractionDigits: 1 })} miles`;
   document.getElementById("dashAttention").textContent = String(needsAttention);
   document.getElementById("dashOutstanding").textContent = money(outstanding);
-  document.getElementById("setupBanner").hidden = Boolean(settings.employeeName.trim());
   document.getElementById("dashboardGreeting").textContent = settings.employeeName ? `${settings.employeeName}'s current report` : "Ready when you are";
   document.getElementById("dashboardReportDescription").textContent = reportDraft.title ? `${reportDraft.title}${reportDraft.periodStart || reportDraft.periodEnd ? ` · ${displayDate(reportDraft.periodStart)} to ${displayDate(reportDraft.periodEnd)}` : ""}` : "Add expenses as they happen, then create a report when you are ready to send it.";
 
@@ -2606,7 +2495,6 @@ function renderDashboard() {
   document.getElementById("dashboardSummary").innerHTML = totals.length
     ? totals.map(([category, amount]) => `<div class="summary-row"><span>${safe(category)}</span><strong>${money(amount)}</strong></div>`).join("")
     : `<div class="empty-state">No expenses are selected for the current report.</div>`;
-  renderBackupReminder();
 }
 
 function renderCurrentReport() {
@@ -2724,16 +2612,15 @@ function renderPastReports() {
     const period = details.periodStart || details.periodEnd ? `${displayDate(details.periodStart)} – ${displayDate(details.periodEnd)}` : "Period not specified";
     return `<article class="report-card">
       <div class="report-card-top">
-        <div><div class="eyebrow">${safe(status)}</div><h3>${safe(details.title)}</h3><div class="report-meta"><span>${safe(period)}</span><span>${items.length} expense${items.length === 1 ? "" : "s"}</span><span>Finalized ${new Date(report.finalizedAt || report.submittedAt || report.createdAt || Date.now()).toLocaleDateString("en-US")}</span></div></div>
+        <div><div class="eyebrow">Completed report</div><h3>${safe(details.title)}</h3><div class="report-meta"><span>${safe(period)}</span><span>${items.length} expense${items.length === 1 ? "" : "s"}</span><span>Finalized ${new Date(report.finalizedAt || report.submittedAt || report.createdAt || Date.now()).toLocaleDateString("en-US")}</span></div></div>
         <div class="report-card-total">${money(reportTotal(report))}</div>
       </div>
       ${details.purpose ? `<p class="report-purpose"><strong>Report note:</strong> ${safe(details.purpose)}</p>` : ""}
       <div class="report-controls">
-        <div class="field"><label for="status-${safe(report.id)}">Reimbursement status</label><select id="status-${safe(report.id)}" onchange="updateReportStatus('${report.id}', this.value)"><option ${status === "Submitted" ? "selected" : ""}>Submitted</option><option ${status === "Reimbursed" ? "selected" : ""}>Reimbursed</option></select></div>
+        <div class="field reimbursement-status-ui" hidden aria-hidden="true"><label for="status-${safe(report.id)}">Reimbursement status</label><select id="status-${safe(report.id)}" onchange="updateReportStatus('${report.id}', this.value)"><option ${status === "Submitted" ? "selected" : ""}>Submitted</option><option ${status === "Reimbursed" ? "selected" : ""}>Reimbursed</option></select></div>
         <div class="report-actions">
           <button class="primary" type="button" onclick="downloadPastReportPdf('${report.id}')">Download PDF</button>
           <button class="secondary" type="button" onclick="downloadPastReportCsv('${report.id}')">Download CSV</button>
-          <button class="secondary" type="button" onclick="reopenReport('${report.id}')">Reopen Report</button>
         </div>
       </div>
     </article>`;
@@ -2785,55 +2672,10 @@ function finalizeCurrentReport() {
   showView("past");
 }
 
-function currentReportHasWork() {
-  const detailsHaveContent = [reportDraft.title, reportDraft.periodStart, reportDraft.periodEnd, reportDraft.purpose]
-    .some(value => String(value || "").trim());
-  return detailsHaveContent || currentExpenses().length > 0;
-}
-
-function reopenReport(id) {
-  const report = reports.find(item => item.id === id);
-  if (!report) return;
-  if (currentReportHasWork()) {
-    showToast("A Current Report is already in progress. Finish it or clear its selected expenses and report details before reopening another report.", "error");
-    showView("current");
-    return;
-  }
-  const status = normalizeReportStatus(report.status);
-  const message = status === "Reimbursed"
-    ? "This report is marked Reimbursed. Reopening it can create differences from the amount already paid. Continue only if Accounting asked for a correction."
-    : "Reopen this report for corrections? It will return to Current Report with the same report details and expenses selected. If it was already sent to Accounting, send the corrected version again.";
-  if (!confirm(message)) return;
-  const items = getReportItems(report);
-  const originalIds = new Set(items.map(item => item.id));
-  const existingIds = new Set(expenses.map(item => item.id));
-  expenses = expenses.map(expense => originalIds.has(expense.id) ? { ...expense, submittedReportId: null } : expense);
-  items.forEach(item => {
-    if (!existingIds.has(item.id)) expenses.push({ ...structuredCloneSafe(item), submittedReportId: null });
-  });
-  const details = getReportDetails(report);
-  reportDraft = {
-    title: details.title,
-    department: details.department,
-    periodStart: details.periodStart,
-    periodEnd: details.periodEnd,
-    purpose: details.purpose,
-    selectedExpenseIds: items.map(item => item.id),
-    selectionInitialized: true
-  };
-  reports = reports.filter(item => item.id !== id);
-  saveAll();
-  renderAll();
-  showToast("Report reopened in Current Report.", "success");
-  showView("current");
-}
-
 function renderSettings() {
   const values = {
     employeeName: settings.employeeName,
     defaultDepartment: settings.defaultDepartment,
-    feedbackEmail: settings.feedbackEmail,
-    backupReminderDays: String(settings.backupReminderDays),
     savedPeopleText: settings.savedPeople.join("\n"),
     savedOrganizationsText: settings.savedOrganizations.join("\n"),
     savedLocationsText: settings.savedLocations.join("\n"),
@@ -2844,22 +2686,20 @@ function renderSettings() {
     if (field && document.activeElement !== field) field.value = value;
   });
   const rateText = `${money(FIXED_MILEAGE_RATE)} / mile`;
-  document.getElementById("fixedMileageRateDisplay").textContent = rateText;
-  document.getElementById("aboutMileageRate").textContent = `${money(FIXED_MILEAGE_RATE)} per mile`;
-  document.getElementById("backupStatus").textContent = settings.lastBackupAt ? `Last backup: ${new Date(settings.lastBackupAt).toLocaleString("en-US")}` : "No complete backup recorded yet.";
+  const fixed = document.getElementById("fixedMileageRateDisplay");
+  const about = document.getElementById("aboutMileageRate");
+  if (fixed) fixed.textContent = rateText;
+  if (about) about.textContent = `${money(FIXED_MILEAGE_RATE)} per mile`;
   renderSavedRoutes();
 }
 
 function saveSettings() {
   settings.employeeName = readField("employeeName");
   settings.defaultDepartment = readField("defaultDepartment");
-  settings.feedbackEmail = readField("feedbackEmail");
-  settings.backupReminderDays = Number(readField("backupReminderDays") || 7);
   settings.mileageRate = FIXED_MILEAGE_RATE;
   if (!reportDraft.department && settings.defaultDepartment) reportDraft.department = settings.defaultDepartment;
   saveAll();
   renderAll();
-  showToast("Settings saved.", "success");
 }
 
 function linesToUnique(value) {
@@ -2890,7 +2730,6 @@ function addSavedRoute() {
     start: readField("routeStart"),
     destination: readField("routeDestination"),
     miles: Number(readField("routeMiles") || 0),
-    tripType: readField("routeTripType") || "Round trip"
   };
   if (!route.start || !route.destination || route.miles <= 0) return showToast("Enter both locations and mileage before saving the route.", "error");
   settings.savedRoutes.push(route);
@@ -2911,181 +2750,7 @@ function removeSavedRoute(id) {
 
 function renderSavedRoutes() {
   const container = document.getElementById("savedRoutesList");
-  container.innerHTML = settings.savedRoutes.length ? settings.savedRoutes.map(route => `<div class="saved-route"><div><strong>${safe(route.start)} → ${safe(route.destination)}</strong><small>${route.miles} miles · ${safe(route.tripType)} · ${money(route.miles * FIXED_MILEAGE_RATE)}</small></div><button class="danger small-button" type="button" onclick="removeSavedRoute('${route.id}')">Remove</button></div>`).join("") : `<div class="muted small-copy">No saved routes yet.</div>`;
-}
-
-function reportFeedbackEmail(kind) {
-  const recipient = settings.feedbackEmail || "";
-  if (!recipient) return showToast("Add a feedback recipient in Settings first.", "error");
-  const isProblem = kind === "problem";
-  const subject = isProblem ? `Ranch Expense Tracker problem - v${APP_VERSION}` : `Ranch Expense Tracker feedback - v${APP_VERSION}`;
-  const body = isProblem
-    ? ["", "What were you trying to do?", "", "What happened?", "", "What did you expect?", "", "Can you repeat the issue? If yes, list the steps:", "", `Device/browser: ${navigator.userAgent}`, "", "Expense details and receipts are not attached automatically."].join("\n")
-    : ["", "What worked well?", "", "What was confusing?", "", "What would you change?", "", "Expense details and receipts are not attached automatically."].join("\n");
-  location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
-function sendFeedbackEmail() { reportFeedbackEmail("feedback"); }
-function reportProblemEmail() { reportFeedbackEmail("problem"); }
-
-function renderBackupReminder() {
-  const reminder = document.getElementById("backupReminder");
-  const text = document.getElementById("backupReminderText");
-  if (!expenses.length && !reports.length) { reminder.hidden = true; return; }
-  const days = Math.max(1, Number(settings.backupReminderDays || 7));
-  const latest = settings.lastBackupAt ? new Date(settings.lastBackupAt).getTime() : 0;
-  const dismissed = settings.backupDismissedAt ? new Date(settings.backupDismissedAt).getTime() : 0;
-  const reference = Math.max(latest, dismissed);
-  const due = !reference || (Date.now() - reference) >= days * 86400000;
-  reminder.hidden = !due;
-  text.textContent = settings.lastBackupAt ? `Your last complete backup was ${new Date(settings.lastBackupAt).toLocaleDateString("en-US")}.` : "No complete backup has been recorded on this device.";
-}
-
-function dismissBackupReminder() {
-  settings.backupDismissedAt = new Date().toISOString();
-  saveAll();
-  renderBackupReminder();
-}
-
-function arrayBufferToBase64(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  const chunk = 0x8000;
-  for (let index = 0; index < bytes.length; index += chunk) binary += String.fromCharCode(...bytes.subarray(index, Math.min(index + chunk, bytes.length)));
-  return btoa(binary);
-}
-
-function base64ToArrayBuffer(base64) {
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
-  return bytes.buffer;
-}
-
-async function buildBackupFile() {
-  const receiptRecords = await getAllReceipts();
-  const backupReceipts = [];
-  for (const record of receiptRecords) {
-    const buffer = record.bytes || (record.blob ? await record.blob.arrayBuffer() : new ArrayBuffer(0));
-    backupReceipts.push({ id: record.id, name: record.name, type: record.type, data: arrayBufferToBase64(buffer) });
-  }
-  const exportedAt = new Date().toISOString();
-  const payload = { app: "Ranch Expense Tracker", version: APP_VERSION, release: RELEASE_NAME, exportedAt, fixedMileageRate: FIXED_MILEAGE_RATE, expenses, reports, settings, reportDraft, receipts: backupReceipts };
-  return new File([JSON.stringify(payload)], `ranch-expense-backup-${exportedAt.slice(0, 10)}.ranchbackup`, { type: "application/octet-stream" });
-}
-
-function markBackupComplete() {
-  settings.lastBackupAt = new Date().toISOString();
-  settings.backupDismissedAt = null;
-  saveAll();
-  const reminder = document.getElementById("backupReminder");
-  if (reminder) reminder.hidden = true;
-  renderAll();
-}
-
-async function shareBackup() {
-  // Backward-compatible alias for older inline calls/bookmarks.
-  return exportBackup();
-}
-
-async function exportBackup() {
-  try {
-    const file = await buildBackupFile();
-    downloadBlob(file, file.name);
-    markBackupComplete();
-    showToast("Backup download started. Look in your device's Downloads or Files app.", "success");
-  } catch (error) {
-    showToast(error.message || "The backup could not be downloaded.", "error");
-  }
-}
-
-async function importBackupFile(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  try {
-    const data = JSON.parse(await file.text());
-    if (!Array.isArray(data.expenses) || !Array.isArray(data.reports) || !Array.isArray(data.receipts)) {
-      throw new Error("This is not a valid Ranch Expense Tracker backup.");
-    }
-
-    // Validate and decode the receipt payloads before replacing any current records.
-    const stagedReceipts = [];
-    for (const receipt of data.receipts) {
-      if (!receipt || !receipt.id) throw new Error("A receipt record in this backup is invalid.");
-      const buffer = base64ToArrayBuffer(receipt.data || "");
-      const type = receipt.type || "application/octet-stream";
-      stagedReceipts.push({
-        id: receipt.id,
-        name: receipt.name || "receipt",
-        type,
-        blob: new Blob([buffer], { type }),
-        savedAt: new Date().toISOString()
-      });
-    }
-
-    if (!confirm(`Restore ${data.expenses.length} expenses, ${data.reports.length} reports, and ${data.receipts.length} receipts? Current expense history on this device will be replaced.`)) return;
-
-    // Restore the core accounting records first. Receipt storage should never
-    // prevent otherwise-valid expenses and reports from being recovered.
-    expenses = data.expenses;
-    reports = data.reports;
-    settings = normalizeSettings(data.settings || {});
-    reportDraft = normalizeReportDraft(data.reportDraft || {});
-    saveAll();
-
-    let restoredReceipts = 0;
-    let failedReceipts = 0;
-    try {
-      await clearReceiptStore();
-      for (const receipt of stagedReceipts) {
-        try {
-          // Store one binary representation instead of duplicating both Blob
-          // and ArrayBuffer data in IndexedDB during a restore.
-          await putReceipt(receipt);
-          restoredReceipts += 1;
-        } catch (receiptError) {
-          failedReceipts += 1;
-          console.warn(`Receipt ${receipt.id} could not be restored.`, receiptError);
-        }
-      }
-    } catch (receiptStoreError) {
-      failedReceipts = stagedReceipts.length;
-      console.warn("Receipt storage could not be reset during backup restore.", receiptStoreError);
-    }
-
-    renderAll();
-    showView("dashboard");
-
-    if (failedReceipts) {
-      showToast(`Backup restored ${data.expenses.length} expenses and ${data.reports.length} reports. ${restoredReceipts} of ${data.receipts.length} receipts were restored; ${failedReceipts} receipt${failedReceipts === 1 ? "" : "s"} could not be restored on this device.`, "neutral");
-    } else {
-      showToast(`Backup restored: ${data.expenses.length} expenses, ${data.reports.length} reports, and ${restoredReceipts} receipts.`, "success");
-    }
-  } catch (error) {
-    console.error(error);
-    showToast(error.message || "The backup could not be restored.", "error");
-  } finally {
-    event.target.value = "";
-  }
-}
-
-
-async function clearExpenseHistory() {
-  const phrase = prompt("This removes expenses, reports, drafts, and receipts but keeps your profile settings. Type CLEAR to continue:");
-  if (phrase !== "CLEAR") return;
-  try {
-    await clearReceiptStore();
-    expenses = [];
-    reports = [];
-    reportDraft = emptyReportDraft();
-    settings.lastBackupAt = null;
-    settings.backupDismissedAt = null;
-    saveAll();
-    renderAll();
-    showToast(`Expense history cleared. ${settings.employeeName || "Your name"} and profile settings were preserved.`, "success");
-    showView("dashboard");
-  } catch (error) {
-    showToast(error.message || "Expense history could not be cleared.", "error");
-  }
+  container.innerHTML = settings.savedRoutes.length ? settings.savedRoutes.map(route => `<div class="saved-route"><div><strong>${safe(route.start)} → ${safe(route.destination)}</strong><small>${route.miles} miles · ${money(route.miles * FIXED_MILEAGE_RATE)}</small></div><button class="danger small-button" type="button" onclick="removeSavedRoute('${route.id}')">Remove</button></div>`).join("") : `<div class="muted small-copy">No saved routes yet.</div>`;
 }
 
 function releaseActiveReceiptUrl() {
@@ -3612,7 +3277,7 @@ function addCoverPage(pdf, details, items, status, submittedDate) {
   });
 
   commands += pdfLineCommand(42, 58, 570, 58, .5);
-  commands += pdfTextCommand(`Created with Ranch Expense Tracker v${APP_VERSION} - data stored locally on the user's device.`, 42, 42, 8);
+  commands += pdfTextCommand(`Created with Ranch Expense Tracker v${APP_VERSION} - cloud synchronized with an offline device cache.`, 42, 42, 8);
   pdf.addPage(commands);
 }
 
@@ -4448,5 +4113,1443 @@ async function init() {
 document.addEventListener("DOMContentLoaded", init);
 
   </script>
+<script>
+(() => {
+"use strict";
+
+if (window.__ranchSavedDefaultsSyncV2) return;
+window.__ranchSavedDefaultsSyncV2 = true;
+
+const TOMBSTONE_KEY = "_deletedSavedDefaults";
+const LIST_KEYS = ["savedPeople", "savedOrganizations", "savedLocations", "savedVehicles", "savedTags"];
+
+const clean = value => String(value || "").trim();
+const unique = values => [...new Set((values || []).map(clean).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+const routeKey = route => String(route?.id || `${route?.start || ""}|${route?.destination || ""}|${route?.miles || ""}`);
+
+function normalizeTombstones(value) {
+  const raw = value && typeof value === "object" ? value : {};
+  const out = {};
+  for (const key of LIST_KEYS) out[key] = unique(raw[key]);
+  out.savedRoutes = unique(raw.savedRoutes);
+  return out;
+}
+
+function snapshot(value) {
+  const s = value || {};
+  const result = {};
+  for (const key of LIST_KEYS) result[key] = unique(s[key]);
+  result.savedRoutes = (Array.isArray(s.savedRoutes) ? s.savedRoutes : []).map(routeKey).filter(Boolean);
+  return result;
+}
+
+function applyTombstones(settingsValue) {
+  const tombstones = normalizeTombstones(settingsValue?.[TOMBSTONE_KEY]);
+  for (const key of LIST_KEYS) {
+    const deleted = new Set(tombstones[key]);
+    settingsValue[key] = unique(settingsValue[key]).filter(value => !deleted.has(value));
+  }
+  const deletedRoutes = new Set(tombstones.savedRoutes);
+  settingsValue.savedRoutes = (Array.isArray(settingsValue.savedRoutes) ? settingsValue.savedRoutes : [])
+    .filter(route => !deletedRoutes.has(routeKey(route)));
+  settingsValue[TOMBSTONE_KEY] = tombstones;
+  return settingsValue;
+}
+
+function installNormalizePatch() {
+  if (window.__savedDefaultsV2NormalizePatched || typeof normalizeSettings !== "function") return false;
+  window.__savedDefaultsV2NormalizePatched = true;
+  const originalNormalizeSettings = normalizeSettings;
+
+  normalizeSettings = function(value = {}) {
+    const normalized = originalNormalizeSettings(value);
+    normalized[TOMBSTONE_KEY] = normalizeTombstones(value?.[TOMBSTONE_KEY]);
+    return applyTombstones(normalized);
+  };
+
+  settings = normalizeSettings(settings || {});
+  return true;
+}
+
+function installSavePatch() {
+  if (window.__savedDefaultsV2SavePatched || typeof saveAll !== "function" || typeof settings === "undefined") return false;
+  window.__savedDefaultsV2SavePatched = true;
+
+  let previous = snapshot(settings);
+  let internalSave = false;
+  const originalSaveAll = saveAll;
+
+  saveAll = function(...args) {
+    const result = originalSaveAll.apply(this, args);
+
+    if (internalSave) {
+      previous = snapshot(settings);
+      return result;
+    }
+
+    const current = snapshot(settings);
+    const tombstones = normalizeTombstones(settings?.[TOMBSTONE_KEY]);
+    let changed = false;
+
+    for (const key of LIST_KEYS) {
+      const before = new Set(previous[key] || []);
+      const after = new Set(current[key] || []);
+      const deleted = new Set(tombstones[key]);
+
+      for (const value of before) {
+        if (!after.has(value) && !deleted.has(value)) {
+          deleted.add(value);
+          changed = true;
+        }
+      }
+      for (const value of after) {
+        if (deleted.delete(value)) changed = true;
+      }
+      tombstones[key] = [...deleted].sort((a,b)=>a.localeCompare(b));
+    }
+
+    const beforeRoutes = new Set(previous.savedRoutes || []);
+    const afterRoutes = new Set(current.savedRoutes || []);
+    const deletedRoutes = new Set(tombstones.savedRoutes || []);
+
+    for (const key of beforeRoutes) {
+      if (!afterRoutes.has(key) && !deletedRoutes.has(key)) {
+        deletedRoutes.add(key);
+        changed = true;
+      }
+    }
+    for (const key of afterRoutes) {
+      if (deletedRoutes.delete(key)) changed = true;
+    }
+    tombstones.savedRoutes = [...deletedRoutes].sort((a,b)=>a.localeCompare(b));
+
+    settings[TOMBSTONE_KEY] = tombstones;
+    applyTombstones(settings);
+    previous = snapshot(settings);
+
+    if (changed) {
+      internalSave = true;
+      try { originalSaveAll.apply(this, args); }
+      finally { internalSave = false; }
+    }
+
+    return result;
+  };
+
+  return true;
+}
+
+function init() {
+  let attempts = 0;
+  const timer = setInterval(() => {
+    attempts += 1;
+    installNormalizePatch();
+    installSavePatch();
+    if ((window.__savedDefaultsV2NormalizePatched && window.__savedDefaultsV2SavePatched) || attempts > 100) {
+      clearInterval(timer);
+      if (window.__savedDefaultsV2NormalizePatched && typeof renderSettings === "function") {
+        try { renderSettings(); } catch {}
+      }
+    }
+  }, 50);
+}
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
+else init();
+})();
+
+</script>
+<script>
+(() => {
+"use strict";
+
+if (window.__ranchCloudSyncV2) return;
+window.__ranchCloudSyncV2 = true;
+
+const SUPABASE_URL = "https://rdxzqudawzkqetooubee.supabase.co";
+const SUPABASE_KEY = "sb_publishable_is8367xzMm8UckiRkyYAMw_jVy8Eyop";
+const BUCKET = "expense-documents";
+const AUTH_KEY = "ranch-expense-v2-auth";
+const META_KEY = "ranchExpense.v2.syncMeta";
+const SYNC_DELAY = 1200;
+const PERIODIC_SYNC_MS = 20000;
+
+let sb = null;
+let user = null;
+let busy = false;
+let applyingRemote = false;
+let syncTimer = null;
+let localMutationGeneration = 0;
+let observed = null;
+
+const clone = value => typeof structuredClone === "function"
+  ? structuredClone(value)
+  : JSON.parse(JSON.stringify(value));
+
+const stable = value => {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return "[" + value.map(stable).join(",") + "]";
+  return "{" + Object.keys(value).sort().map(key => JSON.stringify(key) + ":" + stable(value[key])).join(",") + "}";
+};
+
+function hash(value) {
+  const text = stable(value);
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(16);
+}
+
+const timeOf = value => {
+  const n = Date.parse(value || "");
+  return Number.isFinite(n) ? n : 0;
+};
+
+const expenseVersion = expense => timeOf(expense?.updatedAt || expense?.createdAt);
+const reportVersion = report => timeOf(report?.statusUpdatedAt || report?.updatedAt || report?.finalizedAt || report?.createdAt);
+
+const safeName = value => String(value || "document")
+  .replace(/[^A-Za-z0-9._-]+/g, "-")
+  .replace(/^-+|-+$/g, "") || "document";
+
+function defaultMeta() {
+  return {
+    userId: "",
+    initialized: false,
+    pending: false,
+    knownExpenses: {},
+    knownReports: {},
+    expenseDeletes: [],
+    settingsKnownHash: "",
+    settingsChangedAt: "",
+    draftKnownHash: "",
+    draftChangedAt: ""
+  };
+}
+
+function loadMeta() {
+  try {
+    return { ...defaultMeta(), ...(JSON.parse(localStorage.getItem(META_KEY) || "{}")) };
+  } catch {
+    return defaultMeta();
+  }
+}
+
+let meta = loadMeta();
+
+function saveMeta() {
+  localStorage.setItem(META_KEY, JSON.stringify(meta));
+}
+
+function setMessage(text, type = "") {
+  const el = document.getElementById("completeSyncMessage");
+  if (!el) return;
+  el.textContent = text || "";
+  el.className = "complete-sync-message" + (type ? " " + type : "");
+}
+
+function setPill(text, kind = "") {
+  const el = document.getElementById("completeSyncPill");
+  if (!el) return;
+  el.textContent = text;
+  el.className = "complete-sync-pill" + (kind ? " " + kind : "");
+}
+
+function hasPending() {
+  return Boolean(
+    meta.pending ||
+    (meta.expenseDeletes || []).length
+  );
+}
+
+function renderStatus() {
+  if (!navigator.onLine) {
+    setPill("Offline — will sync later", "wait");
+  } else if (!user) {
+    setPill("Cloud: signed out");
+  } else if (busy) {
+    setPill("Syncing…", "wait");
+  } else if (hasPending()) {
+    setPill("Changes waiting to sync", "wait");
+  } else {
+    setPill("Synced", "ok");
+  }
+
+  const signedIn = Boolean(user);
+  const authFields = document.getElementById("completeSyncAuthFields");
+  const signedInActions = document.getElementById("completeSyncSignedInActions");
+  const authActions = document.getElementById("completeSyncAuthActions");
+  const identity = document.getElementById("completeSyncIdentity");
+
+  if (authFields) authFields.hidden = signedIn;
+  if (authActions) authActions.hidden = signedIn;
+  if (signedInActions) signedInActions.hidden = !signedIn;
+  if (identity) identity.textContent = signedIn ? (user.email || user.id) : "Not signed in";
+  const saveInfo = document.getElementById("saveAccountInfoButton");
+  if (saveInfo) saveInfo.hidden = !signedIn;
+  const accountHelp = document.querySelector("#accountProfileInfo > p");
+  if (accountHelp) accountHelp.textContent = signedIn ? "Your name and department are tied to this cloud account. Update them here anytime." : "New account? Add your name before creating it. Existing account? Sign in and your saved information loads automatically.";
+
+  if (signedIn && !busy && !hasPending()) {
+    setMessage("Your expenses, receipts, reports, current report, profile, and saved defaults are synced.", "ok");
+  } else if (!signedIn) {
+    setMessage("Sign in to keep this device connected to your cloud account.");
+  }
+}
+
+function addStyles() {
+  if (document.getElementById("completeSyncStyles")) return;
+  const style = document.createElement("style");
+  style.id = "completeSyncStyles";
+  style.textContent = `
+    #dashboard .metric-grid{grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}
+    .complete-sync-row{display:flex;justify-content:flex-end;margin:-8px 0 10px}
+    .complete-sync-pill{min-height:29px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel);color:var(--muted);font-size:.76rem;font-weight:900;cursor:pointer;box-shadow:var(--shadow-soft)}
+    .complete-sync-pill::before{content:"●";font-size:.62rem;margin-right:6px}
+    .complete-sync-pill.ok{background:var(--olive-soft);border-color:#c8d8bd;color:#315329}
+    .complete-sync-pill.wait{background:var(--amber-soft);border-color:#ead29f;color:var(--warning)}
+    .complete-sync-pill.err{background:var(--danger-soft);border-color:#efc9c7;color:var(--danger)}
+    .complete-sync-card{margin:0 0 12px;padding:16px;border:1px solid #c9d9bf;border-left:5px solid var(--olive);border-radius:15px;background:linear-gradient(135deg,#f8fbf5,var(--olive-soft));box-shadow:var(--shadow-soft)}
+    .complete-sync-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+    .complete-sync-head h2{font-size:1.08rem;margin:2px 0 3px}.complete-sync-head p{margin:0;color:var(--muted);font-size:.8rem}
+    .complete-sync-identity{font-size:.76rem;font-weight:850;color:#315329;word-break:break-word;text-align:right}
+    .complete-sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    .complete-sync-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .complete-sync-message{margin-top:9px;min-height:18px;font-size:.78rem;line-height:1.4;color:var(--muted)}
+    .complete-sync-message.ok{color:#315329}.complete-sync-message.warn{color:var(--warning)}.complete-sync-message.bad{color:var(--danger)}
+    @media(max-width:680px){.complete-sync-head{flex-direction:column}.complete-sync-identity{text-align:left}.complete-sync-grid{grid-template-columns:1fr}.complete-sync-actions{display:grid;grid-template-columns:1fr 1fr}.complete-sync-actions button{width:100%}}
+  `;
+  document.head.appendChild(style);
+}
+
+function mountDashboardClarification() {
+  const grid = document.querySelector("#dashboard .metric-grid");
+  if (!grid) return;
+
+  const currentCard = document.getElementById("dashTotal")?.closest(".metric-card");
+  if (currentCard) {
+    const label = currentCard.querySelector(".metric-label");
+    if (label) label.textContent = "Current report total";
+  }
+
+  if (!document.getElementById("dashUnreported")) {
+    const card = document.createElement("article");
+    card.className = "metric-card";
+    card.innerHTML = `
+      <div class="metric-label">Unreported expenses</div>
+      <div id="dashUnreported" class="metric-value">$0.00</div>
+      <div id="dashUnreportedCount" class="metric-note">0 expenses stored</div>`;
+    grid.insertBefore(card, grid.firstChild);
+  }
+}
+
+function updateUnreportedDashboard() {
+  mountDashboardClarification();
+  const items = expenses.filter(expense => !expense.submittedReportId);
+  const total = items.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+  const value = document.getElementById("dashUnreported");
+  const note = document.getElementById("dashUnreportedCount");
+  if (value) value.textContent = money(total);
+  if (note) note.textContent = `${items.length} unreported expense${items.length === 1 ? "" : "s"} stored`;
+}
+
+function hookDashboard() {
+  if (window.__completeSyncDashboardHook || typeof renderDashboard !== "function") return;
+  window.__completeSyncDashboardHook = true;
+  const original = renderDashboard;
+  renderDashboard = function(...args) {
+    const result = original.apply(this, args);
+    updateUnreportedDashboard();
+    return result;
+  };
+  updateUnreportedDashboard();
+}
+
+function mountSyncUi() {
+  addStyles();
+  const shell = document.querySelector(".app-shell");
+  if (shell && !document.getElementById("completeSyncPill")) {
+    const row = document.createElement("div");
+    row.className = "complete-sync-row";
+    row.innerHTML = '<button id="completeSyncPill" class="complete-sync-pill" type="button">Cloud: signed out</button>';
+    shell.insertBefore(row, shell.firstChild);
+    document.getElementById("completeSyncPill").onclick = () => typeof showView === "function" && showView("settings");
+  }
+  const signInButton = document.getElementById("completeSyncSignIn");
+  const createButton = document.getElementById("completeSyncCreate");
+  const resendButton = document.getElementById("completeSyncResend");
+  const syncButton = document.getElementById("completeSyncNow");
+  const signOutButton = document.getElementById("completeSyncSignOut");
+  const saveInfoButton = document.getElementById("saveAccountInfoButton");
+  if (signInButton) signInButton.onclick = signIn;
+  if (createButton) createButton.onclick = createAccount;
+  if (resendButton) resendButton.onclick = resendConfirmation;
+  if (syncButton) syncButton.onclick = () => syncAll({ manual: true });
+  if (signOutButton) signOutButton.onclick = signOutSafely;
+  if (saveInfoButton) saveInfoButton.onclick = () => saveAccountInfo(true);
+  const badge = document.querySelector(".header-badge");
+  if (badge) badge.textContent = "Version 2.0.0";
+  renderStatus();
+}
+
+function currentSnapshot() {
+  return {
+    expenseIds: new Set(expenses.map(expense => String(expense.id))),
+    reportIds: new Set(reports.map(report => String(report.id))),
+    settingsHash: hash(settings),
+    draftHash: hash(reportDraft)
+  };
+}
+
+function resetObserved() {
+  observed = currentSnapshot();
+}
+
+function hookSaveAll() {
+  if (window.__completeSyncSaveHook || typeof saveAll !== "function") return;
+  window.__completeSyncSaveHook = true;
+  resetObserved();
+
+  const original = saveAll;
+  saveAll = function(...args) {
+    const result = original.apply(this, args);
+    const after = currentSnapshot();
+
+    if (!applyingRemote) {
+      localMutationGeneration += 1;
+      const expenseDeletes = new Set((meta.expenseDeletes || []).map(String));
+      for (const id of observed.expenseIds) if (!after.expenseIds.has(id)) expenseDeletes.add(id);
+      meta.expenseDeletes = [...expenseDeletes];
+      if (after.settingsHash !== observed.settingsHash) {
+        meta.settingsChangedAt = new Date().toISOString();
+      }
+      if (after.draftHash !== observed.draftHash) {
+        meta.draftChangedAt = new Date().toISOString();
+      }
+
+      meta.pending = true;
+      saveMeta();
+      renderStatus();
+      if (navigator.onLine && user) scheduleSync();
+    }
+
+    observed = after;
+    updateUnreportedDashboard();
+    return result;
+  };
+}
+
+async function waitForApp() {
+  for (let i = 0; i < 80; i++) {
+    if (
+      typeof expenses !== "undefined" &&
+      typeof reports !== "undefined" &&
+      typeof settings !== "undefined" &&
+      typeof reportDraft !== "undefined" &&
+      typeof saveAll === "function" &&
+      typeof renderAll === "function" &&
+      typeof normalizeSettings === "function" &&
+      typeof normalizeReportDraft === "function" &&
+      typeof getAllReceipts === "function" &&
+      typeof getReceipt === "function" &&
+      typeof putReceipt === "function" &&
+      typeof clearReceiptStore === "function"
+    ) {
+      try {
+        await getAllReceipts();
+        return;
+      } catch {}
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  throw new Error("The local Ranch Expense Tracker data layer did not finish loading.");
+}
+
+function scheduleSync(delay = SYNC_DELAY) {
+  clearTimeout(syncTimer);
+  if (user) syncTimer = setTimeout(() => syncAll(), delay);
+}
+
+async function refreshUser() {
+  if (!sb) return null;
+
+  const { data: sessionData } = await sb.auth.getSession();
+  let nextUser = sessionData.session?.user || null;
+
+  if (navigator.onLine && nextUser) {
+    const { data, error } = await sb.auth.getUser();
+    if (!error) nextUser = data.user || nextUser;
+  }
+
+  if (nextUser && meta.userId && meta.userId !== nextUser.id) {
+    await clearLocalUserData();
+    meta = defaultMeta();
+    meta.userId = nextUser.id;
+  } else if (nextUser && !meta.userId) {
+    meta.userId = nextUser.id;
+  }
+
+  user = nextUser;
+  saveMeta();
+  renderStatus();
+  return user;
+}
+
+function showResend(show = true) {
+  const button = document.getElementById("completeSyncResend");
+  if (button) button.hidden = !show;
+}
+
+function saveAccountInfo(showToastMessage = true) {
+  const name = String(document.getElementById("employeeName")?.value || "").trim();
+  const department = String(document.getElementById("defaultDepartment")?.value || "").trim();
+  if (!name) {
+    setMessage("Add your name first.", "warn");
+    document.getElementById("employeeName")?.focus();
+    return false;
+  }
+  settings.employeeName = name;
+  settings.defaultDepartment = department;
+  settings.mileageRate = typeof FIXED_MILEAGE_RATE !== "undefined" ? FIXED_MILEAGE_RATE : settings.mileageRate;
+  if (!reportDraft.department && department) reportDraft.department = department;
+  saveAll();
+  renderAll();
+  if (showToastMessage && typeof showToast === "function") showToast("Account information saved.", "success");
+  return true;
+}
+
+async function signIn() {
+  if (!sb || busy) return;
+  const email = String(document.getElementById("completeSyncEmail")?.value || "").trim();
+  const password = document.getElementById("completeSyncPassword")?.value || "";
+  if (!email || !password) return setMessage("Enter your email and password.", "warn");
+  busy = true; renderStatus(); setMessage("Signing in…");
+  try {
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    showResend(false);
+    await refreshUser();
+    await syncAll({ manual: true });
+  } catch (error) {
+    const text = error.message || String(error);
+    if (/email not confirmed/i.test(text)) showResend(true);
+    setMessage(text, "bad");
+  } finally { busy = false; renderStatus(); }
+}
+
+async function createAccount() {
+  if (!sb || busy) return;
+  const email = String(document.getElementById("completeSyncEmail")?.value || "").trim();
+  const password = document.getElementById("completeSyncPassword")?.value || "";
+  const name = String(document.getElementById("employeeName")?.value || "").trim();
+  const department = String(document.getElementById("defaultDepartment")?.value || "").trim();
+  if (!name) { setMessage("Add your name before creating the account.", "warn"); document.getElementById("employeeName")?.focus(); return; }
+  if (!email || password.length < 6) return setMessage("Enter an email and a password with at least 6 characters.", "warn");
+  settings.employeeName = name; settings.defaultDepartment = department; saveAll();
+  busy = true; renderStatus(); setMessage("Creating account…");
+  try {
+    const redirect = location.origin + location.pathname;
+    const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: redirect, data: { employee_name: name, department } } });
+    if (error) throw error;
+    if (data.session) {
+      await refreshUser();
+      await syncAll({ manual: true });
+    } else {
+      showResend(true);
+      setMessage("Account created. Check your email and confirm the account before signing in.", "warn");
+    }
+  } catch (error) { setMessage(error.message || String(error), "bad"); }
+  finally { busy = false; renderStatus(); }
+}
+
+async function resendConfirmation() {
+  if (!sb || busy) return;
+  const email = String(document.getElementById("completeSyncEmail")?.value || "").trim();
+  if (!email) return setMessage("Enter the email address for the account first.", "warn");
+  const button = document.getElementById("completeSyncResend");
+  if (button) button.disabled = true;
+  try {
+    setMessage("Sending a new confirmation email…");
+    const redirect = location.origin + location.pathname;
+    const { error } = await sb.auth.resend({ type: "signup", email, options: { emailRedirectTo: redirect } });
+    if (error) throw error;
+    setMessage("A new confirmation email was sent. Use the newest email, then return here and sign in.", "ok");
+  } catch (error) { setMessage(error.message || String(error), "bad"); }
+  finally { if (button) button.disabled = false; }
+}
+
+async function clearLocalUserData() {
+  await waitForApp();
+  applyingRemote = true;
+  try {
+    await clearReceiptStore();
+    expenses = [];
+    reports = [];
+    settings = normalizeSettings({});
+    reportDraft = normalizeReportDraft({});
+    saveAll();
+    applyReferenceDataLists();
+    renderAll();
+    if (typeof showView === "function") showView("dashboard");
+  } finally {
+    applyingRemote = false;
+    resetObserved();
+  }
+}
+
+async function signOutSafely() {
+  if (!sb || !user || busy) return;
+
+  if (hasPending() && navigator.onLine) {
+    setMessage("Syncing your latest changes before sign-out…", "warn");
+    await syncAll({ manual: true });
+  }
+
+  if (hasPending()) {
+    const proceed = confirm(
+      "Some changes have not synced yet.\n\nSigning out now will clear this device's local copy, and unsynced changes may be lost.\n\nSign out anyway?"
+    );
+    if (!proceed) return;
+  }
+
+  busy = true;
+  renderStatus();
+  try {
+    const { error } = await sb.auth.signOut({ scope: "local" });
+    if (error && navigator.onLine) throw error;
+
+    await clearLocalUserData();
+    localStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem(META_KEY);
+    meta = defaultMeta();
+    user = null;
+
+    const password = document.getElementById("completeSyncPassword");
+    if (password) password.value = "";
+    setMessage("Signed out. This user's local expenses and receipts were removed from this device.", "ok");
+  } catch (error) {
+    setMessage("Sign-out issue: " + (error.message || String(error)), "bad");
+  } finally {
+    busy = false;
+    renderStatus();
+  }
+}
+
+async function localReceipt(expense) {
+  if (!expense?.receiptId) return null;
+  const record = await getReceipt(expense.receiptId);
+  if (!record) return null;
+
+  const blob = record.blob || (record.bytes
+    ? new Blob([record.bytes], { type: record.type || "application/octet-stream" })
+    : null);
+
+  return blob ? {
+    blob,
+    name: record.name || expense.receiptName || "document",
+    type: record.type || blob.type || "application/octet-stream"
+  } : null;
+}
+
+async function pushExpense(expense, row) {
+  const file = await localReceipt(expense);
+  let path = null, name = null, type = null, size = null;
+
+  const sameReceipt = file && row?.receipt_path &&
+    String(row.payload?.receiptFingerprint || "") === String(expense.receiptFingerprint || "") &&
+    Number(row.receipt_size || 0) === Number(file.blob.size || 0);
+
+  if (file) {
+    if (sameReceipt) {
+      path = row.receipt_path;
+      name = row.receipt_name;
+      type = row.receipt_type;
+      size = row.receipt_size;
+    } else {
+      name = safeName(file.name);
+      type = file.type;
+      size = file.blob.size;
+      path = `${user.id}/expenses/${safeName(expense.id)}/${name}`;
+
+      if (row?.receipt_path && row.receipt_path !== path) {
+        const remove = await sb.storage.from(BUCKET).remove([row.receipt_path]);
+        if (remove.error) throw remove.error;
+      }
+
+      const upload = await sb.storage.from(BUCKET).upload(path, file.blob, {
+        upsert: true,
+        contentType: type || undefined,
+        cacheControl: "3600"
+      });
+      if (upload.error) throw upload.error;
+    }
+  } else if (row?.receipt_path) {
+    const remove = await sb.storage.from(BUCKET).remove([row.receipt_path]);
+    if (remove.error) throw remove.error;
+  }
+
+  const query = await sb.from("expenses").upsert({
+    user_id: user.id,
+    expense_id: String(expense.id),
+    payload: clone(expense),
+    receipt_path: path,
+    receipt_name: name,
+    receipt_type: type,
+    receipt_size: size,
+    deleted_at: null
+  }, { onConflict: "user_id,expense_id" });
+
+  if (query.error) throw query.error;
+}
+
+async function pullExpense(row, oldExpense) {
+  const expense = clone(row.payload || {});
+  expense.id = expense.id || row.expense_id;
+
+  const sameReceipt = oldExpense?.receiptId &&
+    String(oldExpense.receiptFingerprint || "") === String(expense.receiptFingerprint || "");
+
+  if (row.receipt_path) {
+    if (sameReceipt && await getReceipt(oldExpense.receiptId)) {
+      expense.receiptId = oldExpense.receiptId;
+    } else {
+      const download = await sb.storage.from(BUCKET).download(row.receipt_path);
+      if (download.error) throw download.error;
+
+      const receiptId = expense.receiptId || oldExpense?.receiptId || ("receipt-cloud-" + row.expense_id);
+      await putReceipt({
+        id: receiptId,
+        name: row.receipt_name || expense.receiptName || "document",
+        type: row.receipt_type || download.data.type || "application/octet-stream",
+        blob: download.data,
+        originalName: row.receipt_name || expense.receiptName || "document",
+        originalSize: Number(row.receipt_size || download.data.size || 0),
+        optimized: true,
+        savedAt: new Date().toISOString()
+      });
+
+      expense.receiptId = receiptId;
+      expense.receiptName = row.receipt_name || expense.receiptName || "document";
+      expense.receiptType = row.receipt_type || download.data.type || "";
+    }
+  } else if (oldExpense?.receiptId) {
+    try { await deleteReceipt(oldExpense.receiptId); } catch {}
+    expense.receiptId = "";
+    expense.receiptName = "";
+    expense.receiptType = "";
+    expense.receiptFingerprint = "";
+  }
+
+  return expense;
+}
+
+async function tombstoneExpense(row) {
+  if (row?.receipt_path) {
+    const remove = await sb.storage.from(BUCKET).remove([row.receipt_path]);
+    if (remove.error) throw remove.error;
+  }
+
+  const query = await sb.from("expenses").update({
+    deleted_at: new Date().toISOString(),
+    receipt_path: null,
+    receipt_name: null,
+    receipt_type: null,
+    receipt_size: null
+  }).eq("expense_id", row.expense_id);
+
+  if (query.error) throw query.error;
+}
+
+async function pushReport(report) {
+  const query = await sb.from("reports").upsert({
+    user_id: user.id,
+    report_id: String(report.id),
+    payload: clone(report),
+    deleted_at: null
+  }, { onConflict: "user_id,report_id" });
+
+  if (query.error) throw query.error;
+}
+
+function mergeUniqueText(a, b) {
+  return [...new Set([...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])]
+    .map(value => String(value || "").trim())
+    .filter(Boolean))]
+    .sort((x, y) => x.localeCompare(y));
+}
+
+function mergeRoutes(a, b) {
+  const map = new Map();
+  for (const route of [...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])]) {
+    const key = String(route?.id || `${route?.start || ""}|${route?.destination || ""}|${route?.miles || ""}`);
+    if (!map.has(key)) map.set(key, clone(route));
+  }
+  return [...map.values()];
+}
+
+function settingsMeaningful(value) {
+  if (!value) return false;
+  return Boolean(
+    String(value.employeeName || "").trim() ||
+    String(value.defaultDepartment || "").trim() ||
+    ["savedPeople","savedOrganizations","savedLocations","savedVehicles","savedTags","savedRoutes"]
+      .some(key => Array.isArray(value[key]) && value[key].length)
+  );
+}
+
+function mergeSettings(localValue, cloudValue, preferLocalScalars = true) {
+  const local = normalizeSettings(localValue || {});
+  const cloud = normalizeSettings(cloudValue || {});
+  const merged = { ...clone(preferLocalScalars ? cloud : local), ...clone(preferLocalScalars ? local : cloud) };
+
+  for (const key of ["savedPeople","savedOrganizations","savedLocations","savedVehicles","savedTags"]) {
+    merged[key] = mergeUniqueText(local[key], cloud[key]);
+  }
+  merged.savedRoutes = mergeRoutes(local.savedRoutes, cloud.savedRoutes);
+  return normalizeSettings(merged);
+}
+
+function draftMeaningful(value) {
+  if (!value) return false;
+  return Boolean(
+    String(value.title || "").trim() ||
+    String(value.department || "").trim() ||
+    String(value.periodStart || "").trim() ||
+    String(value.periodEnd || "").trim() ||
+    String(value.purpose || "").trim() ||
+    (Array.isArray(value.selectedExpenseIds) && value.selectedExpenseIds.length)
+  );
+}
+
+async function syncSettings(profileRow, startGeneration, localState) {
+  const cloudSettingsRaw = profileRow?.app_settings && typeof profileRow.app_settings === "object"
+    ? profileRow.app_settings
+    : {};
+  const localHash = hash(localState);
+  const cloudHash = hash(normalizeSettings(cloudSettingsRaw));
+  const known = meta.settingsKnownHash || "";
+
+  if (!profileRow) {
+    const upsert = await sb.from("profiles").upsert({
+      user_id: user.id,
+      email: user.email || null,
+      employee_name: String(localState.employeeName || ""),
+      department: String(localState.defaultDepartment || ""),
+      app_settings: clone(localState)
+    }, { onConflict: "user_id" });
+    if (upsert.error) throw upsert.error;
+    meta.settingsKnownHash = localHash;
+    return { value: localState, changedLocal: false };
+  }
+
+  if (localHash === cloudHash) {
+    meta.settingsKnownHash = localHash;
+    return { value: localState, changedLocal: false };
+  }
+
+  const localChanged = known && localHash !== known;
+  const cloudChanged = known && cloudHash !== known;
+
+  let preferLocal;
+  if (!known) {
+    if (!settingsMeaningful(localState) && settingsMeaningful(cloudSettingsRaw)) preferLocal = false;
+    else if (settingsMeaningful(localState) && !settingsMeaningful(cloudSettingsRaw)) preferLocal = true;
+    else preferLocal = true;
+  } else if (localChanged && !cloudChanged) {
+    preferLocal = true;
+  } else if (!localChanged && cloudChanged) {
+    preferLocal = false;
+  } else {
+    preferLocal = timeOf(meta.settingsChangedAt) >= timeOf(profileRow.updated_at);
+  }
+
+  const merged = mergeSettings(localState, cloudSettingsRaw, preferLocal);
+  const mergedHash = hash(merged);
+
+  const upsert = await sb.from("profiles").upsert({
+    user_id: user.id,
+    email: user.email || null,
+    employee_name: String(merged.employeeName || ""),
+    department: String(merged.defaultDepartment || ""),
+    app_settings: clone(merged)
+  }, { onConflict: "user_id" });
+  if (upsert.error) throw upsert.error;
+
+  meta.settingsKnownHash = mergedHash;
+  const changedLocal = mergedHash !== localHash;
+
+  if (changedLocal && localMutationGeneration !== startGeneration) {
+    return { value: localState, changedLocal: false, retry: true };
+  }
+
+  return { value: merged, changedLocal };
+}
+
+async function syncDraft(draftRow, startGeneration, localState) {
+  const cloudValue = normalizeReportDraft(draftRow?.payload || {});
+  const localValue = normalizeReportDraft(localState || {});
+  const localHash = hash(localValue);
+  const cloudHash = hash(cloudValue);
+  const known = meta.draftKnownHash || "";
+
+  if (!draftRow) {
+    const upsert = await sb.from("report_drafts").upsert({
+      user_id: user.id,
+      payload: clone(localValue)
+    }, { onConflict: "user_id" });
+    if (upsert.error) throw upsert.error;
+    meta.draftKnownHash = localHash;
+    return { value: localValue, changedLocal: false };
+  }
+
+  if (localHash === cloudHash) {
+    meta.draftKnownHash = localHash;
+    return { value: localValue, changedLocal: false };
+  }
+
+  const localChanged = known && localHash !== known;
+  const cloudChanged = known && cloudHash !== known;
+
+  let localWins;
+  if (!known) {
+    if (!draftMeaningful(localValue) && draftMeaningful(cloudValue)) localWins = false;
+    else if (draftMeaningful(localValue) && !draftMeaningful(cloudValue)) localWins = true;
+    else localWins = timeOf(meta.draftChangedAt) > timeOf(draftRow.updated_at);
+  } else if (localChanged && !cloudChanged) {
+    localWins = true;
+  } else if (!localChanged && cloudChanged) {
+    localWins = false;
+  } else {
+    localWins = timeOf(meta.draftChangedAt) >= timeOf(draftRow.updated_at);
+  }
+
+  if (localWins) {
+    const upsert = await sb.from("report_drafts").upsert({
+      user_id: user.id,
+      payload: clone(localValue)
+    }, { onConflict: "user_id" });
+    if (upsert.error) throw upsert.error;
+    meta.draftKnownHash = localHash;
+    return { value: localValue, changedLocal: false };
+  }
+
+  if (localMutationGeneration !== startGeneration) {
+    return { value: localValue, changedLocal: false, retry: true };
+  }
+
+  meta.draftKnownHash = cloudHash;
+  return { value: cloudValue, changedLocal: true };
+}
+
+async function syncAll({ manual = false } = {}) {
+  if (busy || !user || !navigator.onLine) {
+    renderStatus();
+    return;
+  }
+
+  busy = true;
+  const startGeneration = localMutationGeneration;
+  renderStatus();
+  if (manual) setMessage("Checking all cloud records…");
+
+  try {
+    await waitForApp();
+
+    const localExpenses = expenses.map(clone);
+    const localReports = reports.map(clone);
+    const localSettings = clone(settings);
+    const localDraft = clone(reportDraft);
+
+    const [expenseQuery, reportQuery, profileQuery, draftQuery] = await Promise.all([
+      sb.from("expenses").select("*").order("created_at", { ascending: true }),
+      sb.from("reports").select("*").order("created_at", { ascending: true }),
+      sb.from("profiles").select("*").eq("user_id", user.id).maybeSingle(),
+      sb.from("report_drafts").select("*").eq("user_id", user.id).maybeSingle()
+    ]);
+
+    for (const result of [expenseQuery, reportQuery, profileQuery, draftQuery]) {
+      if (result.error) throw result.error;
+    }
+
+    const cloudExpenses = new Map((expenseQuery.data || []).map(row => [String(row.expense_id), row]));
+    const cloudReports = new Map((reportQuery.data || []).map(row => [String(row.report_id), row]));
+    const expenseDeletes = new Set((meta.expenseDeletes || []).map(String));
+    for (const id of [...expenseDeletes]) {
+      const row = cloudExpenses.get(id);
+      if (row && !row.deleted_at) await tombstoneExpense(row);
+      if (row) cloudExpenses.set(id, { ...row, deleted_at: new Date().toISOString(), receipt_path: null });
+      expenseDeletes.delete(id);
+    }
+
+
+    const finalExpenses = new Map(localExpenses.map(expense => [String(expense.id), expense]));
+    const expenseIds = new Set([...cloudExpenses.keys(), ...finalExpenses.keys()]);
+    const nextExpenseKnown = {};
+    let expensesChangedLocal = false;
+
+    for (const id of expenseIds) {
+      const localExpense = finalExpenses.get(id) || null;
+      const row = cloudExpenses.get(id) || null;
+      const activeCloud = row && !row.deleted_at;
+
+      if (!localExpense && activeCloud) {
+        const pulled = await pullExpense(row, null);
+        finalExpenses.set(id, pulled);
+        nextExpenseKnown[id] = hash(pulled);
+        expensesChangedLocal = true;
+        continue;
+      }
+
+      if (localExpense && !row) {
+        await pushExpense(localExpense, null);
+        nextExpenseKnown[id] = hash(localExpense);
+        continue;
+      }
+
+      if (localExpense && row?.deleted_at) {
+        if (expenseVersion(localExpense) > timeOf(row.deleted_at)) {
+          await pushExpense(localExpense, row);
+          nextExpenseKnown[id] = hash(localExpense);
+        } else {
+          if (localExpense.receiptId) {
+            try { await deleteReceipt(localExpense.receiptId); } catch {}
+          }
+          finalExpenses.delete(id);
+          nextExpenseKnown[id] = "__deleted__";
+          expensesChangedLocal = true;
+        }
+        continue;
+      }
+
+      if (!localExpense && row?.deleted_at) {
+        nextExpenseKnown[id] = "__deleted__";
+        continue;
+      }
+
+      if (localExpense && activeCloud) {
+        const localHash = hash(localExpense);
+        const cloudHash = hash(row.payload || {});
+        const known = meta.knownExpenses[id] || "";
+
+        if (localHash === cloudHash) {
+          nextExpenseKnown[id] = localHash;
+          continue;
+        }
+
+        const localChanged = known && localHash !== known;
+        const cloudChanged = known && cloudHash !== known;
+
+        let localWins;
+        if (known && localChanged && !cloudChanged) localWins = true;
+        else if (known && !localChanged && cloudChanged) localWins = false;
+        else localWins = expenseVersion(localExpense) > expenseVersion(row.payload);
+
+        if (localWins) {
+          await pushExpense(localExpense, row);
+          nextExpenseKnown[id] = localHash;
+        } else {
+          const pulled = await pullExpense(row, localExpense);
+          finalExpenses.set(id, pulled);
+          nextExpenseKnown[id] = hash(pulled);
+          expensesChangedLocal = true;
+        }
+      }
+    }
+
+    const finalReports = new Map(localReports.map(report => [String(report.id), report]));
+    const reportIds = new Set([...cloudReports.keys(), ...finalReports.keys()]);
+    const nextReportKnown = {};
+    let reportsChangedLocal = false;
+
+    for (const id of reportIds) {
+      const localReport = finalReports.get(id) || null;
+      const row = cloudReports.get(id) || null;
+      const activeCloud = row && !row.deleted_at;
+
+      if (!localReport && activeCloud) {
+        const pulled = clone(row.payload || {});
+        pulled.id = pulled.id || row.report_id;
+        finalReports.set(id, pulled);
+        nextReportKnown[id] = hash(pulled);
+        reportsChangedLocal = true;
+        continue;
+      }
+
+      if (localReport && !row) {
+        await pushReport(localReport);
+        nextReportKnown[id] = hash(localReport);
+        continue;
+      }
+
+      if (localReport && row?.deleted_at) {
+        if (reportVersion(localReport) > timeOf(row.deleted_at)) {
+          await pushReport(localReport);
+          nextReportKnown[id] = hash(localReport);
+        } else {
+          finalReports.delete(id);
+          nextReportKnown[id] = "__deleted__";
+          reportsChangedLocal = true;
+        }
+        continue;
+      }
+
+      if (!localReport && row?.deleted_at) {
+        nextReportKnown[id] = "__deleted__";
+        continue;
+      }
+
+      if (localReport && activeCloud) {
+        const localHash = hash(localReport);
+        const cloudHash = hash(row.payload || {});
+        const known = meta.knownReports[id] || "";
+
+        if (localHash === cloudHash) {
+          nextReportKnown[id] = localHash;
+          continue;
+        }
+
+        const localChanged = known && localHash !== known;
+        const cloudChanged = known && cloudHash !== known;
+
+        let localWins;
+        if (known && localChanged && !cloudChanged) localWins = true;
+        else if (known && !localChanged && cloudChanged) localWins = false;
+        else localWins = reportVersion(localReport) > reportVersion(row.payload);
+
+        if (localWins) {
+          await pushReport(localReport);
+          nextReportKnown[id] = localHash;
+        } else {
+          const pulled = clone(row.payload || {});
+          pulled.id = pulled.id || row.report_id;
+          finalReports.set(id, pulled);
+          nextReportKnown[id] = hash(pulled);
+          reportsChangedLocal = true;
+        }
+      }
+    }
+
+    const settingsResult = await syncSettings(profileQuery.data || null, startGeneration, localSettings);
+    const draftResult = await syncDraft(draftQuery.data || null, startGeneration, localDraft);
+
+    const needsLocalApply =
+      expensesChangedLocal ||
+      reportsChangedLocal ||
+      settingsResult.changedLocal ||
+      draftResult.changedLocal;
+
+    if ((needsLocalApply || settingsResult.retry || draftResult.retry) &&
+        localMutationGeneration !== startGeneration) {
+      meta.pending = true;
+      meta.expenseDeletes = [...expenseDeletes];
+      saveMeta();
+      setMessage("A local change happened during sync. Keeping that change and running another safe pass…", "warn");
+      scheduleSync(100);
+      return;
+    }
+
+    if (needsLocalApply) {
+      applyingRemote = true;
+      try {
+        expenses = [...finalExpenses.values()].sort((a, b) =>
+          String(a.createdAt || "").localeCompare(String(b.createdAt || ""))
+        );
+        reports = [...finalReports.values()].sort((a, b) =>
+          String(a.createdAt || a.finalizedAt || "").localeCompare(String(b.createdAt || b.finalizedAt || ""))
+        );
+        if (settingsResult.changedLocal) settings = normalizeSettings(settingsResult.value);
+        if (draftResult.changedLocal) reportDraft = normalizeReportDraft(draftResult.value);
+
+        saveAll();
+        applyReferenceDataLists();
+        renderAll();
+      } finally {
+        applyingRemote = false;
+        resetObserved();
+      }
+    }
+
+    meta.knownExpenses = nextExpenseKnown;
+    meta.knownReports = nextReportKnown;
+    meta.expenseDeletes = [...expenseDeletes];
+    meta.initialized = true;
+    meta.pending = localMutationGeneration !== startGeneration;
+    saveMeta();
+
+    renderStatus();
+
+    if (meta.pending) {
+      setMessage("A newer local change arrived during sync. Running one more pass…", "warn");
+      scheduleSync(100);
+    } else {
+      setMessage(
+        `Synced ${expenses.length} expense${expenses.length === 1 ? "" : "s"}, ${reports.length} completed report${reports.length === 1 ? "" : "s"}, current report, profile, and saved defaults.`,
+        "ok"
+      );
+    }
+  } catch (error) {
+    meta.pending = true;
+    saveMeta();
+    setPill("Sync issue", "err");
+    setMessage("Sync issue: " + (error.message || String(error)), "bad");
+    console.error(error);
+  } finally {
+    busy = false;
+    renderStatus();
+  }
+}
+
+async function init() {
+  await waitForApp();
+  mountSyncUi();
+  hookDashboard();
+  hookSaveAll();
+
+  try {
+    const mod = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0/+esm");
+    sb = mod.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: AUTH_KEY
+      }
+    });
+
+    sb.auth.onAuthStateChange(() => setTimeout(async () => {
+      await refreshUser();
+      if (user) scheduleSync(100);
+    }, 0));
+
+    await refreshUser();
+    if (user) await syncAll();
+
+    window.addEventListener("online", () => {
+      renderStatus();
+      if (user) scheduleSync(100);
+    });
+    window.addEventListener("offline", renderStatus);
+    window.addEventListener("focus", () => user && scheduleSync(200));
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && user) scheduleSync(200);
+    });
+
+    setInterval(() => {
+      if (user && navigator.onLine) syncAll();
+    }, PERIODIC_SYNC_MS);
+  } catch (error) {
+    setPill("Cloud unavailable", "err");
+    setMessage("Supabase could not initialize: " + (error.message || String(error)), "bad");
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init, { once: true });
+} else {
+  init();
+}
+})();
+</script>
+<script>
+(() => {
+"use strict";
+
+if (window.__ranchAuthGateV2) return;
+window.__ranchAuthGateV2 = true;
+
+let homeParent = null;
+let homeNextSibling = null;
+let revealTimer = null;
+let syncQueued = false;
+let signOutInProgress = false;
+
+function q(id) { return document.getElementById(id); }
+function isSignedIn() {
+  const actions = q("completeSyncSignedInActions");
+  return Boolean(actions && !actions.hidden);
+}
+
+function addStyles() {
+  if (q("ranchAuthGateStylesV2")) return;
+  const style = document.createElement("style");
+  style.id = "ranchAuthGateStylesV2";
+  style.textContent = `
+    #ranchAuthGate{position:fixed;inset:0;z-index:10000;overflow:auto;display:grid;place-items:center;padding:24px 16px calc(24px + env(safe-area-inset-bottom));background:radial-gradient(circle at 88% 4%,rgba(211,154,48,.18),transparent 30rem),linear-gradient(180deg,#fbf7ef 0%,#f5efe4 100%)}
+    #ranchAuthGate[hidden]{display:none!important}
+    .ranch-auth-gate-wrap{width:min(620px,100%)}
+    .ranch-auth-gate-brand{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+    .ranch-auth-gate-mark{display:grid;place-items:center;width:52px;height:52px;border-radius:15px;background:#a71f25;color:#fff;border:2px solid rgba(255,255,255,.24);box-shadow:inset 0 0 0 5px rgba(211,154,48,.18);font-size:1.5rem;font-weight:900;flex:0 0 auto}
+    .ranch-auth-gate-brand strong{display:block;font-size:1.03rem;color:#2a231e}.ranch-auth-gate-brand small{display:block;margin-top:2px;color:#766a60;font-weight:700}
+    .ranch-auth-gate-shell{padding:24px;border:1px solid #dfd1bd;border-radius:20px;background:#fffdf8;box-shadow:0 18px 46px rgba(74,50,30,.13)}
+    .ranch-auth-gate-shell>h1{margin:0 0 7px;font-size:clamp(1.55rem,5vw,2.15rem);line-height:1.08;color:#2a231e}.ranch-auth-gate-shell>.ranch-auth-intro{margin:0 0 18px;color:#766a60;line-height:1.5}
+    .ranch-auth-checking{padding:18px;border:1px solid #dfd1bd;border-radius:14px;background:#f9f3e9;color:#766a60;font-weight:800;text-align:center}
+    #ranchAuthGateCardHost .complete-sync-card{margin:0;padding:18px;border-left:1px solid #c9d9bf;box-shadow:none}#ranchAuthGateCardHost .complete-sync-head{margin-bottom:2px}#ranchAuthGateCardHost .complete-sync-identity{display:none}
+    .ranch-auth-gate-support{margin:15px 2px 0;color:#766a60;font-size:.78rem;text-align:center}
+    @media(max-width:680px){#ranchAuthGate{place-items:start center;padding-top:calc(18px + env(safe-area-inset-top))}.ranch-auth-gate-shell{padding:19px;border-radius:17px}.ranch-auth-gate-brand{margin-bottom:12px}}
+  `;
+  document.head.appendChild(style);
+}
+
+function createGate() {
+  let gate = q("ranchAuthGate");
+  if (gate) return gate;
+  gate = document.createElement("div");
+  gate.id = "ranchAuthGate";
+  gate.setAttribute("role", "dialog");
+  gate.setAttribute("aria-modal", "true");
+  gate.setAttribute("aria-label", "Ranch Expense Tracker account sign in");
+  gate.innerHTML = `
+    <div class="ranch-auth-gate-wrap">
+      <div class="ranch-auth-gate-brand"><div class="ranch-auth-gate-mark">R</div><div><strong>Ranch Expense Tracker</strong><small>Personal business expense tracking</small></div></div>
+      <section class="ranch-auth-gate-shell">
+        <h1>Sign in to continue</h1>
+        <p class="ranch-auth-intro">Your expenses, receipts, reports, and saved defaults stay tied to your account and sync across your devices.</p>
+        <div id="ranchAuthChecking" class="ranch-auth-checking">Checking your account…</div>
+        <div id="ranchAuthGateCardHost"></div>
+        <div class="ranch-auth-gate-support">Need help? Contact Saul Garcia.</div>
+      </section>
+    </div>`;
+  document.body.appendChild(gate);
+  return gate;
+}
+
+function rememberHome(card) {
+  if (homeParent || !card?.parentNode) return;
+  homeParent = card.parentNode;
+  homeNextSibling = card.nextSibling;
+}
+function returnCardHome(card) {
+  if (!card || !homeParent || card.parentNode === homeParent) return;
+  if (homeNextSibling && homeNextSibling.parentNode === homeParent) homeParent.insertBefore(card, homeNextSibling);
+  else {
+    const heading = q("settings")?.querySelector(".page-heading");
+    if (heading && heading.parentNode === homeParent) heading.after(card);
+    else homeParent.appendChild(card);
+  }
+}
+function setChecking(text, visible = true) {
+  const checking = q("ranchAuthChecking");
+  if (!checking) return;
+  checking.textContent = text;
+  checking.hidden = !visible;
+}
+
+function showSignedOut(card) {
+  const gate = createGate();
+  const host = q("ranchAuthGateCardHost");
+  document.documentElement.classList.add("ranch-auth-pending");
+  document.documentElement.classList.remove("ranch-auth-ready");
+  document.body.classList.add("ranch-auth-gated");
+  gate.hidden = false;
+
+  if (!card || card.dataset.accountPolished !== "true") {
+    setChecking("Preparing account sign in…", true);
+    return;
+  }
+
+  rememberHome(card);
+  clearTimeout(revealTimer);
+  revealTimer = setTimeout(() => {
+    if (isSignedIn()) return queueSync();
+    setChecking("Checking your account…", false);
+    if (host && card.parentNode !== host) host.appendChild(card);
+    const email = q("completeSyncEmail");
+    if (email && !email.value) setTimeout(() => email.focus(), 50);
+  }, 180);
+}
+
+function showSignedIn(card) {
+  const gate = createGate();
+  clearTimeout(revealTimer);
+  if (card) {
+    rememberHome(card);
+    returnCardHome(card);
+  }
+
+  // Once authenticated, the account gate stays open. Background sync status,
+  // focus changes, keyboard events, visibility changes, and render cycles must
+  // never relock the app. Only an actual sign-out may show the gate again.
+  if (signOutInProgress) return;
+
+  gate.hidden = true;
+  document.body.classList.remove("ranch-auth-gated");
+  document.documentElement.classList.remove("ranch-auth-pending");
+  document.documentElement.classList.add("ranch-auth-ready");
+  setChecking("Checking your account…", true);
+}
+
+function runGate() {
+  addStyles();
+  createGate();
+  const card = q("completeSyncCard");
+
+  if (signOutInProgress) {
+    if (!isSignedIn()) {
+      signOutInProgress = false;
+      showSignedOut(card);
+    }
+    return;
+  }
+
+  if (isSignedIn()) showSignedIn(card);
+  else showSignedOut(card);
+}
+function queueSync() {
+  if (syncQueued) return;
+  syncQueued = true;
+  requestAnimationFrame(() => {
+    syncQueued = false;
+    runGate();
+  });
+}
+
+// Privacy-cover immediately when an explicit sign-out starts. Keep it covered
+// until the authenticated controls actually switch to signed-out state.
+document.addEventListener("click", event => {
+  if (!event.target?.closest?.("#completeSyncSignOut")) return;
+  signOutInProgress = true;
+  document.documentElement.classList.add("ranch-auth-pending");
+  const gate = createGate();
+  gate.hidden = false;
+  setChecking("Signing out and clearing this device…", true);
+}, true);
+
+const observer = new MutationObserver(queueSync);
+observer.observe(document.documentElement, {childList:true,subtree:true,attributes:true,attributeFilter:["hidden","data-account-polished"]});
+
+let tries = 0;
+const timer = setInterval(() => {
+  tries += 1;
+  queueSync();
+  if (tries > 150 || (q("completeSyncCard") && q("ranchAuthGate"))) clearInterval(timer);
+}, 100);
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", queueSync, {once:true});
+else queueSync();
+})();
+</script>
+<script>
+(() => {
+"use strict";
+if (window.__ranchLegacyMigrationV2) return;
+window.__ranchLegacyMigrationV2 = true;
+const V1 = { expenses:"workExpenseTool.expenses.v1", reports:"workExpenseTool.reports.v1", settings:"workExpenseTool.settings.v1", draft:"workExpenseTool.reportDraft.v1", db:"workExpenseReceiptDB" };
+const parse = (key, fallback) => { try { const raw=localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch { return fallback; } };
+const meaningfulDraft = d => d && (String(d.title||"").trim() || String(d.periodStart||"").trim() || String(d.periodEnd||"").trim() || (Array.isArray(d.selectedExpenseIds)&&d.selectedExpenseIds.length));
+function signedIn(){const a=document.getElementById("completeSyncSignedInActions");return Boolean(a&&!a.hidden)}
+function identity(){return String(document.getElementById("completeSyncIdentity")?.textContent||"").trim()}
+function legacyData(){return {expenses:parse(V1.expenses,[]),reports:parse(V1.reports,[]),settings:parse(V1.settings,{}),draft:parse(V1.draft,{})}}
+function hasLegacy(d){return (Array.isArray(d.expenses)&&d.expenses.length)||(Array.isArray(d.reports)&&d.reports.length)||String(d.settings?.employeeName||"").trim()||meaningfulDraft(d.draft)}
+function openOldDb(){return new Promise((resolve,reject)=>{const req=indexedDB.open(V1.db,1);req.onupgradeneeded=()=>{};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+async function oldReceipts(){let database=null;try{database=await openOldDb();if(!database.objectStoreNames.contains("receipts"))return[];return await new Promise((resolve,reject)=>{const tx=database.transaction("receipts","readonly");const req=tx.objectStore("receipts").getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)})}catch{return[]}finally{try{database?.close()}catch{}}}
+function mergeById(current, legacy, versionField){const map=new Map((Array.isArray(current)?current:[]).map(x=>[String(x.id),x]));for(const item of (Array.isArray(legacy)?legacy:[])){if(!item?.id)continue;const old=map.get(String(item.id));if(!old){map.set(String(item.id),item);continue}const a=Date.parse(old?.[versionField]||old?.updatedAt||old?.createdAt||"")||0;const b=Date.parse(item?.[versionField]||item?.updatedAt||item?.createdAt||"")||0;if(b>a)map.set(String(item.id),item)}return[...map.values()]}
+function mergeText(a,b){return[...new Set([...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])].map(v=>String(v||"").trim()).filter(Boolean))].sort((x,y)=>x.localeCompare(y))}
+async function migrate(){if(!signedIn())return;const email=identity();if(!email||email==="Not signed in")return;const marker="ranchExpense.v2.legacyMigration."+email.toLowerCase();if(localStorage.getItem(marker))return;const legacy=legacyData();if(!hasLegacy(legacy)){localStorage.setItem(marker,"none");return}const count=(legacy.expenses?.length||0);if(!confirm(`Existing Ranch Expense Tracker 1.x data was found on this device.\n\nSigned in as: ${email}\nLegacy expenses found: ${count}\n\nImport this data into this cloud account? The original 1.x copy will remain untouched.`)){localStorage.setItem(marker,"declined");return}
+try{expenses=mergeById(expenses,legacy.expenses,"updatedAt");reports=mergeById(reports,legacy.reports,"statusUpdatedAt");const ls=legacy.settings||{};settings=normalizeSettings({...settings,employeeName:settings.employeeName||ls.employeeName||"",defaultDepartment:settings.defaultDepartment||ls.defaultDepartment||ls.department||"",savedPeople:mergeText(settings.savedPeople,ls.savedPeople),savedOrganizations:mergeText(settings.savedOrganizations,ls.savedOrganizations),savedLocations:mergeText(settings.savedLocations,ls.savedLocations),savedVehicles:mergeText(settings.savedVehicles,ls.savedVehicles),savedTags:mergeText(settings.savedTags,ls.savedTags),savedRoutes:[...(settings.savedRoutes||[]),...(Array.isArray(ls.savedRoutes)?ls.savedRoutes:[])]});if(!meaningfulDraft(reportDraft)&&meaningfulDraft(legacy.draft))reportDraft=normalizeReportDraft(legacy.draft);else if(Array.isArray(legacy.draft?.selectedExpenseIds)){reportDraft.selectedExpenseIds=[...new Set([...(reportDraft.selectedExpenseIds||[]),...legacy.draft.selectedExpenseIds])]}const receipts=await oldReceipts();for(const record of receipts){try{await putReceipt(record)}catch(error){console.warn("Legacy receipt could not be copied",record?.id,error)}}saveAll();renderAll();localStorage.setItem(marker,new Date().toISOString());showToast(`Imported ${count} legacy expense${count===1?"":"s"}. Cloud sync will keep uploading any remaining records automatically.`,"success");setTimeout(()=>document.getElementById("completeSyncNow")?.click(),150)}catch(error){console.error(error);showToast("Legacy data could not be imported. Your original 1.x data was not changed.","error")}}
+let queued=false;const check=()=>{if(queued)return;queued=true;setTimeout(()=>{queued=false;migrate()},250)};new MutationObserver(check).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:["hidden"]});window.addEventListener("focus",check);document.addEventListener("DOMContentLoaded",check,{once:true});setTimeout(check,1200);
+})();
+</script>
 </body>
 </html>

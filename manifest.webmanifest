@@ -1,7 +1,7 @@
 {
   "name": "Ranch Expense Tracker",
   "short_name": "Expense Tracker",
-  "description": "Pizza Ranch personal business expense and mileage tracking.",
+  "description": "Personal business expense and mileage tracking with secure cloud sync.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
