@@ -29,9 +29,8 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
 
-          # Normalize the release-name marker in the build script after the
-          # global display-text replacement performed near the top of the build.
           p = Path('scripts/build-v2-rc.mjs')
           lines = p.read_text().splitlines()
           for i, line in enumerate(lines):
@@ -39,39 +38,14 @@ jobs:
                   lines[i] = line.replace('PDF Accounting Review Update', 'Cloud Sync Release Candidate')
           p.write_text('\n'.join(lines) + '\n')
 
-          # V2 authentication replaces the old unauthenticated setup and backup
-          # banners. Remove them from the temporary build source rather than
-          # carrying hidden 1.x architecture into the generated RC.
           index = Path('index.html')
           text = index.read_text()
-          setup = '''      <div id="setupBanner" class="setup-banner" hidden>
-        <div>
-          <div class="eyebrow">One-time setup</div>
-          <h2>Add your name before creating a report</h2>
-          <p>Your profile stays saved when expense history is cleared.</p>
-        </div>
-        <button class="primary" type="button" onclick="showView('settings', { focus: 'employeeName' })">Open Settings</button>
-      </div>
-
-'''
-          backup = '''      <div id="backupReminder" class="card backup-reminder" hidden>
-        <div>
-          <div class="eyebrow">Protect your records</div>
-          <h2>It is time to create a backup</h2>
-          <p id="backupReminderText" class="muted"></p>
-        </div>
-        <div class="button-row compact-row">
-          <button class="primary" type="button" onclick="exportBackup()">Download Backup</button>
-          <button class="secondary" type="button" onclick="dismissBackupReminder()">Remind Me Later</button>
-        </div>
-      </div>
-
-'''
-          if setup not in text:
-              raise SystemExit('V2 prep could not find legacy setup banner')
-          if backup not in text:
-              raise SystemExit('V2 prep could not find legacy backup banner')
-          text = text.replace(setup, '').replace(backup, '')
+          text, setup_count = re.subn(r'\s*<div id="setupBanner" class="setup-banner" hidden>[\s\S]*?<button class="primary" type="button" onclick="showView\(\'settings\', \{ focus: \'employeeName\' \}\)">Open Settings</button>\s*</div>', '', text, count=1)
+          text, backup_count = re.subn(r'\s*<div id="backupReminder" class="card backup-reminder" hidden>[\s\S]*?<button class="secondary" type="button" onclick="dismissBackupReminder\(\)">Remind Me Later</button>\s*</div>\s*</div>', '', text, count=1)
+          if setup_count != 1:
+              raise SystemExit(f'Expected one legacy setup banner, removed {setup_count}')
+          if backup_count != 1:
+              raise SystemExit(f'Expected one legacy backup banner, removed {backup_count}')
           index.write_text(text)
           PY
 
