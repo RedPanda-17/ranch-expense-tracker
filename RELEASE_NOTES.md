@@ -1,7 +1,13 @@
-# Release Notes - Version 2.0.0
+# Release Notes - Version 2.0.1
 
 **Release date:** September 5, 2026  
-**Release name:** Cloud Sync
+**Release name:** Cloud Sync Hotfix
+
+## Version 2.0.1 hotfix
+- Fixes Version 1.x receipt migration uploads on iPhone/iPad by using verified binary content for Supabase Storage.
+- Restores migrated receipt previews/PDF access when legacy binary bytes are present.
+- Prevents the sign-in form from flashing briefly while an existing saved session is being restored.
+- Keeps the server-side Pizza Ranch email-domain restriction and adds a matching friendly client-side message.
 
 ## Major architecture change
 Ranch Expense Tracker now requires an account and synchronizes user data through Supabase.

@@ -1,5 +1,5 @@
-/* Ranch Expense Tracker 2.0.0 - app shell only. User records are never stored in the service-worker cache. */
-const CACHE='ranch-expense-tracker-v2-2.0.0';
+/* Ranch Expense Tracker 2.0.1 - app shell only. User records are never stored in the service-worker cache. */
+const CACHE='ranch-expense-tracker-v2-2.0.1';
 const APP='./index.html';
 const SUPABASE='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0/+esm';
 self.addEventListener('install',event=>event.waitUntil((async()=>{const c=await caches.open(CACHE);try{const r=await fetch(new Request(APP,{cache:'reload'}));if(r.ok)await c.put(APP,r.clone())}catch{}try{const r=await fetch(SUPABASE);if(r.ok)await c.put(SUPABASE,r.clone())}catch{}await self.skipWaiting()})()));

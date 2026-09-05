@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.1 - September 5, 2026
+
+### Fixed
+- Migrated Version 1.x receipt files now synchronize reliably from iPhone/iPad by sending verified binary ArrayBuffer content to Supabase Storage instead of relying on a restored Blob object.
+- Legacy receipt migration normalizes stored file bytes so future pilot accounts can upload their existing supporting documents safely.
+- Stored receipt preview/PDF paths recover from legacy records whose Blob is empty but whose binary bytes are intact.
+- Returning signed-in users now remain behind a short account-check screen while the saved Supabase session is restored, preventing a brief false sign-in prompt on app launch.
+- Account creation now gives an immediate friendly warning for non-`@pizzaranch.com` addresses in addition to the server-side signup restriction.
+
 ## 2.0.0 - September 5, 2026
 
 ### Added
