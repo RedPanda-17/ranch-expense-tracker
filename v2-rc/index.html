@@ -583,6 +583,32 @@ html.ranch-auth-pending .site-header,html.ranch-auth-pending .app-nav,html.ranch
 @media(max-width:760px){#history .filter-grid{grid-template-columns:1fr 1fr!important}.report-filter-grid{grid-template-columns:1fr}.expense-topline{row-gap:7px}.complete-sync-head{flex-direction:column}.complete-sync-identity{text-align:left}.complete-sync-grid{grid-template-columns:1fr}.complete-sync-actions{display:grid;grid-template-columns:1fr 1fr}.complete-sync-actions button{width:100%}}
 @media(max-width:520px){#history .filter-grid{grid-template-columns:1fr!important}#history .filter-grid .field{min-width:0}.expense-title{flex:1 1 100%}.expense-topline .amount{margin-left:0}.expense-item{overflow:hidden}.expense-item>div{min-width:0}input[type="date"]{width:100%;min-width:0}}
 </style>
+<style id="v2FinalMobileDateFix">
+input[type="date"]{
+  display:block;
+  box-sizing:border-box;
+  inline-size:100%;
+  width:100%;
+  min-inline-size:0;
+  min-width:0;
+  max-inline-size:100%;
+  max-width:100%;
+  min-height:44px;
+  -webkit-min-logical-width:0;
+}
+input[type="date"]::-webkit-date-and-time-value{
+  min-width:0;
+  text-align:left;
+}
+@media(max-width:680px){
+  .field,.form-grid>*,.filter-grid>*,.report-filter-grid>*{min-width:0;max-width:100%}
+  input[type="date"]{
+    font-size:16px;
+    line-height:1.2;
+    padding:11px 12px;
+  }
+}
+</style>
 </head>
 <body>
   <header class="site-header">
@@ -645,7 +671,7 @@ html.ranch-auth-pending .site-header,html.ranch-auth-pending .app-nav,html.ranch
           <div id="dashAttention" class="metric-value">0</div>
           <div class="metric-note">Missing details or receipts</div>
         </article>
-        <article class="metric-card">
+        <article class="metric-card reimbursement-status-ui" hidden aria-hidden="true">
           <div class="metric-label">Awaiting reimbursement</div>
           <div id="dashOutstanding" class="metric-value">$0.00</div>
           <div class="metric-note">Submitted reports not yet marked reimbursed</div>
@@ -946,7 +972,7 @@ html.ranch-auth-pending .site-header,html.ranch-auth-pending .app-nav,html.ranch
         <div>
           <div class="eyebrow">Completed reports</div>
           <h2>Past Reports</h2>
-          <p>Download a PDF or CSV, then print it or attach it to an email using your device. Submitted reports stay locked; reimbursement status can still be tracked.</p>
+          <p>Download a PDF or CSV, then print it or attach it to an email using your device. Submitted reports stay locked and remain available for download.</p>
         </div>
       </div>
       <div id="pastReportsList" class="report-card-list"></div>
@@ -2586,12 +2612,12 @@ function renderPastReports() {
     const period = details.periodStart || details.periodEnd ? `${displayDate(details.periodStart)} – ${displayDate(details.periodEnd)}` : "Period not specified";
     return `<article class="report-card">
       <div class="report-card-top">
-        <div><div class="eyebrow">${safe(status)}</div><h3>${safe(details.title)}</h3><div class="report-meta"><span>${safe(period)}</span><span>${items.length} expense${items.length === 1 ? "" : "s"}</span><span>Finalized ${new Date(report.finalizedAt || report.submittedAt || report.createdAt || Date.now()).toLocaleDateString("en-US")}</span></div></div>
+        <div><div class="eyebrow">Completed report</div><h3>${safe(details.title)}</h3><div class="report-meta"><span>${safe(period)}</span><span>${items.length} expense${items.length === 1 ? "" : "s"}</span><span>Finalized ${new Date(report.finalizedAt || report.submittedAt || report.createdAt || Date.now()).toLocaleDateString("en-US")}</span></div></div>
         <div class="report-card-total">${money(reportTotal(report))}</div>
       </div>
       ${details.purpose ? `<p class="report-purpose"><strong>Report note:</strong> ${safe(details.purpose)}</p>` : ""}
       <div class="report-controls">
-        <div class="field"><label for="status-${safe(report.id)}">Reimbursement status</label><select id="status-${safe(report.id)}" onchange="updateReportStatus('${report.id}', this.value)"><option ${status === "Submitted" ? "selected" : ""}>Submitted</option><option ${status === "Reimbursed" ? "selected" : ""}>Reimbursed</option></select></div>
+        <div class="field reimbursement-status-ui" hidden aria-hidden="true"><label for="status-${safe(report.id)}">Reimbursement status</label><select id="status-${safe(report.id)}" onchange="updateReportStatus('${report.id}', this.value)"><option ${status === "Submitted" ? "selected" : ""}>Submitted</option><option ${status === "Reimbursed" ? "selected" : ""}>Reimbursed</option></select></div>
         <div class="report-actions">
           <button class="primary" type="button" onclick="downloadPastReportPdf('${report.id}')">Download PDF</button>
           <button class="secondary" type="button" onclick="downloadPastReportCsv('${report.id}')">Download CSV</button>
