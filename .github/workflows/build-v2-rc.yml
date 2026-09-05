@@ -55,6 +55,9 @@ jobs:
       - name: Build and audit V2 release candidate
         run: node scripts/build-v2-rc.mjs
 
+      - name: Apply final V2 UI cleanup
+        run: node scripts/v2-final-ui-cleanup.mjs
+
       - name: Check generated changes
         run: git diff --check -- v2-rc
 
