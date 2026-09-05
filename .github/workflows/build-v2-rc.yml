@@ -30,12 +30,11 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           p = Path('scripts/build-v2-rc.mjs')
-          text = p.read_text()
-          text = text.replace(
-              "replaceRequired('const RELEASE_NAME = \\\"PDF Accounting Review Update\\\";',",
-              "replaceRequired('const RELEASE_NAME = \\\"Cloud Sync Release Candidate\\\";',"
-          )
-          p.write_text(text)
+          lines = p.read_text().splitlines()
+          for i, line in enumerate(lines):
+              if "replaceRequired('const RELEASE_NAME" in line:
+                  lines[i] = line.replace('PDF Accounting Review Update', 'Cloud Sync Release Candidate')
+          p.write_text('\n'.join(lines) + '\n')
           PY
 
       - name: Build and audit V2 release candidate
