@@ -38,6 +38,26 @@ function showResend(show = true) {
   const button = ensureResendButton();
   if (button) button.hidden = !show;
 }
+function signedIn() {
+  const actions = q("completeSyncSignedInActions");
+  return Boolean(actions && !actions.hidden);
+}
+
+function ensurePostLoginSync() {
+  let attempts = 0;
+  const timer = setInterval(() => {
+    attempts += 1;
+    if (signedIn()) {
+      const syncNow = q("completeSyncNow");
+      if (syncNow && !syncNow.disabled) {
+        clearInterval(timer);
+        syncNow.click();
+        return;
+      }
+    }
+    if (attempts >= 30) clearInterval(timer);
+  }, 250);
+}
 
 async function init() {
   for (let i = 0; i < 100; i++) {
@@ -50,10 +70,17 @@ async function init() {
   const resendBtn = ensureResendButton();
   if (!createBtn || !signInBtn) throw new Error("Account controls did not finish loading.");
 
-  // IMPORTANT: Do not replace the Sign in handler. The main sync bridge owns
-  // password sign-in so it can update the authenticated user and unlock the
-  // app in-place. The old hotfix forced location.reload(), which could collide
-  // with the privacy gate and leave mobile browsers on a blank screen.
+  // Keep the main sync bridge's Sign in handler. It owns authenticated state,
+  // cloud merging, and the account gate. The previous hotfix replaced it and
+  // forced a reload, which could strand mobile browsers on a hidden app shell.
+  signInBtn.addEventListener("click", ensurePostLoginSync);
+
+  const messageEl = q("completeSyncMessage");
+  if (messageEl) {
+    new MutationObserver(() => {
+      if (/email not confirmed/i.test(String(messageEl.textContent || ""))) showResend(true);
+    }).observe(messageEl, { childList: true, characterData: true, subtree: true });
+  }
 
   const mod = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
   const client = mod.createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -84,8 +111,7 @@ async function init() {
 
       if (data.session) {
         msg("Account created and signed in. Finishing account setup…", "ok");
-        // No reload. Supabase clients sharing this storage key broadcast the
-        // auth change; the main bridge will update the gate and sync state.
+        ensurePostLoginSync();
       } else {
         msg("Account created. Check your email and confirm the account before signing in. If the first link fails, use Resend confirmation below.", "warn");
         showResend(true);
