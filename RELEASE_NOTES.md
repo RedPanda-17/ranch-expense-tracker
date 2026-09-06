@@ -1,7 +1,14 @@
-# Release Notes - Version 2.0.1
+# Release Notes - Version 2.0.2
 
 **Release date:** September 5, 2026  
-**Release name:** Cloud Sync Hotfix
+**Release name:** Cloud Sync Update Guard
+
+## Version 2.0.2 update guard
+- Checks the live release marker before the employee reaches sign-in or account creation.
+- Shows a simple startup status while checking and a clear update message when a new build is being activated.
+- Automatically activates the newest service worker and reloads into the current production shell instead of requiring users to manually close and reopen the PWA.
+- Displays the running version on the account gate for support/troubleshooting.
+- Falls back safely when offline without deleting Version 1.x data or Version 2 local working data.
 
 ## Version 2.0.1 hotfix
 - Fixes Version 1.x receipt migration uploads on iPhone/iPad by using verified binary content for Supabase Storage.

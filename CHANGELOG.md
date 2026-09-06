@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.2 - September 5, 2026
+
+### Fixed
+- App startup now checks the uncached production release marker before exposing account controls.
+- Employees see a short “Checking for updates…” screen and an “Updating Ranch Expense Tracker…” message when a newer release needs to be activated.
+- New service workers are activated automatically and the app performs a fresh navigation so employees do not need to know the close-and-reopen PWA workaround.
+- The sign-in/create-account gate now displays the running application version for easier troubleshooting.
+- Offline startup remains available; a failed update check does not clear or block locally cached expense data.
+
 ## 2.0.1 - September 5, 2026
 
 ### Fixed
