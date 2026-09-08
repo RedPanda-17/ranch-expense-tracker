@@ -1,7 +1,14 @@
-# Release Notes - Version 2.0.2
+# Release Notes - Version 2.1.0
 
 **Release date:** September 5, 2026  
-**Release name:** Cloud Sync Update Guard
+**Release name:** Scalable Cloud Sync
+
+## Version 2.1.0 scalable cloud sync
+- Syncs expense/report metadata first so a new device can become usable without downloading the user’s entire receipt history.
+- Downloads a receipt only when it is viewed or needed for a generated document.
+- Keeps cloud-viewed files temporary instead of persisting them in local IndexedDB.
+- Removes redundant local receipt binaries after a confirmed cloud upload while preserving the original cloud copy.
+- Adds support for a receipt purge marker so future Accounting archival can remove old receipt files without deleting expense/report history.
 
 ## Version 2.0.2 update guard
 - Checks the live release marker before the employee reaches sign-in or account creation.

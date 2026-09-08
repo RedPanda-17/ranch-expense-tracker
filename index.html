@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ranch Expenses">
-  <title>Ranch Expense Tracker - Version 2.0.2</title>
+  <title>Ranch Expense Tracker - Version 2.1.0</title>
   <style id="ranchStartupUpdateStyles">
     #ranchStartupUpdate{position:fixed;inset:0;z-index:12000;display:grid;place-items:center;padding:24px 18px calc(24px + env(safe-area-inset-bottom));background:radial-gradient(circle at 88% 4%,rgba(211,154,48,.18),transparent 30rem),linear-gradient(180deg,#fbf7ef 0%,#f5efe4 100%);color:#2a231e;text-align:center}
     #ranchStartupUpdate.ranch-startup-update-done{opacity:0;pointer-events:none;transition:opacity .16s ease}
@@ -624,12 +624,12 @@ input[type="date"]::-webkit-date-and-time-value{
       <div class="ranch-startup-update-spinner" aria-hidden="true"></div>
       <strong id="ranchStartupUpdateMessage">Checking for updates…</strong>
       <span id="ranchStartupUpdateDetail">Making sure you have the latest Ranch Expense Tracker.</span>
-      <small>Version 2.0.2</small>
+      <small>Version 2.1.0</small>
     </div>
   </div>
   <script>
   (() => {
-    const CURRENT_VERSION = "2.0.2";
+    const CURRENT_VERSION = "2.1.0";
     const MIN_VISIBLE_MS = 650;
     const started = Date.now();
     const overlay = document.getElementById("ranchStartupUpdate");
@@ -747,7 +747,7 @@ input[type="date"]::-webkit-date-and-time-value{
           <p>Record business expenses and mileage, organize reports, and download clear PDF and CSV files.</p>
         </div>
       </div>
-      <div class="header-badge">Version 2.0.2</div>
+      <div class="header-badge">Version 2.1.0</div>
     </div>
   </header>
 
@@ -1186,7 +1186,7 @@ input[type="date"]::-webkit-date-and-time-value{
           <summary><div class="compact-settings-summary-copy"><strong>About this app</strong><small>Version, storage, mileage rate, and release details</small></div><span class="compact-settings-chevron">+</span></summary>
           <div class="compact-settings-body">
             <section class="about-card">
-              <div class="section-heading"><div><div class="eyebrow">About</div><h2>Ranch Expense Tracker</h2></div><span class="version-chip">Version 2.0.2</span></div>
+              <div class="section-heading"><div><div class="eyebrow">About</div><h2>Ranch Expense Tracker</h2></div><span class="version-chip">Version 2.1.0</span></div>
               <div class="about-grid">
                 <div><span>Release</span><strong>Cloud Sync</strong></div>
                 <div><span>Storage</span><strong>Cloud + offline cache</strong></div>
@@ -1222,7 +1222,7 @@ input[type="date"]::-webkit-date-and-time-value{
 
 
   <footer class="site-footer">
-    <div>Ranch Expense Tracker · Version 2.0.2 · Cloud Sync</div>
+    <div>Ranch Expense Tracker · Version 2.1.0 · Cloud Sync</div>
     <div>Copyright © 2026 Saul Garcia. All Rights Reserved.</div>
     <div>Licensed for Pizza Ranch internal business use and IT evaluation.</div>
   </footer>
@@ -1230,7 +1230,7 @@ input[type="date"]::-webkit-date-and-time-value{
   <script>
 "use strict";
 
-const APP_VERSION = "2.0.2";
+const APP_VERSION = "2.1.0";
 const RELEASE_NAME = "Cloud Sync";
 // Accounting can update this single value in a future release after confirming the company rate.
 const FIXED_MILEAGE_RATE = 0.40;
@@ -1249,7 +1249,7 @@ const RECEIPT_PDF_TARGET_BYTES = 120 * 1024;
 const RECEIPT_PDF_MIN_DIMENSION = 960;
 const RECEIPT_PDF_MIN_JPEG_QUALITY = 0.48;
 
-// Keep the production storage keys so Version 2.0.2 opens data created by Version 1.x releases.
+// Keep the production storage keys so Version 2.1.0 opens data created by Version 1.x releases.
 const EXPENSE_KEY = "workExpenseTool.expenses.v2";
 const REPORT_KEY = "workExpenseTool.reports.v2";
 const SETTINGS_KEY = "workExpenseTool.settings.v2";
@@ -1879,7 +1879,7 @@ function renderInlineReceiptPreview(blob, name = "", type = "") {
 async function showStoredInlineReceiptPreview(receiptId) {
   if (!receiptId) return clearInlineReceiptPreview();
   try {
-    const record = await getReceipt(receiptId);
+    const record = await getReceiptForViewing(receiptId);
     const blob = record?.blob?.size ? record.blob : (record?.bytes ? new Blob([record.bytes], { type: record.type || "application/octet-stream" }) : null);
     if (!blob?.size) return clearInlineReceiptPreview();
     renderInlineReceiptPreview(blob, record.name || "Stored receipt", record.type || blob.type || "");
@@ -2964,13 +2964,23 @@ async function openInlineReceiptViewer() {
   );
 }
 
+async function getReceiptForViewing(receiptId) {
+  if (!receiptId) return null;
+  let record = await getReceipt(receiptId);
+  if (record && (!record.blob || !record.blob.size) && record.bytes) {
+    record = { ...record, blob: new Blob([record.bytes], { type: record.type || "application/octet-stream" }) };
+  }
+  if (record?.blob?.size) return record;
+
+  const expense = expenses.find(item => String(item?.receiptId || "") === String(receiptId));
+  if (!expense || typeof window.ranchCloudReceiptLoader !== "function") return null;
+  return window.ranchCloudReceiptLoader(expense);
+}
+
 async function openReceipt(receiptId) {
   try {
-    const record = await getReceipt(receiptId);
-    if ((!record?.blob || !record.blob.size) && record?.bytes) {
-      record.blob = new Blob([record.bytes], { type: record.type || "application/octet-stream" });
-    }
-    if (!record?.blob?.size) throw new Error("Receipt file data was not found on this device.");
+    const record = await getReceiptForViewing(receiptId);
+    if (!record?.blob?.size) throw new Error("Receipt file data is not available.");
     return openReceiptBlob(
       record.blob,
       record.name || "Receipt",
@@ -3412,7 +3422,7 @@ async function getPdfSupportingDocument(pdf, expense, imageCache) {
   if (!expense.receiptId) return null;
   if (imageCache.has(expense.receiptId)) return imageCache.get(expense.receiptId);
   let record = null;
-  try { record = await getReceipt(expense.receiptId); }
+  try { record = await getReceiptForViewing(expense.receiptId); }
   catch (error) { console.warn("Could not retrieve supporting document.", error); }
   const blob = (record?.blob?.size ? record.blob : null) || (record?.bytes ? new Blob([record.bytes], { type: record.type || "application/octet-stream" }) : null);
   const filename = record?.name || expense.receiptName || "supporting-document";
@@ -4627,7 +4637,7 @@ function mountSyncUi() {
   if (signOutButton) signOutButton.onclick = signOutSafely;
   if (saveInfoButton) saveInfoButton.onclick = () => saveAccountInfo(true);
   const badge = document.querySelector(".header-badge");
-  if (badge) badge.textContent = "Version 2.0.2";
+  if (badge) badge.textContent = "Version 2.1.0";
   renderStatus();
 }
 
@@ -4914,15 +4924,69 @@ async function localReceipt(expense) {
   };
 }
 
+function stampCloudReceiptMetadata(expense, path, name, type, size, purgedAt = null) {
+  if (!expense) return;
+  expense.receiptCloudPath = path || "";
+  expense.receiptCloudName = name || expense.receiptName || "";
+  expense.receiptCloudType = type || expense.receiptType || "";
+  expense.receiptCloudSize = Number(size || 0);
+  expense.receiptPurgedAt = purgedAt || "";
+}
+
+function expenseStillReferencesReceipt(expense) {
+  return Boolean(
+    expense?.receiptId ||
+    expense?.receiptName ||
+    expense?.receiptFingerprint ||
+    expense?.receiptCloudPath
+  );
+}
+
+window.ranchCloudReceiptLoader = async expense => {
+  if (!user || !expense?.id) throw new Error("Receipt information is unavailable.");
+
+  const lookup = await sb.from("expenses")
+    .select("receipt_path,receipt_name,receipt_type,receipt_size,receipt_purged_at")
+    .eq("user_id", user.id)
+    .eq("expense_id", String(expense.id))
+    .maybeSingle();
+  if (lookup.error) throw lookup.error;
+
+  const row = lookup.data;
+  if (row?.receipt_purged_at) {
+    throw new Error("This receipt has been archived and is no longer available online.");
+  }
+  if (!row?.receipt_path) {
+    throw new Error("No cloud receipt is available for this expense.");
+  }
+
+  const download = await sb.storage.from(BUCKET).download(row.receipt_path);
+  if (download.error) throw download.error;
+  if (!download.data?.size) throw new Error("The cloud receipt was empty.");
+
+  return {
+    id: expense.receiptId || ("receipt-cloud-" + expense.id),
+    name: row.receipt_name || expense.receiptName || "Receipt",
+    type: row.receipt_type || download.data.type || expense.receiptType || "application/octet-stream",
+    blob: download.data,
+    optimized: true,
+    temporary: true,
+    originalSize: Number(row.receipt_size || download.data.size || 0)
+  };
+};
+
 async function pushExpense(expense, row) {
   const file = await localReceipt(expense);
   let path = null, name = null, type = null, size = null;
+  let purgedAt = row?.receipt_purged_at || null;
+  const receiptExpected = expenseStillReferencesReceipt(expense);
 
   const sameReceipt = file && row?.receipt_path &&
     String(row.payload?.receiptFingerprint || "") === String(expense.receiptFingerprint || "") &&
     Number(row.receipt_size || 0) === Number(file.size || 0);
 
   if (file) {
+    purgedAt = null;
     if (sameReceipt) {
       path = row.receipt_path;
       name = row.receipt_name;
@@ -4946,10 +5010,20 @@ async function pushExpense(expense, row) {
       });
       if (upload.error) throw upload.error;
     }
+  } else if (row?.receipt_path && receiptExpected) {
+    // The receipt is already safely in cloud storage. A missing IndexedDB copy is
+    // intentional in 2.1.0 and must never be interpreted as a cloud delete.
+    path = row.receipt_path;
+    name = row.receipt_name;
+    type = row.receipt_type;
+    size = row.receipt_size;
   } else if (row?.receipt_path) {
     const remove = await sb.storage.from(BUCKET).remove([row.receipt_path]);
     if (remove.error) throw remove.error;
+    purgedAt = null;
   }
+
+  stampCloudReceiptMetadata(expense, path, name, type, size, purgedAt);
 
   const query = await sb.from("expenses").upsert({
     user_id: user.id,
@@ -4959,49 +5033,53 @@ async function pushExpense(expense, row) {
     receipt_name: name,
     receipt_type: type,
     receipt_size: size,
+    receipt_purged_at: purgedAt,
     deleted_at: null
   }, { onConflict: "user_id,expense_id" });
 
   if (query.error) throw query.error;
+
+  // Once a local receipt is confirmed in the cloud, remove the IndexedDB binary.
+  // Viewing it later performs a temporary cloud download that is released on close.
+  if (file && path && expense.receiptId) {
+    try { await deleteReceipt(expense.receiptId); }
+    catch (error) { console.warn("Could not release the local receipt cache.", error); }
+  }
 }
 
 async function pullExpense(row, oldExpense) {
   const expense = clone(row.payload || {});
   expense.id = expense.id || row.expense_id;
 
-  const sameReceipt = oldExpense?.receiptId &&
-    String(oldExpense.receiptFingerprint || "") === String(expense.receiptFingerprint || "");
-
   if (row.receipt_path) {
-    if (sameReceipt && await getReceipt(oldExpense.receiptId)) {
-      expense.receiptId = oldExpense.receiptId;
-    } else {
-      const download = await sb.storage.from(BUCKET).download(row.receipt_path);
-      if (download.error) throw download.error;
+    expense.receiptId = expense.receiptId || oldExpense?.receiptId || ("receipt-cloud-" + row.expense_id);
+    stampCloudReceiptMetadata(
+      expense,
+      row.receipt_path,
+      row.receipt_name,
+      row.receipt_type,
+      row.receipt_size,
+      row.receipt_purged_at
+    );
 
-      const receiptId = expense.receiptId || oldExpense?.receiptId || ("receipt-cloud-" + row.expense_id);
-      await putReceipt({
-        id: receiptId,
-        name: row.receipt_name || expense.receiptName || "document",
-        type: row.receipt_type || download.data.type || "application/octet-stream",
-        blob: download.data,
-        bytes: await download.data.arrayBuffer(),
-        originalName: row.receipt_name || expense.receiptName || "document",
-        originalSize: Number(row.receipt_size || download.data.size || 0),
-        optimized: true,
-        savedAt: new Date().toISOString()
-      });
-
-      expense.receiptId = receiptId;
-      expense.receiptName = row.receipt_name || expense.receiptName || "document";
-      expense.receiptType = row.receipt_type || download.data.type || "";
+    // Cloud-backed receipts stay cloud-only. Remove an older local cache copy if present.
+    if (expense.receiptId) {
+      try { await deleteReceipt(expense.receiptId); }
+      catch (error) { console.warn("Could not release a local receipt cache copy.", error); }
     }
-  } else if (oldExpense?.receiptId) {
-    try { await deleteReceipt(oldExpense.receiptId); } catch {}
-    expense.receiptId = "";
-    expense.receiptName = "";
-    expense.receiptType = "";
-    expense.receiptFingerprint = "";
+  } else {
+    stampCloudReceiptMetadata(
+      expense,
+      "",
+      row.receipt_name,
+      row.receipt_type,
+      row.receipt_size,
+      row.receipt_purged_at
+    );
+    if (row.receipt_purged_at && expense.receiptId) {
+      try { await deleteReceipt(expense.receiptId); }
+      catch (error) { console.warn("Could not release a purged receipt cache copy.", error); }
+    }
   }
 
   return expense;
@@ -5237,6 +5315,17 @@ async function syncAll({ manual = false } = {}) {
 
     const cloudExpenses = new Map((expenseQuery.data || []).map(row => [String(row.expense_id), row]));
     const cloudReports = new Map((reportQuery.data || []).map(row => [String(row.report_id), row]));
+    for (const localExpense of localExpenses) {
+      if (!localExpense?.receiptId) continue;
+      const cloudRow = cloudExpenses.get(String(localExpense.id));
+      if (!cloudRow || cloudRow.deleted_at || !cloudRow.receipt_path) continue;
+      const localFingerprint = String(localExpense.receiptFingerprint || "");
+      const cloudFingerprint = String(cloudRow.payload?.receiptFingerprint || "");
+      if (!localFingerprint || !cloudFingerprint || localFingerprint !== cloudFingerprint) continue;
+      try { await deleteReceipt(localExpense.receiptId); }
+      catch (error) { console.warn("Could not release a previously cached cloud receipt.", error); }
+    }
+
     const expenseDeletes = new Set((meta.expenseDeletes || []).map(String));
     for (const id of [...expenseDeletes]) {
       const row = cloudExpenses.get(id);
@@ -5565,7 +5654,7 @@ function createGate() {
   gate.setAttribute("aria-label", "Ranch Expense Tracker account sign in");
   gate.innerHTML = `
     <div class="ranch-auth-gate-wrap">
-      <div class="ranch-auth-gate-brand"><div class="ranch-auth-gate-mark">R</div><div><strong>Ranch Expense Tracker</strong><small>Personal business expense tracking · Version 2.0.2</small></div></div>
+      <div class="ranch-auth-gate-brand"><div class="ranch-auth-gate-mark">R</div><div><strong>Ranch Expense Tracker</strong><small>Personal business expense tracking · Version 2.1.0</small></div></div>
       <section class="ranch-auth-gate-shell">
         <h1>Sign in to continue</h1>
         <p class="ranch-auth-intro">Your expenses, receipts, reports, and saved defaults stay tied to your account and sync across your devices.</p>
