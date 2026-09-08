@@ -1,0 +1,91 @@
+name: Apply Ranch Expense Tracker 2.1.1 remove OCR
+
+on:
+  push:
+    branches:
+      - feature-2.1.1-remove-ocr
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature-2.1.1-remove-ocr
+          fetch-depth: 0
+
+      - name: Apply OCR removal patch
+        run: python3 scripts/patch-2.1.1-remove-ocr.py
+
+      - name: Validate source
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import json, re, subprocess, tempfile
+
+          text = Path('index.html').read_text(encoding='utf-8')
+          required = [
+              'Ranch Expense Tracker - Version 2.1.1',
+              'async function analyzeExpenseForAccounting(expense, doc, context)',
+              'Another expense in this report has the same date, merchant, and amount.',
+              'Expense date is outside the report period'
+          ]
+          for marker in required:
+              if marker not in text:
+                  raise SystemExit(f'Missing required marker: {marker}')
+
+          forbidden = [
+              'tesseract.js@5',
+              'worker.recognize(',
+              'getAccountingOcrWorker(',
+              'loadAccountingOcrLibrary('
+          ]
+          for marker in forbidden:
+              if marker in text:
+                  raise SystemExit(f'OCR marker still present: {marker}')
+
+          analyzer = re.search(r'async function analyzeExpenseForAccounting\(expense, doc, context\) \{(.*?)\n\}', text, re.S)
+          if not analyzer:
+              raise SystemExit('Accounting analyzer not found')
+          if 'receiptDate' in analyzer.group(1) or 'parseAccountingReceiptAmounts' in analyzer.group(1):
+              raise SystemExit('Receipt OCR analysis still active')
+
+          scripts = re.findall(r'<script([^>]*)>(.*?)</script>', text, flags=re.S|re.I)
+          for i, (attrs, code) in enumerate(scripts):
+              if not code.strip():
+                  continue
+              suffix = '.mjs' if 'type="module"' in attrs or "type='module'" in attrs else '.js'
+              with tempfile.NamedTemporaryFile('w', suffix=suffix, delete=False, encoding='utf-8') as handle:
+                  handle.write(code)
+                  temp_name = handle.name
+              result = subprocess.run(['node', '--check', temp_name], capture_output=True, text=True)
+              if result.returncode != 0:
+                  raise SystemExit(f'Inline script {i} failed syntax validation:\n{result.stderr}')
+
+          result = subprocess.run(['node', '--check', 'service-worker.js'], capture_output=True, text=True)
+          if result.returncode != 0:
+              raise SystemExit(result.stderr)
+
+          version = json.loads(Path('version.json').read_text(encoding='utf-8'))
+          if version.get('version') != '2.1.1':
+              raise SystemExit('version.json was not bumped to 2.1.1')
+          if version.get('release') != 'Manual Accounting Review':
+              raise SystemExit('release name mismatch')
+          if 'ranch-expense-tracker-v2-2.1.1' not in Path('service-worker.js').read_text(encoding='utf-8'):
+              raise SystemExit('service-worker cache namespace was not bumped')
+          PY
+
+      - name: Commit 2.1.1 source
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html service-worker.js version.json README.md CHANGELOG.md RELEASE_NOTES.md
+          git commit -m "Build Ranch Expense Tracker 2.1.1 without OCR"
+          git push origin HEAD:feature-2.1.1-remove-ocr
