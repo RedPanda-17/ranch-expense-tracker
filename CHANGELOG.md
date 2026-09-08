@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.1.0 - September 8, 2026
+
+### Changed
+- New-device sync now downloads expense/report metadata without automatically downloading every historical receipt or support file.
+- Cloud-backed receipts are fetched only when the employee opens one or generates a document that needs it.
+- Temporary cloud receipt blobs are not written back to IndexedDB; closing the viewer releases the in-memory object URL.
+- Once a newly added receipt is safely uploaded, its local IndexedDB binary is removed to keep device storage small.
+- Existing 2.0.x receipt caches are cleaned up when their fingerprint matches the confirmed cloud copy.
+- Receipt rows now understand a future archive/purge marker so historical expense rows can remain after supporting files are intentionally removed from cloud storage.
+
 ## 2.0.2 - September 5, 2026
 
 ### Fixed
