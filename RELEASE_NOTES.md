@@ -1,7 +1,13 @@
-# Release Notes - Version 2.1.0
+# Release Notes - Version 2.1.1
 
 **Release date:** September 5, 2026  
-**Release name:** Scalable Cloud Sync
+**Release name:** Manual Accounting Review
+
+## Version 2.1.1 manual accounting review
+- Removes the local Tesseract OCR step from employee PDF generation.
+- Receipts are still included in the report for Accounting to review manually.
+- Lightweight checks for missing documents, duplicate expenses, and out-of-period dates remain.
+- This reduces device processing and removes the external OCR library from the active report-generation path.
 
 ## Version 2.1.0 scalable cloud sync
 - Syncs expense/report metadata first so a new device can become usable without downloading the user’s entire receipt history.
