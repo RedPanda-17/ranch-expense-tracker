@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.1 - September 8, 2026
+
+### Changed
+- Removed in-browser Tesseract OCR from employee PDF generation.
+- PDF generation no longer scans receipt text for totals, dates, tips, or restricted items.
+- Kept lightweight non-OCR report checks for missing supporting documents, possible duplicates, and expenses outside the report period.
+- Accounting remains responsible for normal receipt and policy review.
+
 ## 2.1.0 - September 8, 2026
 
 ### Changed
