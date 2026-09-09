@@ -1,110 +1,103 @@
-# Technical Handoff - Version 2.0.0
+# Technical Handoff - Version 2.1.2
 
-## Current architecture
-Ranch Expense Tracker is a static Progressive Web App hosted through GitHub Pages with Supabase providing authentication, cloud database storage, and private supporting-document storage.
+## Current status
+Ranch Expense Tracker is a static Progressive Web App hosted through GitHub Pages. Supabase provides authentication, PostgreSQL data storage, and private supporting-document storage.
+
+The employee-facing application is considered feature-complete for the current pilot. Future development should focus on Accounting workflow, automated reimbursement cycles, archival/retention, and company-approved identity/hosting decisions.
 
 Live URL: https://redpanda-17.github.io/ranch-expense-tracker/
 
-Current live application assets:
-- `index.html` — self-contained application HTML/CSS/JavaScript
+## Production architecture
+- `index.html` — self-contained employee application HTML/CSS/JavaScript
 - `manifest.webmanifest` — PWA metadata
-- `service-worker.js` — network-first app-shell caching and offline fallback
-- `icon-192.png` / `icon-512.png` — installed-app icons
-- `version.json` — release metadata
+- `service-worker.js` — application-shell caching and offline fallback
+- `version.json` — live release marker used by the startup updater
+- GitHub Pages — static application hosting
+- Supabase Auth — employee authentication
+- Supabase Postgres — profiles, expenses, reports, report draft/state, saved defaults, and receipt metadata
+- Private Supabase Storage — receipt and mileage-support files in the `expense-documents` bucket
+- Browser localStorage/IndexedDB — temporary/offline working cache only
 
-## Version 2 data model
-Supabase is the authenticated cloud system of record.
+Supabase is the cloud system of record for authenticated Version 2 data.
 
-- Postgres: profiles, expenses, reports, current report draft, and saved defaults
-- Storage: receipt and mileage-support files in the private `expense-documents` bucket
-- LocalStorage/IndexedDB: offline working cache only
-- Service-worker Cache Storage: application shell and pinned Supabase browser client only; user records are never cached by the service worker
+## Receipt storage behavior
+Receipt binaries are intended to remain cloud-first after successful synchronization.
 
-Version 2 uses new V2 local cache keys and IndexedDB storage so the Version 1.x local data remains untouched for migration safety.
+1. A newly attached receipt can exist locally long enough to save and upload safely.
+2. After the Storage upload and database synchronization succeed, the redundant app-managed IndexedDB copy is removed.
+3. Opening a cloud-backed receipt downloads only that receipt temporarily.
+4. Closing the receipt viewer releases the temporary object used by the app.
+5. Generating a PDF temporarily retrieves the supporting documents required for that report.
+
+The employee application does not persist the user's full cloud receipt history on each device.
+
+A `receipt_purged_at` field exists so future Accounting archival can remove an old Storage object while retaining the expense/history row and receipt metadata.
 
 ## Authentication and isolation
-Supabase Auth is required before application use.
+Authentication is required before Version 2 application use.
 
-Row Level Security restricts user-owned database rows to the authenticated user. Storage policies scope supporting documents to the authenticated user's path. Two-account testing confirmed one account could not read the other account's expenses or receipts.
+Current controls include:
+- Row Level Security limiting employee-owned database records to the authenticated user.
+- Private Storage policies scoped to the authenticated user's document path.
+- Submitted report/expense protections that prevent normal employee modification or deletion after submission.
+- No Supabase service-role/admin credential embedded in the GitHub Pages frontend.
 
-Signing out clears the signed-in user's Version 2 local working cache from that device while leaving cloud records intact.
-
-## Submitted-history protection
-Submitted reimbursement history is immutable to the employee.
-
-Database and Storage protections prevent the employee from:
-- editing or deleting an expense attached to a submitted report;
-- reopening or deleting a submitted report;
-- replacing or deleting the supporting document for a submitted expense.
-
-Submitted records remain readable/downloadable by their owning user.
-
-A future Accounting "Returned for correction" workflow is the intended supported path for reopening submitted records.
+The current controlled pilot restricts signup to `@pizzaranch.com`. Email confirmation is currently disabled, so the domain restriction does not independently prove mailbox ownership. Before broader deployment, use a company-approved verification/identity method such as Microsoft Entra/SSO or approved email verification.
 
 ## Synchronization behavior
-Version 2 uses record-level synchronization rather than replacing whole-device snapshots.
+Synchronization is record-based rather than full-device backup replacement.
 
 Important rules:
-- Missing local data does not imply cloud deletion.
-- Expense deletion must originate from an explicit employee delete action on an unsubmitted expense.
-- Cloud tombstones win over stale local cache copies.
-- Stable record IDs are not reused.
-- Offline changes save locally and retry after reconnect.
-- Saved-default deletion tombstones prevent removed choices from reappearing from another device.
+- Missing local cache data does not imply cloud deletion.
+- Explicit employee deletion is required for an eligible unsubmitted expense.
+- Cloud tombstones protect against stale local records reappearing.
+- Stable record IDs are preserved.
+- Offline changes can remain local temporarily and retry after reconnect.
+- New devices synchronize expense/report records without downloading the user's entire receipt library.
 
-## Version 1.x migration
-After authentication, Version 2 can detect existing Version 1 local data and offer a one-time import into the signed-in account.
+Current technical debt: expense/report row synchronization still retrieves the user's available historical rows rather than using a fully paginated/incremental watermark model. This is acceptable for the current pilot but should be revisited at larger scale.
 
-Migration rules:
-1. Never migrate before authentication.
-2. Show the signed-in account before import.
-3. Merge records by stable IDs rather than replacing the cloud snapshot.
-4. Copy legacy supporting documents into the V2 cache and upload through normal sync.
-5. Merge saved defaults and the current report draft.
-6. Leave the original Version 1 data untouched.
-7. Record a per-user migration marker after successful cloud synchronization.
-8. On failure, preserve the Version 1 source and allow synchronization to retry.
+## Version 1 migration
+Existing Version 1.x local data can be offered for one-time import after authentication.
 
-## PWA and offline behavior
-The Version 2 service worker uses cache namespace `ranch-expense-tracker-v2-2.0.0`.
+Migration principles:
+- Never migrate before authentication.
+- Preserve the original Version 1 source data.
+- Merge by stable IDs.
+- Upload legacy supporting documents through normal Version 2 synchronization.
+- Avoid importing old local data from a secondary device after the account is already populated from the authoritative device.
 
-- Navigation remains network-first.
-- The last successful application shell is available offline.
-- Same-origin static assets can fall back to cache.
-- Supabase browser SDK is pinned to `@supabase/supabase-js@2.115.0` and can be cached as part of the app shell.
-- Supabase API responses containing user data are not cached by the service worker.
-- The application begins with the UI inert/hidden until the persisted authentication state is resolved.
+Do not clear browser/app data or uninstall an old PWA that still contains legacy data until migration has been verified.
 
-## PDF Accounting Review and OCR
-Version 1.5 PDF Accounting Review behavior remains in Version 2. Receipt OCR continues to run in the browser and is advisory.
+## PDF and Accounting review
+Employees can currently build/finalize a report and download PDF or CSV files.
 
-The application can flag possible amount/date mismatches, tips over 20%, duplicates, missing supporting documents, and selected potentially non-reimbursable items. Accounting should verify the attached receipt.
+The PDF contains the expense details and supporting documents needed for normal Accounting review. In-browser Tesseract OCR was removed in Version 2.1.1, so the employee's device no longer scans receipt text for totals, dates, tips, or restricted items during PDF generation.
+
+Lightweight non-OCR checks may still identify missing documentation, possible duplicate expenses, or expenses outside the selected report period.
+
+## Future Accounting direction
+The current employee workflow can remain in place while Accounting requirements are validated.
+
+Potential next phase:
+- Accounting work queue/dashboard for submitted employee reports.
+- Employee reimbursement preference: twice monthly (1–15 and 16–month end) or once monthly.
+- Automated report creation after a defined grace period following the reimbursement cycle.
+- Employee reminders before automatic submission.
+- Accounting archive package/download followed by explicit receipt purge after the approved retention period.
+- Long-term archive stored in a company-controlled location such as SharePoint/OneDrive if approved by IT/Accounting.
+- Optional server-side OCR/document analysis for Accounting only if it proves valuable.
+
+Any company-wide Accounting or purge capability must be implemented with privileged server-side authorization; a service-role credential must never be exposed in the browser application.
 
 ## Current employee-interface decisions
-- Reimbursement status remains in the underlying data model but is hidden from the employee-facing Version 2 interface.
-- Mileage stores total miles; One Way/Round Trip was removed.
-- Manual backup/restore and Bulk Clear Expense History were removed from Version 2.
-- Employee Reopen Report was removed.
-- Settings are organized into Account, Saved Defaults, Data & Support, and About.
+- Employee reimbursement status exists in the data model but is not a primary employee-facing control.
+- Mileage stores total miles.
+- Submitted reports remain locked from employee reopening/editing.
+- Settings include account, saved defaults, data/support, and app information.
+- Receipt OCR is not part of the employee workflow.
 
-## Security status at release
-Verified before production:
-- RLS enabled and scoped to `auth.uid()` on the Version 2 user tables.
-- Private supporting-document bucket.
-- Submitted-record database and Storage protections.
-- Internal `SECURITY DEFINER` trigger execution rights restricted.
-- Supabase performance advisor reports no findings.
+## Repository status
+`main` is the production source of truth. Old archive, feature, and hotfix branches are historical development references only.
 
-Open platform warning:
-- Supabase security advisor reports leaked-password protection disabled. Supabase documents this feature as available on Pro plans and above.
-
-The Auth Site URL and redirect allow-list should remain pointed at the production GitHub Pages URL for confirmation and recovery flows.
-
-## Current mileage configuration
-`FIXED_MILEAGE_RATE` remains defined in `index.html` and is currently `0.40`. Change it only after Accounting confirms an approved rate, then update the application version, release metadata, documentation, and service-worker cache namespace as appropriate.
-
-## Release preservation
-- Pre-1.5 cleanup state: `archive-pre-1.5-cleanup-2026-09-01`
-- Final pre-production Version 2 RC state: `archive-pre-2.0.0-production-2026-09-05`
-
-The `v2-rc/` directory remains as the generated release-candidate snapshot used immediately before the Version 2 production promotion. The former automatic RC workflow is intentionally retired because `main` now contains the Version 2 production source.
+Release history is documented in `CHANGELOG.md` and `RELEASE_NOTES.md`.
