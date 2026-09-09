@@ -5,50 +5,49 @@ Current release: **Version 2.1.2 — Past Reports Polish**
 Live app: https://redpanda-17.github.io/ranch-expense-tracker/
 
 ## Purpose
-Ranch Expense Tracker is a personal business expense and mileage Progressive Web App for capturing receipts, organizing expenses, building reimbursement reports, and exporting PDF/CSV files.
+Ranch Expense Tracker is a Progressive Web App for recording personal business expenses and mileage, attaching supporting documents, organizing reimbursement reports, and exporting PDF/CSV files.
 
-Version 2.0.0 moves the application from device-local storage to an account-required cloud-synchronized architecture while retaining local offline working storage.
+The employee-facing application is considered feature-complete for the current pilot. Future work is expected to focus on Accounting workflow, automation, and company-approved authentication/hosting decisions rather than adding more employee-side features.
 
-## Version 2.0 highlights
-- Supabase Auth account sign-in and account creation
-- Secure per-user cloud synchronization for expenses, reports, the current report draft, profile information, and saved defaults
-- Private Supabase Storage for receipt and mileage-support files
-- Offline working cache after the application has loaded successfully online
-- Sign out clears the signed-in user's V2 local cache while leaving cloud data intact
-- Submitted reports, attached expenses, and supporting files are locked from employee editing or deletion
-- One-time migration path for existing Version 1.x local data after the user signs in
-- Compact Settings sections for Account, Saved Defaults, Data & Support, and About
-- Dashboard separation between Unreported Expenses and Current Report Total
-- Version 1.5 PDF Accounting Review and export capabilities retained
+## Current architecture
+- **GitHub Pages** hosts the static employee application.
+- **Supabase Auth** provides account sign-in.
+- **Supabase Postgres** stores employee profiles, expenses, reports, current report state, and saved defaults.
+- **Private Supabase Storage** stores receipt and mileage-support files in the `expense-documents` bucket.
+- **Browser localStorage/IndexedDB** are used as temporary/offline working storage, not the long-term system of record.
+- **Service Worker Cache Storage** keeps the application shell available for installed/offline use.
+
+## Receipt behavior
+After a receipt is successfully synchronized to Supabase, the redundant app-managed local binary is removed. When the employee later views a cloud-backed receipt, that individual file is downloaded temporarily for viewing and released when the viewer closes.
+
+Generating a PDF can temporarily retrieve the supporting documents needed for that report. Receipt OCR is not performed in the employee application; Accounting performs normal receipt review.
+
+## Security model
+- Authentication is required before accessing Version 2 data.
+- Row Level Security limits normal employee database access to the authenticated user's records.
+- Supporting documents are stored in a private bucket and scoped to the authenticated user's path.
+- Submitted reports and attached expenses/supporting files are protected from normal employee modification or deletion.
+- Administrative/service-role credentials are not embedded in the public GitHub Pages frontend.
+
+The current controlled pilot restricts signup to `@pizzaranch.com`, but email confirmation is not currently enabled. Broader deployment should use a company-approved identity/verification approach such as Microsoft Entra/SSO or approved email verification.
 
 ## Current application files
 - `index.html` — self-contained live application
 - `manifest.webmanifest` — PWA metadata
-- `service-worker.js` — network-first app-shell caching and offline fallback
+- `service-worker.js` — app-shell caching and offline fallback
 - `icon-192.png` / `icon-512.png` — installed-app icons
 - `version.json` — release metadata
-
-## Data architecture
-Supabase is the cloud system of record for authenticated Version 2 data.
-
-Browser `localStorage` and IndexedDB are used only as the Version 2 offline working cache. Missing local data does not mean cloud data should be deleted.
-
-The Version 1.x local keys are left untouched so an authenticated user can be offered a one-time import of existing local data into the correct cloud account.
-
-## Receipt OCR
-Receipt recognition continues to run in the browser. OCR resources are loaded on demand, so automatic image-receipt reading requires internet access when those resources are not already available.
 
 ## Documentation
 - `USER_GUIDE.md` — employee workflow
 - `WEB_APP_INSTALLATION_GUIDE.md` — browser/PWA installation
-- `TECHNICAL_HANDOFF.md` — architecture, security, migration, and operational notes
-- `RELEASE_NOTES.md` — current release
+- `TECHNICAL_HANDOFF.md` — architecture, security, storage, migration, and future direction
+- `RELEASE_NOTES.md` — current release notes
 - `CHANGELOG.md` — release history
-- `V2_AUDIT.md` — Version 2 pre-release architecture and security audit
+- `V2_AUDIT.md` — historical Version 2 pre-release audit
 
-## Release preservation
-- Pre-1.5 cleanup state: `archive-pre-1.5-cleanup-2026-09-01`
-- Final pre-production 2.0 RC state: `archive-pre-2.0.0-production-2026-09-05`
+## Repository status
+`main` is the production source of truth. Historical archive, feature, and hotfix branches are retained only as development history and are not active production branches.
 
 ## Use notice
 See `COPYRIGHT.md` and `INTERNAL_USE_NOTICE.txt` for the repository's current use notice.
