@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ranch Expense Tracker — SharePoint Employee Mock</title>
+  <style>
+    :root {
+      --bg:#f5efe4;--panel:#fffdf8;--panel-alt:#f9f3e9;--text:#2a231e;--muted:#766a60;--border:#dfd1bd;
+      --brand:#a71f25;--brand-dark:#721419;--brand-soft:#fae8e7;--amber:#d39a30;--amber-soft:#fff4dc;
+      --olive:#557044;--olive-soft:#eaf2e4;--danger:#a6191f;--danger-soft:#fff0ef;--shadow:0 14px 34px rgba(74,50,30,.10);--shadow-soft:0 8px 22px rgba(74,50,30,.07);--radius:18px;
+      --ms:#0f6cbd;--ms-dark:#115ea3;
+    }
+    *{box-sizing:border-box} [hidden]{display:none!important} body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 90% 0%,rgba(211,154,48,.16),transparent 34rem),linear-gradient(180deg,#fbf7ef 0%,var(--bg) 100%);color:var(--text)}
+    button,input,select,textarea{font:inherit} button{border:0;cursor:pointer} h1,h2,h3,p{margin-top:0} p{line-height:1.55}.muted{color:var(--muted)}
+    .m365-bar{height:48px;background:#1b1a19;color:white;display:flex;align-items:center;justify-content:space-between;padding:0 14px;gap:16px;font-size:.84rem}.m365-left,.m365-right{display:flex;align-items:center;gap:14px}.waffle{font-size:20px;line-height:1}.m365-brand{font-weight:700}.m365-search{width:min(460px,42vw);height:32px;border-radius:4px;border:0;padding:0 12px;background:white;color:#333}.m365-avatar{width:30px;height:30px;border-radius:50%;background:#7a171b;display:grid;place-items:center;font-weight:800}
+    .sp-sitebar{background:white;border-bottom:1px solid #e5e5e5;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.03)}.sp-sitebar strong{font-size:1rem}.sp-sitebar small{display:block;color:#666;margin-top:2px}.sp-actions{display:flex;align-items:center;gap:8px}.sp-chip{border:1px solid #d6d6d6;background:#fafafa;border-radius:6px;padding:7px 10px;font-size:.78rem;font-weight:700;color:#444}.sp-chip.ms{border-color:#c7dcf2;background:#eff6fc;color:var(--ms-dark)}
+    .site-header{color:white;background:linear-gradient(135deg,rgba(23,20,17,.95),rgba(76,30,25,.96)),linear-gradient(135deg,var(--brand-dark),var(--brand));border-bottom:4px solid var(--amber);padding:22px 20px 24px}.header-wrap,.nav-wrap,.app-shell{width:min(1180px,calc(100% - 28px));margin:0 auto}.header-wrap{display:flex;justify-content:space-between;align-items:center;gap:24px}.brand-lockup{display:flex;align-items:center;gap:16px}.brand-lockup p{margin-bottom:0;color:rgba(255,255,255,.78)}.brand-mark{display:grid;place-items:center;flex:0 0 auto;width:54px;height:54px;border-radius:16px;background:var(--brand);border:2px solid rgba(255,255,255,.18);box-shadow:inset 0 0 0 5px rgba(211,154,48,.18);font-size:1.6rem;font-weight:900}.eyebrow{color:var(--brand);font-size:.76rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}.site-header .eyebrow{color:#f2c46a}.header-badge{padding:9px 13px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(255,255,255,.08);white-space:nowrap;font-size:.82rem;font-weight:800}
+    .app-nav{position:sticky;top:0;z-index:40;background:rgba(255,253,248,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);box-shadow:0 3px 16px rgba(67,43,25,.06)}.nav-wrap{display:flex;gap:5px;overflow-x:auto;padding:9px 0;scrollbar-width:none}.nav-btn{padding:10px 13px;border-radius:11px;background:transparent;color:var(--muted);font-weight:800;white-space:nowrap}.nav-btn:hover{background:var(--panel-alt);color:var(--text)}.nav-btn.active{background:var(--brand-soft);color:var(--brand-dark);box-shadow:inset 0 0 0 1px rgba(167,31,37,.08)}
+    .app-shell{padding:26px 0 72px}.view{display:none}.view.active{display:block;animation:viewIn .18s ease-out}@keyframes viewIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+    .card,.hero-panel,.setup-banner{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-soft)}.card{padding:22px}.hero-panel{display:flex;justify-content:space-between;gap:24px;align-items:center;padding:28px;margin-bottom:18px;background:linear-gradient(135deg,rgba(255,253,248,.96),rgba(255,244,220,.88));position:relative;overflow:hidden}.hero-panel::after{content:"";position:absolute;width:210px;height:210px;border-radius:50%;border:28px solid rgba(167,31,37,.06);right:-70px;bottom:-120px;pointer-events:none}.hero-panel p{margin-bottom:0;color:var(--muted);max-width:720px}.hero-action{min-width:180px;position:relative;z-index:1}
+    .metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.metric-card{padding:19px;border:1px solid var(--border);border-radius:16px;background:rgba(255,253,248,.9);box-shadow:var(--shadow-soft);overflow:hidden;position:relative}.metric-card::after{content:"";position:absolute;right:-24px;bottom:-38px;width:86px;height:86px;border:12px solid rgba(211,154,48,.10);border-radius:50%}.metric-label{color:var(--muted);font-size:.76rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase}.metric-value{margin-top:6px;font-size:1.8rem;font-weight:900}.metric-note{margin-top:3px;color:var(--muted);font-size:.83rem}.two-column{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(290px,.65fr);gap:18px;align-items:start}.section-heading,.page-heading{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.page-heading{margin-bottom:18px}.page-heading p{color:var(--muted);margin-bottom:0;max-width:760px}.summary-list{margin-top:16px;display:grid;gap:8px}.summary-row{display:flex;justify-content:space-between;gap:14px;padding:11px 12px;border-radius:12px;background:var(--panel-alt)}
+    .primary,.secondary,.success,.danger{min-height:42px;padding:10px 15px;border-radius:11px;font-weight:850}.primary{color:white;background:var(--brand);box-shadow:0 8px 18px rgba(167,31,37,.18)}.secondary{color:#463b33;background:#eee5d9}.success{color:white;background:var(--olive)}.danger{color:var(--danger);background:var(--danger-soft);border:1px solid rgba(166,25,31,.15)}.small{min-height:34px;padding:7px 10px;font-size:.82rem}.button-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}.text-button{background:transparent;color:var(--brand);padding:5px;font-weight:850}
+    .form-card{max-width:920px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}label{font-size:.9rem;font-weight:850}.required::after{content:" *";color:var(--brand)}input,select,textarea{width:100%;border:1px solid #cdbda8;border-radius:11px;background:white;color:var(--text);padding:11px 12px}.upload-box{border:1px dashed #bda98f;border-radius:14px;padding:18px;background:#fffaf2}.upload-box strong{display:block;margin-bottom:5px}.file-name{margin-top:9px;color:var(--olive);font-weight:800;font-size:.84rem}
+    .table-wrap{overflow:auto;border:1px solid var(--border);border-radius:14px;background:white}table{width:100%;border-collapse:collapse;min-width:760px}th{text-align:left;padding:10px 12px;background:#f5ede1;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}td{padding:12px;border-top:1px solid #eee4d7;font-size:.88rem}.amount{text-align:right;font-weight:900}.badge{display:inline-flex;border-radius:999px;padding:5px 8px;font-size:.72rem;font-weight:900}.badge.ready{background:var(--olive-soft);color:#3e5a31}.badge.draft{background:var(--amber-soft);color:#84570b}.badge.submitted{background:#eaf2f6;color:#315f78}.badge.mock{background:#eff6fc;color:var(--ms-dark);border:1px solid #c7dcf2}
+    .sp-map{display:grid;gap:10px}.sp-map-row{display:grid;grid-template-columns:140px 20px 1fr;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:var(--panel-alt)}.sp-map-row strong{font-size:.86rem}.sp-map-row span{color:var(--muted);font-size:.82rem}.arrow{color:var(--ms);font-weight:900;text-align:center}.notice{padding:13px 14px;border-radius:13px;background:#eff6fc;border:1px solid #c7dcf2;color:#244f73;font-size:.86rem;margin-bottom:16px}.notice strong{display:block;margin-bottom:3px}.empty-state{padding:32px 14px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:14px}
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.setting-row{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:13px 0;border-top:1px solid #eee4d7}.setting-row:first-of-type{border-top:0}.setting-row small{display:block;color:var(--muted);margin-top:3px}.toggle{width:46px;height:26px;background:#ddd2c4;border-radius:999px;padding:3px}.toggle span{display:block;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 1px 4px rgba(0,0,0,.18)}.toggle.on{background:var(--olive)}.toggle.on span{margin-left:20px}
+    .footer-note{text-align:center;color:var(--muted);font-size:.78rem;padding:0 14px 28px}.toast{position:fixed;right:20px;bottom:20px;background:#2a231e;color:white;padding:12px 15px;border-radius:12px;box-shadow:var(--shadow);opacity:0;transform:translateY(8px);pointer-events:none;transition:.18s;z-index:90}.toast.show{opacity:1;transform:none}
+    @media(max-width:900px){.metric-grid{grid-template-columns:repeat(2,1fr)}.two-column,.settings-grid{grid-template-columns:1fr}.m365-search{display:none}}
+    @media(max-width:640px){.m365-bar{height:44px}.m365-brand{display:none}.sp-sitebar{padding:8px 12px}.sp-actions .sp-chip:not(.ms){display:none}.header-wrap{align-items:flex-start}.header-badge{display:none}.site-header{padding:18px 14px 20px}.app-shell{padding-top:18px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.metric-grid{grid-template-columns:1fr 1fr}.hero-panel{display:block}.hero-action{margin-top:16px;min-width:0}.sp-map-row{grid-template-columns:1fr}.arrow{text-align:left}.nav-btn{padding:9px 11px}}
+    @media(max-width:430px){.metric-grid{grid-template-columns:1fr}.brand-mark{width:48px;height:48px}.m365-right span{display:none}}
+  </style>
+</head>
+<body>
+  <div class="m365-bar">
+    <div class="m365-left"><span class="waffle">⠿</span><span class="m365-brand">Microsoft 365</span></div>
+    <input class="m365-search" value="" placeholder="Search this site" aria-label="Search this site">
+    <div class="m365-right"><span>SharePoint</span><span>⚙</span><span>?</span><div class="m365-avatar">S</div></div>
+  </div>
+  <div class="sp-sitebar">
+    <div><strong>Ranch Expense Tracker</strong><small>Pizza Ranch • SharePoint Online</small></div>
+    <div class="sp-actions"><span class="sp-chip">Following</span><span class="sp-chip ms">Employee Portal Mock</span></div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-wrap">
+      <div class="brand-lockup"><div class="brand-mark">R</div><div><div class="eyebrow">Personal business expense tracking</div><h1 style="margin:2px 0 5px;font-size:clamp(1.5rem,4vw,2.15rem)">Ranch Expense Tracker</h1><p>Track expenses, mileage, receipts, and reimbursement reports.</p></div></div>
+      <div class="header-badge">Signed in with Microsoft 365<br><span style="font-weight:600;opacity:.8">Saul Garcia</span></div>
+    </div>
+  </header>
+
+  <nav class="app-nav"><div class="nav-wrap">
+    <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+    <button class="nav-btn" data-view="add">Add Expense</button>
+    <button class="nav-btn" data-view="expenses">All Expenses</button>
+    <button class="nav-btn" data-view="report">Current Report</button>
+    <button class="nav-btn" data-view="past">Past Reports</button>
+    <button class="nav-btn" data-view="settings">Settings</button>
+  </div></nav>
+
+  <main class="app-shell">
+    <section class="view active" id="dashboard">
+      <div class="notice"><strong>SharePoint prototype</strong>The Ranch interface is intentionally kept nearly identical. The Microsoft 365 and SharePoint bars above represent the surrounding SharePoint experience. Sample data only.</div>
+      <div class="hero-panel"><div><div class="eyebrow">Employee dashboard</div><h2 style="font-size:clamp(1.55rem,3vw,2.1rem);margin-bottom:7px">Good afternoon, Saul</h2><p>Your expense information would be stored in SharePoint Lists and supporting documents in a private SharePoint document library.</p></div><div class="hero-action"><button class="primary" data-go="add" style="width:100%">+ Add Expense</button></div></div>
+      <div class="metric-grid">
+        <div class="metric-card"><div class="metric-label">Unreported Expenses</div><div class="metric-value" id="metricUnreported">3</div><div class="metric-note">Not yet in a report</div></div>
+        <div class="metric-card"><div class="metric-label">Unreported Total</div><div class="metric-value" id="metricUnreportedTotal">$86.41</div><div class="metric-note">Current open expenses</div></div>
+        <div class="metric-card"><div class="metric-label">Current Report</div><div class="metric-value" id="metricReportTotal">$164.87</div><div class="metric-note">August 16–31</div></div>
+        <div class="metric-card"><div class="metric-label">Past Reports</div><div class="metric-value" id="metricPast">2</div><div class="metric-note">Available in SharePoint history</div></div>
+      </div>
+      <div class="two-column">
+        <div class="card"><div class="section-heading"><div><div class="eyebrow">Recent activity</div><h2>Recent Expenses</h2></div><button class="text-button" data-go="expenses">View all</button></div><div class="summary-list" id="recentList"></div></div>
+        <div class="card"><div class="eyebrow">Behind the scenes</div><h2>SharePoint Mapping</h2><p class="muted">Same employee workflow, different storage underneath.</p><div class="sp-map"><div class="sp-map-row"><strong>Expense details</strong><div class="arrow">→</div><span>Expenses SharePoint List</span></div><div class="sp-map-row"><strong>Receipts</strong><div class="arrow">→</div><span>Expense Documents Library</span></div><div class="sp-map-row"><strong>Reports</strong><div class="arrow">→</div><span>Reports SharePoint List</span></div><div class="sp-map-row"><strong>Identity</strong><div class="arrow">→</div><span>Microsoft 365 / Entra ID</span></div></div></div>
+      </div>
+    </section>
+
+    <section class="view" id="add">
+      <div class="page-heading"><div><div class="eyebrow">New expense</div><h1>Add Expense</h1><p>Same entry flow as the current Ranch Expense Tracker. In production, Save would write the record to a SharePoint List and upload the receipt to the document library.</p></div><span class="badge mock">SharePoint mock</span></div>
+      <form class="card form-card" id="expenseForm">
+        <div class="form-grid">
+          <div class="field"><label class="required">Expense Date</label><input type="date" id="expenseDate" value="2026-09-09" required></div>
+          <div class="field"><label class="required">Amount</label><input type="number" id="expenseAmount" min="0" step="0.01" placeholder="0.00" required></div>
+          <div class="field"><label class="required">Merchant / Organization</label><input id="expenseMerchant" placeholder="Merchant name" required></div>
+          <div class="field"><label class="required">Category</label><select id="expenseCategory" required><option value="">Select category</option><option>Meals</option><option>Supplies</option><option>Travel</option><option>Education</option><option>Other</option></select></div>
+          <div class="field full"><label>Description</label><textarea id="expenseDescription" rows="3" placeholder="Optional details"></textarea></div>
+          <div class="field full"><label>Receipt / Supporting Document</label><div class="upload-box"><strong>Upload receipt</strong><span class="muted">In SharePoint this would upload directly into the secured Expense Documents library.</span><div style="margin-top:10px"><input type="file" id="receiptFile" accept="image/*,.pdf"></div><div class="file-name" id="fileName"></div></div></div>
+        </div>
+        <div class="button-row"><button class="primary" type="submit">Save Expense</button><button class="secondary" type="button" data-go="dashboard">Cancel</button></div>
+      </form>
+    </section>
+
+    <section class="view" id="expenses">
+      <div class="page-heading"><div><div class="eyebrow">Expense history</div><h1>All Expenses</h1><p>Employee sees only their own records. Accounting access would be handled separately through SharePoint permissions.</p></div><button class="primary" data-go="add">+ Add Expense</button></div>
+      <div class="card"><div class="table-wrap"><table><thead><tr><th>Date</th><th>Merchant</th><th>Category</th><th>Status</th><th style="text-align:right">Amount</th></tr></thead><tbody id="expenseRows"></tbody></table></div></div>
+    </section>
+
+    <section class="view" id="report">
+      <div class="page-heading"><div><div class="eyebrow">Reimbursement period</div><h1>Current Report</h1><p>August 16–31, 2026 • The report builder can retain the same appearance and calculations while the records live in SharePoint.</p></div><span class="badge draft">Draft</span></div>
+      <div class="two-column">
+        <div class="card"><div class="section-heading"><div><h2>Included Expenses</h2><p class="muted">Select which open expenses belong in this report.</p></div></div><div class="summary-list" id="reportExpenses"></div></div>
+        <div class="card"><div class="eyebrow">Report summary</div><h2>August 16–31</h2><div class="summary-list"><div class="summary-row"><span>Expenses selected</span><strong id="selectedCount">2</strong></div><div class="summary-row"><span>Report total</span><strong id="selectedTotal">$164.87</strong></div><div class="summary-row"><span>Supporting docs</span><strong>2 of 2</strong></div></div><div class="button-row"><button class="secondary" id="mockPdf">Download PDF</button><button class="success" id="submitReport">Submit Report</button></div><p class="muted" style="font-size:.8rem;margin:12px 0 0">Prototype actions only. A real submission would update SharePoint records and lock the employee-side report.</p></div>
+      </div>
+    </section>
+
+    <section class="view" id="past">
+      <div class="page-heading"><div><div class="eyebrow">Submitted history</div><h1>Past Reports</h1><p>Submitted reports remain available to the employee while Accounting sees the broader review workflow.</p></div></div>
+      <div class="card"><div class="table-wrap"><table><thead><tr><th>Report</th><th>Period</th><th>Submitted</th><th>Status</th><th style="text-align:right">Total</th></tr></thead><tbody id="pastRows"></tbody></table></div></div>
+    </section>
+
+    <section class="view" id="settings">
+      <div class="page-heading"><div><div class="eyebrow">Employee preferences</div><h1>Settings</h1><p>Microsoft identity would replace the separate Ranch login. Saved preferences can live in SharePoint and follow the employee across devices.</p></div></div>
+      <div class="settings-grid">
+        <div class="card"><div class="eyebrow">Microsoft 365 account</div><h2>Account</h2><div class="setting-row"><div><strong>Saul Garcia</strong><small>saul.garcia@pizzaranch.com</small></div><span class="badge ready">Signed in</span></div><div class="setting-row"><div><strong>Department</strong><small>Profitability & Operations</small></div><button class="secondary small">Edit</button></div><div class="setting-row"><div><strong>Authentication</strong><small>Microsoft 365 / Entra ID</small></div><span class="badge mock">SharePoint</span></div></div>
+        <div class="card"><div class="eyebrow">Reimbursement</div><h2>Preferences</h2><div class="setting-row"><div><strong>Reimbursement schedule</strong><small>Twice Monthly</small></div><button class="secondary small">Change</button></div><div class="setting-row"><div><strong>Auto-save draft</strong><small>Save changes while working</small></div><div class="toggle on"><span></span></div></div><div class="setting-row"><div><strong>Receipt reminders</strong><small>Flag expenses missing documents</small></div><div class="toggle on"><span></span></div></div></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer-note">Prototype only • no SharePoint connection • no company data • employee production app remains unchanged</div>
+  <div class="toast" id="toast"></div>
+
+<script>
+  const expenses = [
+    {date:'2026-09-08',merchant:'Casey’s',category:'Meals',amount:18.42,status:'Open',receipt:true},
+    {date:'2026-09-05',merchant:'Staples',category:'Supplies',amount:47.99,status:'Open',receipt:true},
+    {date:'2026-09-03',merchant:'Pizza Ranch - Sioux City',category:'Meals',amount:19.00,status:'Open',receipt:false},
+    {date:'2026-08-28',merchant:'Holiday Inn Express',category:'Travel',amount:124.87,status:'Current Report',receipt:true},
+    {date:'2026-08-22',merchant:'Kwik Star',category:'Travel',amount:40.00,status:'Current Report',receipt:true}
+  ];
+  const reports = [
+    {name:'Aug 1–15',period:'Aug 1–15, 2026',submitted:'Aug 16, 2026',status:'Submitted',total:213.66},
+    {name:'Jul 16–31',period:'Jul 16–31, 2026',submitted:'Aug 1, 2026',status:'Processed',total:178.04}
+  ];
+
+  const money = n => '$' + Number(n).toFixed(2);
+  function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2300)}
+  function setView(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===id));window.scrollTo({top:0,behavior:'smooth'})}
+  document.addEventListener('click',e=>{const go=e.target.closest('[data-go]');if(go)setView(go.dataset.go);const nav=e.target.closest('.nav-btn');if(nav)setView(nav.dataset.view)});
+  document.getElementById('receiptFile').addEventListener('change',e=>{document.getElementById('fileName').textContent=e.target.files[0]?`Selected: ${e.target.files[0].name}`:''});
+
+  function render(){
+    const open=expenses.filter(x=>x.status==='Open'); const current=expenses.filter(x=>x.status==='Current Report');
+    document.getElementById('metricUnreported').textContent=open.length;
+    document.getElementById('metricUnreportedTotal').textContent=money(open.reduce((s,x)=>s+x.amount,0));
+    document.getElementById('metricReportTotal').textContent=money(current.reduce((s,x)=>s+x.amount,0));
+    document.getElementById('metricPast').textContent=reports.length;
+    document.getElementById('recentList').innerHTML=expenses.slice(0,4).map(x=>`<div class="summary-row"><span><strong>${x.merchant}</strong><br><small class="muted">${x.date} • ${x.category}</small></span><strong>${money(x.amount)}</strong></div>`).join('');
+    document.getElementById('expenseRows').innerHTML=expenses.map(x=>`<tr><td>${x.date}</td><td><strong>${x.merchant}</strong><br><small class="muted">${x.receipt?'Receipt attached':'Receipt missing'}</small></td><td>${x.category}</td><td><span class="badge ${x.status==='Open'?'ready':'draft'}">${x.status}</span></td><td class="amount">${money(x.amount)}</td></tr>`).join('');
+    document.getElementById('reportExpenses').innerHTML=current.map((x,i)=>`<label class="summary-row" style="align-items:center"><span><input type="checkbox" class="reportCheck" data-index="${expenses.indexOf(x)}" checked style="width:auto;margin-right:8px"><strong>${x.merchant}</strong><br><small class="muted" style="margin-left:26px">${x.date} • ${x.category} • ${x.receipt?'Receipt attached':'Receipt missing'}</small></span><strong>${money(x.amount)}</strong></label>`).join('') || '<div class="empty-state">No expenses are currently in this report.</div>';
+    document.getElementById('pastRows').innerHTML=reports.map(r=>`<tr><td><strong>${r.name}</strong></td><td>${r.period}</td><td>${r.submitted}</td><td><span class="badge submitted">${r.status}</span></td><td class="amount">${money(r.total)}</td></tr>`).join('');
+    updateSelected();
+  }
+  function updateSelected(){const checks=[...document.querySelectorAll('.reportCheck')];const chosen=checks.filter(c=>c.checked).map(c=>expenses[Number(c.dataset.index)]);document.getElementById('selectedCount').textContent=chosen.length;document.getElementById('selectedTotal').textContent=money(chosen.reduce((s,x)=>s+x.amount,0))}
+  document.addEventListener('change',e=>{if(e.target.classList.contains('reportCheck'))updateSelected()});
+  document.getElementById('expenseForm').addEventListener('submit',e=>{e.preventDefault();const amount=Number(document.getElementById('expenseAmount').value);expenses.unshift({date:document.getElementById('expenseDate').value,merchant:document.getElementById('expenseMerchant').value,category:document.getElementById('expenseCategory').value,amount,status:'Open',receipt:!!document.getElementById('receiptFile').files[0]});e.target.reset();document.getElementById('expenseDate').value='2026-09-09';document.getElementById('fileName').textContent='';render();toast('Mock SharePoint expense saved');setView('expenses')});
+  document.getElementById('mockPdf').addEventListener('click',()=>toast('PDF generation would use the same Ranch report layout'));
+  document.getElementById('submitReport').addEventListener('click',()=>{const chosen=[...document.querySelectorAll('.reportCheck')].filter(c=>c.checked).map(c=>expenses[Number(c.dataset.index)]);if(!chosen.length){toast('Select at least one expense');return}const total=chosen.reduce((s,x)=>s+x.amount,0);reports.unshift({name:'Aug 16–31',period:'Aug 16–31, 2026',submitted:'Sep 9, 2026',status:'Submitted',total});chosen.forEach(x=>x.status='Submitted');render();toast('Mock report submitted to SharePoint');setView('past')});
+  render();
+</script>
+</body>
+</html>
