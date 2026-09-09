@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.2 - September 9, 2026
+
+### Changed
+- Left-aligned the Past Reports PDF and CSV actions with the report content.
+- Made the action row span the full report card instead of sitting inside the unused first grid column.
+- No expense, receipt, sync, or accounting behavior changed.
+
 ## 2.1.1 - September 8, 2026
 
 ### Changed

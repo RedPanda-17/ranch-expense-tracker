@@ -1,7 +1,12 @@
-# Release Notes - Version 2.1.1
+# Release Notes - Version 2.1.2
 
-**Release date:** September 8, 2026  
-**Release name:** Manual Accounting Review
+**Release date:** September 9, 2026  
+**Release name:** Past Reports Polish
+
+## Version 2.1.2 past reports polish
+- Aligns the Download PDF and Download CSV buttons to the left edge of each Past Reports card.
+- Keeps the buttons grouped together consistently on desktop and mobile.
+- This is a visual-only change; report generation, receipt storage, and cloud sync are unchanged.
 
 ## Version 2.1.1 manual accounting review
 - Removes the local Tesseract OCR step from employee PDF generation.

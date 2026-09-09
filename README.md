@@ -1,6 +1,6 @@
 # Ranch Expense Tracker
 
-Current release: **Version 2.1.1 — Manual Accounting Review**
+Current release: **Version 2.1.2 — Past Reports Polish**
 
 Live app: https://redpanda-17.github.io/ranch-expense-tracker/
 
