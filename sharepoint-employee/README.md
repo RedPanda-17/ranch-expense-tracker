@@ -1,34 +1,61 @@
-# Ranch Expense Tracker — SharePoint Employee Mock
+# Ranch Expense Tracker — SharePoint Employee Parity Prototype
 
-This folder demonstrates how the existing Ranch Expense Tracker employee experience can be presented inside SharePoint while preserving the current Ranch visual design and workflow.
+This folder is the working employee-side SharePoint migration prototype. The goal is not to redesign Ranch Expense Tracker. The goal is to preserve the Version 2.1.2 employee experience and move the backend/infrastructure into Microsoft 365 and SharePoint.
 
-## Purpose
-- Keep the Ranch Expense Tracker interface visually consistent with Version 2.1.2.
-- Show the extra Microsoft 365 / SharePoint chrome that would surround the application.
-- Simulate the employee workflow before a real SharePoint DEV site and SPFx package exist.
-- Provide a clickable prototype for IT and Accounting review.
+## Hard requirement
+The Ranch application area should remain visually and functionally as close as practical to the current Ranch Expense Tracker. SharePoint should be the host and backend, not a reason to replace the app with generic SharePoint list screens.
 
-## Mock only
-This prototype uses sample/in-memory data only. It does not connect to SharePoint, Supabase, Microsoft Graph, or company data.
+## Current parity work
+The prototype now mirrors the current employee app structure:
+- Dashboard
+- Add Expense
+- Current Report
+- All Expenses
+- Past Reports
+- Settings
+- production category names
+- production subcategory names
+- category/subcategory-driven fields
+- Mileage at the current fixed $0.40/mile test rate
+- receipt / route-document selection and preview
+- saved people, merchants, locations, vehicles, tags, and mileage routes
+- draft expense editing/deleting
+- report expense selection and readiness checks
+- report finalization / submitted locking behavior
+- CSV export
+- Microsoft 365 identity concept instead of a second app login
 
-The production employee app is unchanged.
+The mock stores sample/test state in browser `localStorage`. It does not connect to Supabase or Pizza Ranch SharePoint.
+
+## Still to port for full parity
+- Current production PDF generator and embedded receipt pages
+- production receipt compression behavior
+- real temporary receipt viewing/download behavior
+- exact production duplicate-warning behavior
+- any remaining minor validation/copy differences found during side-by-side testing
+- production-grade accessibility/regression testing
 
 ## Intended SharePoint mapping
-- Microsoft 365 / Entra ID → employee identity and authentication
+- Microsoft Entra / Microsoft 365 current user → employee identity and authentication
 - SharePoint `Expenses` List → expense records
 - SharePoint `Reports` List → report records
 - SharePoint `Expense Documents` Library → receipts and mileage documents
-- SharePoint employee-preference lists → saved defaults and settings
-- SPFx full-page application → the Ranch Expense Tracker UI
+- SharePoint `User Settings` / related lists → saved defaults and settings
+- SPFx full-page application → Ranch Expense Tracker employee UI
 
-## Visual goal
-The application area should remain nearly identical to Ranch Expense Tracker. The main visible difference is the Microsoft 365 / SharePoint interface surrounding it. A real tenant may show slightly different SharePoint navigation or site chrome depending on Pizza Ranch IT settings.
+## Portability design
+`app.js` keeps storage behind `MockSharePointAdapter`. In the real SPFx project, that adapter is replaced with SharePoint API calls while the UI and business rules remain largely unchanged.
+
+See `SPFX_PORTING_PLAN.md` for the production migration plan and proposed SharePoint schema.
 
 ## What requires a real SharePoint DEV environment
 - SPFx package deployment
-- current Microsoft 365 user identity
-- real List and Document Library writes
-- employee/accounting/admin permissions
-- document access isolation
-- Power Automate workflows
-- tenant-specific SharePoint styling and navigation behavior
+- real current-user identity from Microsoft 365
+- real SharePoint List and Document Library writes
+- employee/accounting/admin authorization
+- receipt/document access isolation
+- tenant-specific SharePoint navigation/chrome validation
+- Power Automate or server-side workflows where required
+
+## Safety
+The production Ranch Expense Tracker at the repository root is intentionally untouched by this prototype work.
