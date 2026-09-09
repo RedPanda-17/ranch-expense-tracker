@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ranch Expense Tracker — Accounting Dashboard Mock</title>
+  <style>
+    :root {
+      --bg:#f4efe5;
+      --panel:#fffdf8;
+      --panel-soft:#faf4ea;
+      --text:#2a231e;
+      --muted:#75695f;
+      --border:#dfd1bd;
+      --brand:#a71f25;
+      --brand-dark:#721419;
+      --amber:#d39a30;
+      --amber-soft:#fff4dc;
+      --olive:#557044;
+      --olive-soft:#eaf2e4;
+      --danger:#a6191f;
+      --danger-soft:#fff0ef;
+      --info:#315f78;
+      --info-soft:#eaf2f6;
+      --shadow:0 12px 30px rgba(74,50,30,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:linear-gradient(180deg,#fbf7ef 0%,var(--bg) 100%);min-height:100vh}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .shell{min-height:100vh;display:grid;grid-template-columns:240px minmax(0,1fr)}
+    .sidebar{background:linear-gradient(180deg,#241b17 0%,#351c19 70%,#211916 100%);color:white;padding:22px 16px;position:sticky;top:0;height:100vh;border-right:4px solid var(--amber)}
+    .brand{display:flex;gap:12px;align-items:center;padding:2px 6px 24px}
+    .brand-mark{width:46px;height:46px;border-radius:14px;background:var(--brand);display:grid;place-items:center;font-weight:900;font-size:1.4rem;box-shadow:inset 0 0 0 4px rgba(211,154,48,.2)}
+    .brand strong{display:block;font-size:1.02rem}.brand small{display:block;color:#d8c9bd;margin-top:2px}
+    .nav{display:grid;gap:6px}
+    .nav button{width:100%;text-align:left;border:0;border-radius:11px;background:transparent;color:#e8ddd5;padding:11px 12px;font-weight:800}
+    .nav button:hover{background:rgba(255,255,255,.07)}
+    .nav button.active{background:rgba(167,31,37,.92);color:#fff}
+    .sidebar-footer{position:absolute;bottom:18px;left:16px;right:16px;color:#cdbfb4;font-size:.75rem;line-height:1.45}
+    .main{min-width:0}
+    .topbar{height:74px;background:rgba(255,253,248,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 28px;position:sticky;top:0;z-index:20}
+    .topbar-title strong{display:block;font-size:1.18rem}.topbar-title small{color:var(--muted)}
+    .top-actions{display:flex;align-items:center;gap:10px}
+    .pill{border:1px solid var(--border);background:var(--panel);border-radius:999px;padding:8px 11px;font-size:.78rem;font-weight:800;color:var(--muted)}
+    .user{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:12px;background:var(--panel-soft);border:1px solid var(--border)}
+    .avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--brand);color:white;font-weight:900}
+    .content{padding:26px 28px 50px;max-width:1500px;margin:0 auto}
+    .view{display:none}.view.active{display:block}
+    .eyebrow{color:var(--brand);font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.11em}
+    h1,h2,h3,p{margin-top:0}h1{font-size:2rem;margin-bottom:6px}h2{font-size:1.28rem}p{line-height:1.55}
+    .page-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:20px}.page-head p{color:var(--muted);margin-bottom:0;max-width:760px}
+    .prototype-note{padding:10px 12px;border-radius:12px;background:var(--amber-soft);border:1px solid #ecd29d;font-size:.82rem;font-weight:750;color:#6d4a12;white-space:nowrap}
+    .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+    .metric{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}.metric::after{content:"";position:absolute;right:-28px;bottom:-40px;width:92px;height:92px;border-radius:50%;border:14px solid rgba(211,154,48,.10)}
+    .metric span{display:block;color:var(--muted);font-size:.73rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em}.metric strong{display:block;font-size:1.75rem;margin-top:6px}.metric small{display:block;color:var(--muted);margin-top:3px}
+    .grid-2{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr);gap:18px;align-items:start}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:17px;box-shadow:var(--shadow);padding:20px}
+    .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:15px}.card-head h2{margin-bottom:3px}.card-head p{margin:0;color:var(--muted);font-size:.86rem}
+    .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}.filters input,.filters select{border:1px solid #ccbca7;background:white;border-radius:10px;padding:9px 10px;color:var(--text)}.filters input{min-width:220px;flex:1}
+    .table-wrap{overflow:auto;border:1px solid var(--border);border-radius:13px}
+    table{width:100%;border-collapse:collapse;min-width:760px;background:white}th{text-align:left;padding:10px 12px;background:#f5ede1;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}td{padding:12px;border-top:1px solid #eee4d7;font-size:.88rem;vertical-align:middle}tbody tr{cursor:pointer}tbody tr:hover{background:#fff9f0}.amount{text-align:right;font-weight:900}.actions{text-align:right}
+    .badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 8px;font-size:.72rem;font-weight:900}.badge.ready{background:var(--olive-soft);color:#3e5a31}.badge.review{background:var(--amber-soft);color:#84570b}.badge.returned{background:var(--danger-soft);color:#8a171c}.badge.processed{background:var(--info-soft);color:#315f78}.badge.archived{background:#eee8df;color:#6a5e54}
+    .btn{border:0;border-radius:10px;min-height:38px;padding:8px 12px;font-weight:850}.btn.primary{background:var(--brand);color:white}.btn.secondary{background:#eee5d9;color:#463b33}.btn.success{background:var(--olive);color:white}.btn.ghost{background:transparent;color:var(--brand);border:1px solid rgba(167,31,37,.18)}.btn.danger{background:var(--danger-soft);color:var(--danger);border:1px solid rgba(166,25,31,.15)}.btn.small{min-height:31px;padding:6px 9px;font-size:.76rem}
+    .quick-list{display:grid;gap:10px}.quick-item{padding:12px;border-radius:12px;background:var(--panel-soft);border:1px solid #eadfce}.quick-item strong{display:flex;justify-content:space-between;gap:12px}.quick-item small{display:block;color:var(--muted);margin-top:4px}
+    .progress-row{margin-top:14px}.progress-label{display:flex;justify-content:space-between;color:var(--muted);font-size:.79rem;font-weight:800;margin-bottom:6px}.progress{height:9px;background:#eee4d6;border-radius:99px;overflow:hidden}.progress span{display:block;height:100%;background:var(--olive);border-radius:99px}
+    .section-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.mini-card{padding:16px;border:1px solid var(--border);background:var(--panel);border-radius:15px}.mini-card p{color:var(--muted);font-size:.84rem;margin-bottom:12px}
+    .archive-row{display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid #eee4d7}.archive-row:first-of-type{border-top:0}.archive-row strong{display:block}.archive-row small{color:var(--muted)}
+    .employee-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.employee{padding:17px;border:1px solid var(--border);border-radius:15px;background:var(--panel)}.employee-top{display:flex;gap:11px;align-items:center}.employee .avatar{width:38px;height:38px}.employee p{color:var(--muted);font-size:.83rem;margin:11px 0}.employee-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}.employee-meta div{padding:9px;background:var(--panel-soft);border-radius:10px}.employee-meta small{display:block;color:var(--muted)}
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.setting-row{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:13px 0;border-top:1px solid #eee4d7}.setting-row:first-of-type{border-top:0}.setting-row small{color:var(--muted);display:block;margin-top:3px}.toggle{width:45px;height:25px;background:#ddd2c4;border-radius:999px;padding:3px}.toggle span{display:block;width:19px;height:19px;border-radius:50%;background:white;box-shadow:0 1px 4px rgba(0,0,0,.18)}.toggle.on{background:var(--olive)}.toggle.on span{margin-left:20px}
+    .drawer-backdrop{position:fixed;inset:0;background:rgba(30,22,18,.35);z-index:90;display:none}.drawer-backdrop.open{display:block}.drawer{position:absolute;right:0;top:0;height:100%;width:min(720px,100%);background:#fbf7ef;box-shadow:-20px 0 50px rgba(0,0,0,.2);overflow:auto}.drawer-head{padding:22px 24px;background:linear-gradient(135deg,#261d19,#51231f);color:white;display:flex;justify-content:space-between;gap:18px}.drawer-head h2{margin:3px 0 0}.close{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;border-radius:10px;width:38px;height:38px;font-size:1.2rem}.drawer-body{padding:20px 24px 36px}.summary-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.summary-box{background:white;border:1px solid var(--border);border-radius:12px;padding:11px}.summary-box small{display:block;color:var(--muted)}.summary-box strong{display:block;margin-top:3px}.expense-detail{background:white;border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden}.expense-detail-head{padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:12px}.expense-detail-head small{display:block;color:var(--muted);margin-top:3px}.receipt-placeholder{margin:0 14px 14px;padding:24px;border:1px dashed #cdbca8;border-radius:12px;text-align:center;color:var(--muted);background:#faf5ec}.drawer-actions{position:sticky;bottom:0;background:rgba(251,247,239,.96);backdrop-filter:blur(10px);padding:13px 24px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap}
+    .empty{padding:28px;text-align:center;color:var(--muted)}
+    @media(max-width:1050px){.metrics{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}.section-grid,.employee-grid{grid-template-columns:repeat(2,1fr)}.settings-grid{grid-template-columns:1fr}}
+    @media(max-width:760px){.shell{grid-template-columns:1fr}.sidebar{position:relative;height:auto;border-right:0;border-bottom:4px solid var(--amber)}.nav{grid-template-columns:repeat(3,1fr)}.sidebar-footer{display:none}.topbar{top:0;padding:0 16px}.content{padding:20px 14px 40px}.page-head{display:block}.prototype-note{display:inline-block;margin-top:10px}.metrics{grid-template-columns:1fr 1fr}.section-grid,.employee-grid{grid-template-columns:1fr}.summary-strip{grid-template-columns:1fr 1fr}}
+    @media(max-width:480px){.metrics{grid-template-columns:1fr}.nav{grid-template-columns:1fr 1fr}.topbar-title small,.pill{display:none}.summary-strip{grid-template-columns:1fr}.filters input{min-width:100%}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">R</div>
+      <div><strong>Ranch Expenses</strong><small>Accounting Portal</small></div>
+    </div>
+    <nav class="nav">
+      <button class="active" data-view="dashboard">Dashboard</button>
+      <button data-view="queue">Review Queue</button>
+      <button data-view="reports">Report History</button>
+      <button data-view="employees">Employees</button>
+      <button data-view="archive">Archive</button>
+      <button data-view="settings">Settings</button>
+    </nav>
+    <div class="sidebar-footer">Prototype only — sample data.<br>No Supabase connection or Accounting permissions are active in this mock.</div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title"><strong>Accounting Dashboard</strong><small>Expense reimbursement review and history</small></div>
+      <div class="top-actions"><span class="pill">Prototype v0.1</span><div class="user"><div class="avatar">J</div><div><strong>Jolinda</strong><small style="display:block;color:var(--muted)">Accounting</small></div></div></div>
+    </header>
+
+    <div class="content">
+      <section id="dashboard" class="view active">
+        <div class="page-head"><div><div class="eyebrow">Accounting overview</div><h1>Good morning</h1><p>Review what needs attention, what has been processed, and which completed periods are approaching archival.</p></div><div class="prototype-note">Sample data — no live employee information</div></div>
+        <div class="metrics">
+          <div class="metric"><span>Awaiting Review</span><strong>14</strong><small>9 ready · 5 need attention</small></div>
+          <div class="metric"><span>Needs Attention</span><strong>5</strong><small>Missing receipt or returned item</small></div>
+          <div class="metric"><span>September Reimbursements</span><strong>$8,426</strong><small>23 reports processed</small></div>
+          <div class="metric"><span>Ready to Archive</span><strong>27</strong><small>Completed reports older than 90 days</small></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><div><h2>Priority review queue</h2><p>Reports most likely to need Accounting attention first.</p></div><button class="btn ghost small" onclick="goTo('queue')">View all</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Period</th><th>Submitted</th><th>Status</th><th class="amount">Amount</th></tr></thead><tbody>
+              <tr onclick="openReport('Saul Garcia','Aug 16–31, 2026','$412.67','Ready for review','8')"><td><strong>Saul Garcia</strong><br><small>Profitability & Operations</small></td><td>Aug 16–31</td><td>Sep 1</td><td><span class="badge ready">Ready</span></td><td class="amount">$412.67</td></tr>
+              <tr onclick="openReport('Jordan Miller','Sep 1–15, 2026','$188.20','Needs attention','6')"><td><strong>Jordan Miller</strong><br><small>Field Business Consultant</small></td><td>Sep 1–15</td><td>Sep 16</td><td><span class="badge review">Missing receipt</span></td><td class="amount">$188.20</td></tr>
+              <tr onclick="openReport('Taylor Smith','Sep 1–15, 2026','$722.10','Ready for review','10')"><td><strong>Taylor Smith</strong><br><small>Operations</small></td><td>Sep 1–15</td><td>Sep 16</td><td><span class="badge ready">Ready</span></td><td class="amount">$722.10</td></tr>
+              <tr onclick="openReport('Morgan Lee','August 2026','$96.48','Returned to employee','3')"><td><strong>Morgan Lee</strong><br><small>Field Business Consultant</small></td><td>August</td><td>Sep 2</td><td><span class="badge returned">Returned</span></td><td class="amount">$96.48</td></tr>
+            </tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2>Period health</h2><p>Current reimbursement cycle.</p></div></div>
+            <div class="quick-list">
+              <div class="quick-item"><strong><span>Twice-monthly employees</span><span>42</span></strong><small>Next automated period: Sep 1–15</small></div>
+              <div class="quick-item"><strong><span>Monthly employees</span><span>11</span></strong><small>Next automated period: Sep 1–30</small></div>
+              <div class="quick-item"><strong><span>Open late expenses</span><span>3</span></strong><small>Needs Accounting decision before next cycle</small></div>
+            </div>
+            <div class="progress-row"><div class="progress-label"><span>September reports processed</span><span>61%</span></div><div class="progress"><span style="width:61%"></span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="queue" class="view">
+        <div class="page-head"><div><div class="eyebrow">Work queue</div><h1>Reports awaiting Accounting</h1><p>Filter reports, open expense details, review receipts, and decide what happens next.</p></div></div>
+        <div class="card">
+          <div class="filters"><input id="queueSearch" placeholder="Search employee or report" oninput="filterQueue()"><select id="statusFilter" onchange="filterQueue()"><option value="all">All statuses</option><option value="ready">Ready</option><option value="review">Needs attention</option><option value="returned">Returned</option></select><select><option>All reimbursement periods</option><option>Sep 1–15</option><option>August monthly</option></select></div>
+          <div class="table-wrap"><table id="queueTable"><thead><tr><th>Employee</th><th>Report</th><th>Expenses</th><th>Status</th><th>Age</th><th class="amount">Total</th></tr></thead><tbody>
+            <tr data-search="saul garcia aug 16 31" data-status="ready" onclick="openReport('Saul Garcia','Aug 16–31, 2026','$412.67','Ready for review','8')"><td><strong>Saul Garcia</strong><br><small>Profitability & Operations</small></td><td>Aug 16–31, 2026</td><td>8</td><td><span class="badge ready">Ready</span></td><td>1 day</td><td class="amount">$412.67</td></tr>
+            <tr data-search="jordan miller sep 1 15" data-status="review" onclick="openReport('Jordan Miller','Sep 1–15, 2026','$188.20','Needs attention','6')"><td><strong>Jordan Miller</strong><br><small>FBC</small></td><td>Sep 1–15, 2026</td><td>6</td><td><span class="badge review">Missing receipt</span></td><td>3 hrs</td><td class="amount">$188.20</td></tr>
+            <tr data-search="taylor smith sep 1 15" data-status="ready" onclick="openReport('Taylor Smith','Sep 1–15, 2026','$722.10','Ready for review','10')"><td><strong>Taylor Smith</strong><br><small>Operations</small></td><td>Sep 1–15, 2026</td><td>10</td><td><span class="badge ready">Ready</span></td><td>5 hrs</td><td class="amount">$722.10</td></tr>
+            <tr data-search="morgan lee august monthly" data-status="returned" onclick="openReport('Morgan Lee','August 2026','$96.48','Returned to employee','3')"><td><strong>Morgan Lee</strong><br><small>FBC</small></td><td>August 2026</td><td>3</td><td><span class="badge returned">Returned</span></td><td>2 days</td><td class="amount">$96.48</td></tr>
+            <tr data-search="casey brown sep 1 15" data-status="review" onclick="openReport('Casey Brown','Sep 1–15, 2026','$531.83','Needs attention','7')"><td><strong>Casey Brown</strong><br><small>Marketing</small></td><td>Sep 1–15, 2026</td><td>7</td><td><span class="badge review">Review note</span></td><td>7 hrs</td><td class="amount">$531.83</td></tr>
+          </tbody></table></div>
+        </div>
+      </section>
+
+      <section id="reports" class="view">
+        <div class="page-head"><div><div class="eyebrow">Searchable history</div><h1>Report History</h1><p>Processed and returned reimbursement reports remain searchable even after old supporting documents are archived.</p></div></div>
+        <div class="card">
+          <div class="filters"><input placeholder="Search employee, period, amount or status"><select><option>All statuses</option><option>Processed</option><option>Returned</option><option>Archived</option></select><select><option>2026</option><option>2025</option></select></div>
+          <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Period</th><th>Processed</th><th>Status</th><th>Receipts</th><th class="amount">Total</th></tr></thead><tbody>
+            <tr onclick="openReport('Alex Johnson','Aug 1–15, 2026','$286.11','Processed','5')"><td><strong>Alex Johnson</strong></td><td>Aug 1–15</td><td>Aug 19</td><td><span class="badge processed">Processed</span></td><td>5 available</td><td class="amount">$286.11</td></tr>
+            <tr onclick="openReport('Jamie Davis','July 2026','$1,024.38','Processed','14')"><td><strong>Jamie Davis</strong></td><td>July 2026</td><td>Aug 4</td><td><span class="badge processed">Processed</span></td><td>14 available</td><td class="amount">$1,024.38</td></tr>
+            <tr><td><strong>Chris Wilson</strong></td><td>May 2026</td><td>Jun 3</td><td><span class="badge archived">Archived</span></td><td>Archived Jun 30</td><td class="amount">$447.75</td></tr>
+          </tbody></table></div>
+        </div>
+      </section>
+
+      <section id="employees" class="view">
+        <div class="page-head"><div><div class="eyebrow">Employee reimbursement profiles</div><h1>Employees</h1><p>See reimbursement schedule, recent activity and report history without changing the employee-facing workflow.</p></div></div>
+        <div class="employee-grid">
+          <div class="employee"><div class="employee-top"><div class="avatar">S</div><div><strong>Saul Garcia</strong><small style="display:block;color:var(--muted)">Profitability & Operations</small></div></div><p>Twice-monthly reimbursement schedule.</p><div class="employee-meta"><div><small>YTD Reports</small><strong>14</strong></div><div><small>YTD Total</small><strong>$4,826</strong></div></div></div>
+          <div class="employee"><div class="employee-top"><div class="avatar">J</div><div><strong>Jordan Miller</strong><small style="display:block;color:var(--muted)">Field Business Consultant</small></div></div><p>Monthly reimbursement schedule.</p><div class="employee-meta"><div><small>YTD Reports</small><strong>8</strong></div><div><small>YTD Total</small><strong>$7,116</strong></div></div></div>
+          <div class="employee"><div class="employee-top"><div class="avatar">T</div><div><strong>Taylor Smith</strong><small style="display:block;color:var(--muted)">Operations</small></div></div><p>Twice-monthly reimbursement schedule.</p><div class="employee-meta"><div><small>YTD Reports</small><strong>15</strong></div><div><small>YTD Total</small><strong>$6,204</strong></div></div></div>
+        </div>
+      </section>
+
+      <section id="archive" class="view">
+        <div class="page-head"><div><div class="eyebrow">Retention and archival</div><h1>Ready to Archive</h1><p>Future workflow: download a verified archive package first, then purge only the cloud receipt files while retaining searchable database history.</p></div><div class="prototype-note">Purge actions disabled in mock</div></div>
+        <div class="card">
+          <div class="archive-row"><div><strong>May 2026</strong><small>Completed reimbursement reports</small></div><div><strong>42</strong><small>Reports</small></div><div><strong>317</strong><small>Expenses</small></div><div><strong>186 MB</strong><small>Receipt storage</small></div><div><button class="btn secondary small">Prepare Archive</button></div></div>
+          <div class="archive-row"><div><strong>June 2026</strong><small>Completed reimbursement reports</small></div><div><strong>47</strong><small>Reports</small></div><div><strong>341</strong><small>Expenses</small></div><div><strong>204 MB</strong><small>Receipt storage</small></div><div><button class="btn secondary small">Prepare Archive</button></div></div>
+          <div class="archive-row"><div><strong>July 2026</strong><small>Not yet at 90-day retention point</small></div><div><strong>51</strong><small>Reports</small></div><div><strong>376</strong><small>Expenses</small></div><div><strong>221 MB</strong><small>Receipt storage</small></div><div><button class="btn small" disabled>Not Ready</button></div></div>
+        </div>
+      </section>
+
+      <section id="settings" class="view">
+        <div class="page-head"><div><div class="eyebrow">Future controls</div><h1>Accounting Settings</h1><p>Examples of settings that may eventually be controlled by Accounting or an administrator.</p></div></div>
+        <div class="settings-grid">
+          <div class="card"><h2>Reimbursement cycles</h2><div class="setting-row"><div><strong>Default new employee schedule</strong><small>Employees can later choose monthly or twice monthly.</small></div><select><option>Twice monthly</option><option>Monthly</option></select></div><div class="setting-row"><div><strong>Grace period</strong><small>Time after the period ends before automatic report creation.</small></div><select><option>48 hours</option><option>24 hours</option><option>72 hours</option></select></div><div class="setting-row"><div><strong>Allow schedule changes mid-month</strong><small>Recommended off to avoid overlapping periods.</small></div><div class="toggle"><span></span></div></div></div>
+          <div class="card"><h2>Retention</h2><div class="setting-row"><div><strong>Receipt active period</strong><small>Supporting documents remain immediately viewable.</small></div><select><option>90 days</option><option>180 days</option><option>1 year</option></select></div><div class="setting-row"><div><strong>Require archive confirmation before purge</strong><small>Prevents receipt deletion until Accounting confirms the archive was saved.</small></div><div class="toggle on"><span></span></div></div><div class="setting-row"><div><strong>Automatic purge</strong><small>Would remain off until the archive workflow is proven reliable.</small></div><div class="toggle"><span></span></div></div></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div id="drawerBackdrop" class="drawer-backdrop" onclick="backdropClose(event)">
+  <aside class="drawer">
+    <div class="drawer-head"><div><div style="color:#f2c46a;font-size:.72rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase">Report Review</div><h2 id="drawerTitle">Employee</h2><small id="drawerPeriod" style="color:#e2d4cb"></small></div><button class="close" onclick="closeDrawer()">×</button></div>
+    <div class="drawer-body">
+      <div class="summary-strip"><div class="summary-box"><small>Total</small><strong id="drawerTotal">$0.00</strong></div><div class="summary-box"><small>Expenses</small><strong id="drawerCount">0</strong></div><div class="summary-box"><small>Status</small><strong id="drawerStatus">Ready</strong></div><div class="summary-box"><small>Documents</small><strong>Available</strong></div></div>
+      <div class="card" style="box-shadow:none;margin-bottom:14px"><div class="card-head"><div><h2>Expense review</h2><p>Sample structure for line-by-line review.</p></div></div>
+        <div class="expense-detail"><div class="expense-detail-head"><div><strong>Marriott — Hotel</strong><small>Aug 21 · Lodging · Business travel</small></div><strong>$188.00</strong></div><div class="receipt-placeholder">Receipt preview would load temporarily from Supabase here<br><button class="btn secondary small" style="margin-top:10px">View Receipt</button></div></div>
+        <div class="expense-detail"><div class="expense-detail-head"><div><strong>Walmart — Supplies</strong><small>Aug 24 · Supplies</small></div><strong>$42.18</strong></div><div class="receipt-placeholder">Receipt available in cloud storage<br><button class="btn secondary small" style="margin-top:10px">View Receipt</button></div></div>
+        <div class="expense-detail"><div class="expense-detail-head"><div><strong>Mileage</strong><small>Aug 28 · Orange City → Sioux City · 91.2 miles</small></div><strong>$36.48</strong></div><div class="receipt-placeholder">Mileage / route documentation placeholder</div></div>
+      </div>
+      <div class="card" style="box-shadow:none"><h2>Accounting notes</h2><p style="color:var(--muted);font-size:.86rem">Future notes could stay with the report and be visible in Accounting history.</p><input style="width:100%;border:1px solid #ccbca7;border-radius:10px;padding:10px" placeholder="Add internal Accounting note"></div>
+    </div>
+    <div class="drawer-actions"><button class="btn primary">Download PDF</button><button class="btn success">Mark Processed</button><button class="btn danger">Return to Employee</button><button class="btn secondary" onclick="closeDrawer()">Close</button></div>
+  </aside>
+</div>
+
+<script>
+  const navButtons=[...document.querySelectorAll('.nav button')];
+  const views=[...document.querySelectorAll('.view')];
+  navButtons.forEach(button=>button.addEventListener('click',()=>goTo(button.dataset.view)));
+  function goTo(id){
+    views.forEach(v=>v.classList.toggle('active',v.id===id));
+    navButtons.forEach(b=>b.classList.toggle('active',b.dataset.view===id));
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function openReport(name,period,total,status,count){
+    document.getElementById('drawerTitle').textContent=name;
+    document.getElementById('drawerPeriod').textContent=period;
+    document.getElementById('drawerTotal').textContent=total;
+    document.getElementById('drawerStatus').textContent=status;
+    document.getElementById('drawerCount').textContent=count;
+    document.getElementById('drawerBackdrop').classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function closeDrawer(){document.getElementById('drawerBackdrop').classList.remove('open');document.body.style.overflow=''}
+  function backdropClose(event){if(event.target.id==='drawerBackdrop')closeDrawer()}
+  function filterQueue(){
+    const text=(document.getElementById('queueSearch').value||'').toLowerCase();
+    const status=document.getElementById('statusFilter').value;
+    document.querySelectorAll('#queueTable tbody tr').forEach(row=>{
+      const textMatch=!text||row.dataset.search.includes(text);
+      const statusMatch=status==='all'||row.dataset.status===status;
+      row.style.display=textMatch&&statusMatch?'':'none';
+    });
+  }
+  document.addEventListener('keydown',event=>{if(event.key==='Escape')closeDrawer()});
+</script>
+</body>
+</html>
