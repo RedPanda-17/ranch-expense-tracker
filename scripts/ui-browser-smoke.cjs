@@ -19,6 +19,14 @@ async function prepare(page) {
   });
   await page.goto('http://127.0.0.1:4173/index.html', { waitUntil:'domcontentloaded' });
   await page.waitForTimeout(800);
+  await page.addStyleTag({content: `
+    #ranchAuthGate, #ranchStartupUpdateOverlay { display:none !important; visibility:hidden !important; }
+    body.ranch-auth-gated .site-header, body.ranch-auth-gated .app-nav, body.ranch-auth-gated .app-shell,
+    .site-header, .app-nav, .app-shell { visibility:visible !important; opacity:1 !important; }
+    body.ranch-auth-gated .site-header { display:block !important; }
+    body.ranch-auth-gated .app-nav { display:block !important; }
+    body.ranch-auth-gated .app-shell { display:block !important; }
+  `});
   await page.evaluate(() => {
     document.getElementById('ranchAuthGate')?.remove();
     document.getElementById('ranchStartupUpdateOverlay')?.remove();
