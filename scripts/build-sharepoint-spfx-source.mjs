@@ -96,7 +96,7 @@ baseLogic = baseLogic.replaceAll('document.addEventListener("change"', '(ranchRo
 baseLogic = baseLogic.replaceAll('document.addEventListener("click"', '(ranchRoot || document).addEventListener("click"');
 parityLogic = parityLogic.replace(/document\.addEventListener\("click", event => \{([\s\S]*?)\}\);\s*$/m, 'function bindParityEvents(){\n  (ranchRoot || document).addEventListener("click", event => {$1});\n}');
 
-const appLogic = `// @ts-nocheck\nlet ranchRoot: ShadowRoot | null = null;\n\n${baseLogic}\n\n${parityLogic}\n\nexport function initializeRanchExpenseTracker(root: ShadowRoot): void {\n  ranchRoot = root;\n  bindEvents();\n  const toggle = el("payPeriodToggleButton");\n  if (toggle) toggle.addEventListener("click", () => { const panel = el("payPeriodPanel"); if (panel) panel.hidden = !panel.hidden; });\n  refreshDatalists();\n  resetExpenseForm();\n  renderAll();\n  if (typeof bindParityEvents === "function") bindParityEvents();\n}\n`;
+const appLogic = `/* eslint-disable */\n// @ts-nocheck\nlet ranchRoot: ShadowRoot | null = null;\n\n${baseLogic}\n\n${parityLogic}\n\nexport function initializeRanchExpenseTracker(root: ShadowRoot): void {\n  ranchRoot = root;\n  bindEvents();\n  const toggle = el("payPeriodToggleButton");\n  if (toggle) toggle.addEventListener("click", () => { const panel = el("payPeriodPanel"); if (panel) panel.hidden = !panel.hidden; });\n  refreshDatalists();\n  resetExpenseForm();\n  renderAll();\n  if (typeof bindParityEvents === "function") bindParityEvents();\n}\n`;
 
 write(path.join(webPartDir, 'appHtml.ts'), `export const appHtml: string = ${JSON.stringify(html)};\n`);
 write(path.join(webPartDir, 'appCss.ts'), `export const appCss: string = ${JSON.stringify(css)};\n`);
