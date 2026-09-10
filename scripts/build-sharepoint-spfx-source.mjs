@@ -19,6 +19,13 @@ function mustRead(file) {
   return fs.readFileSync(file, 'utf8');
 }
 
+function parseJsonc(file) {
+  const source = mustRead(file)
+    .replace(/^\s*\/\/.*$/gm, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '');
+  return JSON.parse(source);
+}
+
 function write(file, content) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, content, 'utf8');
@@ -65,7 +72,7 @@ write(path.join(webPartDir, 'appCss.ts'), `export const appCss: string = ${JSON.
 write(path.join(webPartDir, 'appLogic.ts'), appLogic);
 write(webPartFile, `import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';\nimport { appHtml } from './appHtml';\nimport { appCss } from './appCss';\nimport { initializeRanchExpenseTracker } from './appLogic';\n\nexport interface IRanchExpenseTrackerWebPartProps {}\n\nexport default class ${className} extends BaseClientSideWebPart<IRanchExpenseTrackerWebPartProps> {\n  public render(): void {\n    this.domElement.innerHTML = '';\n    const host = document.createElement('div');\n    host.className = 'ranch-expense-tracker-spfx-host';\n    this.domElement.appendChild(host);\n    const shadow = host.attachShadow({ mode: 'open' });\n    shadow.innerHTML = '<style>' + appCss + '</style>' + appHtml;\n    initializeRanchExpenseTracker(shadow);\n  }\n  protected onDispose(): void { this.domElement.innerHTML = ''; }\n}\n`);
 
-const manifest = JSON.parse(mustRead(manifestFile));
+const manifest = parseJsonc(manifestFile);
 manifest.supportedHosts = ['SharePointWebPart', 'SharePointFullPage'];
 if (Array.isArray(manifest.preconfiguredEntries) && manifest.preconfiguredEntries[0]) {
   const entry = manifest.preconfiguredEntries[0];
@@ -75,7 +82,7 @@ if (Array.isArray(manifest.preconfiguredEntries) && manifest.preconfiguredEntrie
 write(manifestFile, JSON.stringify(manifest, null, 2) + '\n');
 
 const packageSolutionFile = path.join(spfxDir, 'config', 'package-solution.json');
-const packageSolution = JSON.parse(mustRead(packageSolutionFile));
+const packageSolution = parseJsonc(packageSolutionFile);
 packageSolution.solution = packageSolution.solution || {};
 packageSolution.solution.name = 'ranch-expense-tracker-sharepoint-client-side-solution';
 packageSolution.solution.includeClientSideAssets = true;
