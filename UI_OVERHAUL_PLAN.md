@@ -10,12 +10,12 @@ This branch modernizes the existing employee experience without replacing Supaba
 - Validate existing employee workflows before promotion.
 
 ## Work order
-1. Shared design tokens and motion foundation
-2. App shell / responsive navigation
-3. Employee dashboard hierarchy
-4. Add Expense side-sheet / mobile bottom-sheet experience
-5. Expense and report detail scanning
-6. Receipt upload/viewer polish
-7. Empty/loading/error/success states
-8. Responsive and accessibility pass
-9. Regression validation
+1. Shared design tokens and motion foundation — implemented
+2. App shell / responsive navigation — implemented
+3. Employee dashboard hierarchy — implemented
+4. Add Expense side-sheet / mobile bottom-sheet experience — implemented
+5. Expense and report detail scanning — implemented
+6. Receipt upload/viewer polish — implemented
+7. Empty/loading/error/success states — implemented
+8. Responsive and accessibility pass — implemented
+9. Regression validation — in progress
