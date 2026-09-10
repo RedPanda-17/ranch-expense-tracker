@@ -13,45 +13,56 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ui-overhaul-premium
-      - name: Apply idempotency and accessibility fixes
+      - name: Apply final presentation safeguards
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
-          p=Path('ui-premium.js')
-          t=p.read_text(encoding='utf-8')
-          old="""    const target = card.querySelector('.ui-recent-list');
-    if (!target) return;
-    const expenses = [...historyList.querySelectorAll('.expense-item')].slice(0, 3);
-    if (!expenses.length) {
-      target.innerHTML = '<div class=\"empty-state\">Your latest expenses will appear here as you add them.</div>';
-      return;
-    }
-    target.replaceChildren(...expenses.map(cloneExpenseForDashboard));
-"""
-          new="""    const target = card.querySelector('.ui-recent-list');
-    if (!target) return;
-    const expenses = [...historyList.querySelectorAll('.expense-item')].slice(0, 3);
-    const signature = expenses.map(expense => (expense.textContent || '').replace(/\\s+/g, ' ').trim()).join('|');
-    if (target.dataset.uiSignature === signature) return;
-    target.dataset.uiSignature = signature;
-    if (!expenses.length) {
-      target.innerHTML = '<div class=\"empty-state\">Your latest expenses will appear here as you add them.</div>';
-      return;
-    }
-    target.replaceChildren(...expenses.map(cloneExpenseForDashboard));
-"""
-          if old not in t:
-              raise SystemExit('Recent-expense target block not found')
-          t=t.replace(old,new,1)
-          p.write_text(t,encoding='utf-8')
-
           p=Path('ui-premium.css')
           t=p.read_text(encoding='utf-8')
-          t=t.replace("#add.view.active {\n  transform: translateX(0);", "#add.view[aria-hidden=\"true\"] { visibility: hidden; }\n#add.view.active {\n  visibility: visible;\n  transform: translateX(0);", 1)
-          t=t.replace("  .expense-item.ui-collapsed .expense-meta,\n  .expense-item.ui-collapsed .expense-purpose,", "  .expense-item.ui-collapsed .expense-purpose,", 1)
-          t += '''\n#saveExpenseButton.ui-saving{position:relative;padding-right:40px;}\n#saveExpenseButton.ui-saving::after{content:\"\";position:absolute;right:15px;top:50%;width:14px;height:14px;margin-top:-7px;border:2px solid rgba(255,255,255,.42);border-top-color:#fff;border-radius:50%;animation:uiSpin .7s linear infinite;}\n@keyframes uiSpin{to{transform:rotate(360deg)}}\n'''
-          p.write_text(t,encoding='utf-8')
+          additions=[]
+          if '#add.view[aria-hidden="true"]' not in t:
+              additions.append('''
+/* Keep the off-canvas form out of the accessibility/interaction surface while closed. */
+#add.view[aria-hidden="true"] { visibility: hidden; }
+#add.view.active { visibility: visible; }
+''')
+          if '.ui-expense-mobile-meta-override' not in t:
+              additions.append('''
+/* Keep date + receipt state scannable even when mobile expense details are collapsed. */
+@media (max-width: 760px) {
+  .expense-item.ui-collapsed .expense-meta.ui-expense-mobile-meta-override { display: block; }
+}
+''')
+          if '#saveExpenseButton.ui-saving::after' not in t:
+              additions.append('''
+#saveExpenseButton.ui-saving { position: relative; padding-right: 40px; }
+#saveExpenseButton.ui-saving::after {
+  content: "";
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  border: 2px solid rgba(255,255,255,.42);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: uiSpin .7s linear infinite;
+}
+@keyframes uiSpin { to { transform: rotate(360deg); } }
+''')
+          if additions:
+              p.write_text(t+'\n'+''.join(additions), encoding='utf-8')
+          
+          p=Path('ui-premium.js')
+          j=p.read_text(encoding='utf-8')
+          marker="container.querySelectorAll('.expense-item').forEach(card => {"
+          replacement="container.querySelectorAll('.expense-item').forEach(card => {\n      card.querySelector('.expense-meta')?.classList.add('ui-expense-mobile-meta-override');"
+          if 'ui-expense-mobile-meta-override' not in j:
+              if marker not in j: raise SystemExit('Expense enhancement marker not found')
+              j=j.replace(marker,replacement,1)
+              p.write_text(j,encoding='utf-8')
           PY
       - name: Syntax check interaction layer
         run: node --check ui-premium.js
