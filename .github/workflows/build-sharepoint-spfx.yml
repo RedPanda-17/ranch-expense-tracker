@@ -40,7 +40,6 @@ jobs:
             --component-alias RanchExpenseTracker \
             --component-description "Ranch Expense Tracker employee portal" \
             --solution-name ranch-expense-tracker-sharepoint \
-            --spfx-version 1.23.2 \
             --target-dir sharepoint-spfx \
             --package-manager npm
 
