@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Ranch Expense Tracker — SharePoint Employee Parity Mock</title>
   <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="parity-polish.css">
 </head>
 <body>
   <div class="m365-bar">
@@ -153,7 +154,7 @@
             <div id="readinessSummary" class="readiness-summary"></div><div id="readinessIssues" class="issue-list"></div>
             <div class="report-total-box"><span>Selected total</span><strong id="currentReportTotal">$0.00</strong></div>
             <div class="stacked-actions"><button id="downloadDraftPdfButton" class="primary" type="button">Download PDF</button><button id="downloadCurrentCsvButton" class="secondary" type="button">Download CSV</button><button id="finalizeReportButton" class="success-button" type="button">Finalize Report</button></div>
-            <p class="sidebar-note">The CSV works in this prototype. PDF generation is the next parity item to port from the current employee app.</p>
+            <p class="sidebar-note">Download the PDF as a single file, then open or print it from your device, or attach it manually to an email. Finalizing saves a copy under Past Reports and locks the submitted expenses.</p>
           </section>
         </aside>
       </div>
@@ -215,5 +216,6 @@
   <datalist id="savedPeopleList"></datalist><datalist id="savedOrganizationsList"></datalist><datalist id="savedLocationsList"></datalist><datalist id="savedVehiclesList"></datalist><datalist id="savedTagsList"></datalist>
   <footer class="site-footer">Ranch Expense Tracker · SharePoint employee parity prototype · Sample data only</footer>
   <script src="app.js"></script>
+  <script src="parity-polish.js"></script>
 </body>
 </html>
