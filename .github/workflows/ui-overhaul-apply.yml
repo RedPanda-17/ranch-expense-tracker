@@ -1,0 +1,55 @@
+name: Apply premium UI layer
+on:
+  push:
+    branches: [ui-overhaul-premium]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: ${{ !contains(github.event.head_commit.message, '[ui-apply]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ui-overhaul-premium
+      - name: Inject isolated premium assets
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('index.html')
+          text=path.read_text(encoding='utf-8')
+          css='  <link rel="stylesheet" href="ui-premium.css?v=2.2-preview">\n'
+          js='  <script src="ui-premium.js?v=2.2-preview"></script>\n'
+          if 'ui-premium.css' not in text:
+              assert '</head>' in text
+              text=text.replace('</head>', css+'</head>', 1)
+          if 'ui-premium.js' not in text:
+              assert '</body>' in text
+              text=text.replace('</body>', js+'</body>', 1)
+          path.write_text(text, encoding='utf-8')
+          assert text.count('ui-premium.css') == 1
+          assert text.count('ui-premium.js') == 1
+          print('Premium presentation assets are wired once; core inline app logic remains in place.')
+          PY
+      - name: Static guardrails
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          t=Path('index.html').read_text(encoding='utf-8')
+          required=['const APP_VERSION = "2.1.2"','const FIXED_MILEAGE_RATE = 0.40','SUPABASE_URL','ranchCloudReceiptLoader','function saveExpense(','function finalizeCurrentReport(','function openReceiptBlob(']
+          missing=[x for x in required if x not in t]
+          if missing: raise SystemExit('Missing preserved contracts: '+', '.join(missing))
+          print('Preserved app/version/mileage/auth/storage/report/receipt contracts.')
+          PY
+      - name: Commit wiring
+        shell: bash
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Apply premium UI assets [ui-apply]"
+          git push origin HEAD:ui-overhaul-premium
