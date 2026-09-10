@@ -1,0 +1,80 @@
+name: Build SharePoint SPFx package
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'sharepoint-employee/**'
+      - 'scripts/build-sharepoint-spfx-source.mjs'
+      - '.github/workflows/build-sharepoint-spfx.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+
+      - name: Install SPFx CLI
+        run: npm install --global @microsoft/spfx-cli
+
+      - name: Scaffold SPFx 1.23.2 project
+        run: |
+          rm -rf sharepoint-spfx sharepoint-spfx-package
+          spfx create \
+            --template webpart-noframework \
+            --library-name ranch-expense-tracker-sharepoint \
+            --component-name "Ranch Expense Tracker" \
+            --component-alias RanchExpenseTracker \
+            --component-description "Ranch Expense Tracker employee portal" \
+            --solution-name ranch-expense-tracker-sharepoint \
+            --spfx-version 1.23.2 \
+            --target-dir sharepoint-spfx \
+            --package-manager npm
+
+      - name: Convert Ranch employee prototype into SPFx web part
+        run: node scripts/build-sharepoint-spfx-source.mjs
+
+      - name: Build production bundle
+        working-directory: sharepoint-spfx
+        run: npx heft build --clean --production
+
+      - name: Package solution
+        working-directory: sharepoint-spfx
+        run: npx heft package-solution --production
+
+      - name: Copy deployable package
+        run: |
+          mkdir -p sharepoint-spfx-package
+          cp sharepoint-spfx/sharepoint/solution/ranch-expense-tracker-sharepoint.sppkg sharepoint-spfx-package/ranch-expense-tracker-sharepoint-1.0.0.sppkg
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ranch-expense-tracker-sharepoint-spfx
+          path: sharepoint-spfx-package/ranch-expense-tracker-sharepoint-1.0.0.sppkg
+          if-no-files-found: error
+
+      - name: Commit generated SPFx source and package
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sharepoint-spfx sharepoint-spfx-package
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+          else
+            git commit -m "Build Ranch Expense Tracker SharePoint package [skip ci]"
+            git push origin HEAD:main
+          fi
