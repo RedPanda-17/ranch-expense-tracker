@@ -19,10 +19,41 @@ function mustRead(file) {
   return fs.readFileSync(file, 'utf8');
 }
 
+function stripJsonComments(source) {
+  let out = '';
+  let inString = false;
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
+  for (let i = 0; i < source.length; i += 1) {
+    const ch = source[i];
+    const next = source[i + 1];
+    if (lineComment) {
+      if (ch === '\n') { lineComment = false; out += ch; }
+      continue;
+    }
+    if (blockComment) {
+      if (ch === '*' && next === '/') { blockComment = false; i += 1; }
+      else if (ch === '\n') out += ch;
+      continue;
+    }
+    if (inString) {
+      out += ch;
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') { inString = true; out += ch; continue; }
+    if (ch === '/' && next === '/') { lineComment = true; i += 1; continue; }
+    if (ch === '/' && next === '*') { blockComment = true; i += 1; continue; }
+    out += ch;
+  }
+  return out;
+}
+
 function parseJsonc(file) {
-  const source = mustRead(file)
-    .replace(/^\s*\/\/.*$/gm, '')
-    .replace(/\/\*[\s\S]*?\*\//g, '');
+  const source = stripJsonComments(mustRead(file)).replace(/,(\s*[}\]])/g, '$1');
   return JSON.parse(source);
 }
 
