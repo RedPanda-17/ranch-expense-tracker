@@ -617,6 +617,7 @@ input[type="date"]::-webkit-date-and-time-value{
   }
 }
 </style>
+  <link rel="stylesheet" href="ui-premium.css?v=2.2-preview">
 </head>
 <body>
   <div id="ranchStartupUpdate" role="status" aria-live="polite" aria-label="Ranch Expense Tracker startup status">
@@ -5677,5 +5678,6 @@ try{expenses=mergeById(expenses,legacy.expenses,"updatedAt");reports=mergeById(r
 let queued=false;const check=()=>{if(queued)return;queued=true;setTimeout(()=>{queued=false;migrate()},250)};new MutationObserver(check).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:["hidden"]});window.addEventListener("focus",check);document.addEventListener("DOMContentLoaded",check,{once:true});setTimeout(check,1200);
 })();
 </script>
+  <script src="ui-premium.js?v=2.2-preview"></script>
 </body>
 </html>
