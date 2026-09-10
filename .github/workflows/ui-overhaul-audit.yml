@@ -15,35 +15,43 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re, json
-          text=Path('index.html').read_text(encoding='utf-8')
-          print('=== FILES ===')
-          for p in sorted(Path('.').iterdir(), key=lambda p:p.name.lower()): print(p.name)
-          print('\n=== INDEX SUMMARY ===')
-          print('lines', text.count('\n')+1, 'bytes', len(text.encode()))
+          import re
+          lines=Path('index.html').read_text(encoding='utf-8').splitlines()
+          text='\n'.join(lines)
+          print('=== INDEX SUMMARY ===')
+          print('lines', len(lines), 'bytes', len(text.encode()))
           print('external scripts', re.findall(r'<script[^>]+src=["\']([^"\']+)', text, re.I))
           print('external styles', re.findall(r'<link[^>]+href=["\']([^"\']+\.css[^"\']*)', text, re.I))
-          print('\n=== VIEWS / MAJOR SECTIONS ===')
-          for m in re.finditer(r'<(?:section|main|div)[^>]+(?:id=["\']([^"\']+)["\'])[^>]*>', text, re.I):
-              tag=m.group(0)
-              if any(k in tag.lower() for k in ['view','dashboard','report','expense','settings','auth','receipt']): print(tag[:260])
-          print('\n=== NAV BUTTONS ===')
-          for m in re.finditer(r'<button[^>]+class=["\'][^"\']*nav-btn[^"\']*["\'][^>]*>[\s\S]*?</button>', text, re.I): print(re.sub(r'\s+',' ',m.group(0))[:400])
-          print('\n=== FUNCTIONS (selected) ===')
-          funcs=re.findall(r'(?:async\s+)?function\s+([A-Za-z0-9_$]+)\s*\(', text)
-          for f in funcs:
-              if any(k in f.lower() for k in ['render','expense','report','receipt','auth','sync','view','pdf','csv','save','submit','delete','edit','modal','toast']): print(f)
-          print('\n=== ID CATALOG ===')
-          ids=[]
-          for x in re.findall(r'\bid=["\']([^"\']+)["\']', text):
-              if x not in ids: ids.append(x)
-          print('\n'.join(ids))
-          print('\n=== CLASSES (top frequency) ===')
-          classes=[]
-          for v in re.findall(r'\bclass=["\']([^"\']+)["\']', text): classes.extend(v.split())
-          from collections import Counter
-          for c,n in Counter(classes).most_common(120): print(n,c)
-          print('\n=== SUPABASE / AUTH REFERENCES ===')
-          for i,line in enumerate(text.splitlines(),1):
-              if any(k in line.lower() for k in ['supabase','createclient','signina','auth.','storage.from','from("expenses','from(\'expenses']): print(f'{i}: {line[:300]}')
+          print('\n=== SECTION LINE NUMBERS ===')
+          for i,line in enumerate(lines,1):
+              if '<section id=' in line or '<nav ' in line or '<header ' in line or '<div id="receiptViewer"' in line:
+                  print(f'{i}: {line.strip()}')
+          def snippet(label, needle, before=8, after=65):
+              print(f'\n=== {label} ===')
+              for i,line in enumerate(lines):
+                  if needle in line:
+                      s=max(0,i-before); e=min(len(lines),i+after)
+                      for j in range(s,e): print(f'{j+1}: {lines[j]}')
+                      return
+              print('NOT FOUND')
+          snippet('DASHBOARD MARKUP','<section id="dashboard"',3,90)
+          snippet('ADD EXPENSE MARKUP','<section id="add"',3,150)
+          snippet('CURRENT REPORT MARKUP','<section id="current"',3,150)
+          snippet('HISTORY MARKUP','<section id="history"',3,95)
+          snippet('PAST REPORTS MARKUP','<section id="past"',3,80)
+          snippet('SETTINGS MARKUP','<section id="settings"',3,100)
+          snippet('RECEIPT VIEWER','<div id="receiptViewer"',3,85)
+          snippet('showView','function showView(',5,70)
+          snippet('showToast','function showToast(',5,50)
+          snippet('expenseCardHtml','function expenseCardHtml(',5,120)
+          snippet('renderDashboard','function renderDashboard(',5,120)
+          snippet('renderCurrentReport','function renderCurrentReport(',5,180)
+          snippet('renderHistory','function renderHistory(',5,100)
+          snippet('renderPastReports','function renderPastReports(',5,130)
+          snippet('saveExpense','async function saveExpense(',5,170)
+          snippet('renderInlineReceiptPreview','function renderInlineReceiptPreview(',5,100)
+          snippet('openReceiptBlob','function openReceiptBlob(',5,100)
+          print('\n=== CSS MEDIA QUERIES ===')
+          for i,line in enumerate(lines,1):
+              if '@media' in line: print(f'{i}: {line.strip()}')
           PY
