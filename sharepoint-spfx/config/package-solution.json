@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "ranch-expense-tracker-sharepoint-client-side-solution",
+    "id": "1bb89302-f757-477b-b3c5-e2abe2a88cf3",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": false,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.22.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "Ranch Expense Tracker employee portal"
+      },
+      "longDescription": {
+        "default": "Ranch Expense Tracker employee portal"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "ranch-expense-tracker-sharepoint Feature",
+        "description": "The feature that activates elements of the ranch-expense-tracker-sharepoint solution.",
+        "id": "529a9085-0cf1-4529-86fe-4c99e6c37e63",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/ranch-expense-tracker-sharepoint.sppkg"
+  }
+}

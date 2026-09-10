@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "21c27fa2-78ac-401b-870e-3b007afb995f",
+  "alias": "RanchExpenseTrackerWebPart",
+  "componentType": "WebPart",
+  "version": "*",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": [
+    "SharePointWebPart",
+    "SharePointFullPage"
+  ],
+  "supportsThemeVariants": true,
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+      "group": {
+        "default": "Advanced"
+      },
+      "title": {
+        "default": "Ranch Expense Tracker"
+      },
+      "description": {
+        "default": "Pizza Ranch employee business expense and mileage tracker"
+      },
+      "officeFabricIconFontName": "Page",
+      "properties": {
+        "description": "Ranch Expense Tracker"
+      }
+    }
+  ]
+}
