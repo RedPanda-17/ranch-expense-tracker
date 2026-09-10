@@ -3,13 +3,12 @@
 (() => {
   'use strict';
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobile = window.matchMedia('(max-width: 760px)');
   let lastNonAddView = 'dashboard';
   let returnFocus = null;
   let enhanceFrame = 0;
 
-  const svg = (paths, viewBox = '0 0 24 24') => `<svg viewBox="${viewBox}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+  const svg = paths => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
   const icons = {
     dashboard: svg('<path d="M4 13h6V4H4v9Z"/><path d="M14 20h6V11h-6v9Z"/><path d="M4 20h6v-3H4v3Z"/><path d="M14 7h6V4h-6v3Z"/>'),
     add: svg('<path d="M12 5v14M5 12h14"/>'),
@@ -67,8 +66,8 @@
   }
 
   function moneyValue(text) {
-    const number = Number(String(text || '').replace(/[^0-9.-]/g, ''));
-    return Number.isFinite(number) ? number : 0;
+    const value = Number(String(text || '').replace(/[^0-9.-]/g, ''));
+    return Number.isFinite(value) ? value : 0;
   }
 
   function enhanceDashboardSummary() {
@@ -85,8 +84,8 @@
         track.innerHTML = '<span class="ui-category-fill"></span>';
         row.appendChild(track);
       }
-      const value = moneyValue(row.querySelector('strong')?.textContent);
       const fill = track.querySelector('.ui-category-fill');
+      const value = moneyValue(row.querySelector('strong')?.textContent);
       fill?.style.setProperty('--ui-fill', `${Math.max(4, Math.round((value / max) * 100))}%`);
     });
   }
@@ -114,13 +113,19 @@
           <button class="text-button ui-view-all-expenses" type="button">View all →</button>
         </div>
         <div class="ui-recent-list"></div>`;
-      card.querySelector('.ui-view-all-expenses')?.addEventListener('click', () => window.showView?.('history'));
+      card.querySelector('.ui-view-all-expenses')?.addEventListener('click', () => {
+        if (typeof window.showView === 'function') window.showView('history');
+      });
       anchor.insertAdjacentElement('afterend', card);
     }
 
     const target = card.querySelector('.ui-recent-list');
     if (!target) return;
     const expenses = [...historyList.querySelectorAll('.expense-item')].slice(0, 3);
+    const signature = expenses.map(expense => (expense.textContent || '').replace(/\s+/g, ' ').trim()).join('|');
+    if (target.dataset.uiSignature === signature) return;
+    target.dataset.uiSignature = signature;
+
     if (!expenses.length) {
       target.innerHTML = '<div class="empty-state">Your latest expenses will appear here as you add them.</div>';
       return;
@@ -176,11 +181,11 @@
     );
     const summary = document.getElementById('selectionSummary')?.textContent || '';
     const selectionMatch = summary.match(/(\d+)\s+of\s+\d+\s+expenses selected/i);
-    const expenseDone = Number(selectionMatch?.[1] || 0) > 0;
+    const expensesDone = Number(selectionMatch?.[1] || 0) > 0;
     const badge = document.getElementById('readinessBadge');
     const readyDone = Boolean(badge && !badge.classList.contains('blocked') && /ready/i.test(badge.textContent || ''));
     steps.querySelector('[data-step="details"]')?.classList.toggle('is-done', detailsDone);
-    steps.querySelector('[data-step="expenses"]')?.classList.toggle('is-done', expenseDone);
+    steps.querySelector('[data-step="expenses"]')?.classList.toggle('is-done', expensesDone);
     steps.querySelector('[data-step="ready"]')?.classList.toggle('is-done', readyDone);
   }
 
@@ -252,7 +257,7 @@
       if (!file) return;
       const allowed = file.type.startsWith('image/') || file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
       if (!allowed) {
-        window.showToast?.('Choose an image or PDF receipt.', 'error');
+        if (typeof window.showToast === 'function') window.showToast('Choose an image or PDF receipt.', 'error');
         return;
       }
       try {
@@ -325,15 +330,14 @@
     }, true);
 
     const toast = document.getElementById('toast');
-    if (toast) {
-      new MutationObserver(() => {
-        if (!toast.classList.contains('show')) return;
-        if (/saved|finalized|updated|created/i.test(toast.textContent || '')) {
-          button.classList.add('ui-saved-pulse');
-          setTimeout(() => button.classList.remove('ui-saved-pulse'), 720);
-        }
-      }).observe(toast, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['class'] });
-    }
+    if (!toast) return;
+    new MutationObserver(() => {
+      if (!toast.classList.contains('show')) return;
+      if (/saved|finalized|updated|created/i.test(toast.textContent || '')) {
+        button.classList.add('ui-saved-pulse');
+        setTimeout(() => button.classList.remove('ui-saved-pulse'), 720);
+      }
+    }).observe(toast, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['class'] });
   }
 
   function setupMutationEnhancement() {
@@ -347,7 +351,13 @@
       document.getElementById('add')
     ].filter(Boolean);
     const observer = new MutationObserver(scheduleEnhance);
-    watched.forEach(node => observer.observe(node, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class', 'hidden'] }));
+    watched.forEach(node => observer.observe(node, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['class', 'hidden']
+    }));
 
     ['reportTitle', 'reportPeriodStart', 'reportPeriodEnd'].forEach(id => {
       document.getElementById(id)?.addEventListener('input', enhanceReadiness);
