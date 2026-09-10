@@ -1,0 +1,49 @@
+name: UI overhaul audit
+on:
+  push:
+    branches: [ui-overhaul-premium]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect application structure
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, json
+          text=Path('index.html').read_text(encoding='utf-8')
+          print('=== FILES ===')
+          for p in sorted(Path('.').iterdir(), key=lambda p:p.name.lower()): print(p.name)
+          print('\n=== INDEX SUMMARY ===')
+          print('lines', text.count('\n')+1, 'bytes', len(text.encode()))
+          print('external scripts', re.findall(r'<script[^>]+src=["\']([^"\']+)', text, re.I))
+          print('external styles', re.findall(r'<link[^>]+href=["\']([^"\']+\.css[^"\']*)', text, re.I))
+          print('\n=== VIEWS / MAJOR SECTIONS ===')
+          for m in re.finditer(r'<(?:section|main|div)[^>]+(?:id=["\']([^"\']+)["\'])[^>]*>', text, re.I):
+              tag=m.group(0)
+              if any(k in tag.lower() for k in ['view','dashboard','report','expense','settings','auth','receipt']): print(tag[:260])
+          print('\n=== NAV BUTTONS ===')
+          for m in re.finditer(r'<button[^>]+class=["\'][^"\']*nav-btn[^"\']*["\'][^>]*>[\s\S]*?</button>', text, re.I): print(re.sub(r'\s+',' ',m.group(0))[:400])
+          print('\n=== FUNCTIONS (selected) ===')
+          funcs=re.findall(r'(?:async\s+)?function\s+([A-Za-z0-9_$]+)\s*\(', text)
+          for f in funcs:
+              if any(k in f.lower() for k in ['render','expense','report','receipt','auth','sync','view','pdf','csv','save','submit','delete','edit','modal','toast']): print(f)
+          print('\n=== ID CATALOG ===')
+          ids=[]
+          for x in re.findall(r'\bid=["\']([^"\']+)["\']', text):
+              if x not in ids: ids.append(x)
+          print('\n'.join(ids))
+          print('\n=== CLASSES (top frequency) ===')
+          classes=[]
+          for v in re.findall(r'\bclass=["\']([^"\']+)["\']', text): classes.extend(v.split())
+          from collections import Counter
+          for c,n in Counter(classes).most_common(120): print(n,c)
+          print('\n=== SUPABASE / AUTH REFERENCES ===')
+          for i,line in enumerate(text.splitlines(),1):
+              if any(k in line.lower() for k in ['supabase','createclient','signina','auth.','storage.from','from("expenses','from(\'expenses']): print(f'{i}: {line[:300]}')
+          PY
